@@ -1,0 +1,30 @@
+---
+title: "In-class Exercise 2: Geospatial Data Wrangling"
+date: "`r Sys.Date()`"
+format: html
+execute: 
+  message: true
+  warning: false
+editor: visual
+---
+Installing and check packages (sf, tidyverse, funModeling)
+```{r}
+pacman::p_load(sf, tidyverse, funModeling)
+```
+
+Importing the geoNGA data 
+```{r}
+geoNGA = st_read(dsn = "data/geospatial/", 
+               layer = "geoBoundaries-NGA-ADM2")%>%
+  
+#because the values were in decimals and hence need to transform
+st_transform(crs = 26392)
+```
+
+Importing the NGA data 
+```{r}
+NGA <- st_read(dsn = "data/geospatial/", 
+               layer = "nga_admbnda_adm2_osgof_20190417")%>%
+  
+st_transform(crs = 26392)
+```
