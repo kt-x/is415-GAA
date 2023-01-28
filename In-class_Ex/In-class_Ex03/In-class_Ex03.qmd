@@ -16,15 +16,11 @@ editor: visual
 pacman::p_load(sf, tmap, tidyverse)
 ```
 
-
-
-
 ##Importing Data
+
 ```{r}
 NGA_wp <- read_rds("data/rds/NGA_wp.rds")
 ```
-
-
 
 ```{r}
 p1 <- tm_shape(NGA_wp) +
@@ -43,13 +39,11 @@ p1
 #tmap_arrange(p2, p1, nrow=1)
 ```
 
-
 ```{r}
 NGA_wp <- NGA_wp %>%
   mutate(pct_functional = wp_functional/total_wp) %>%
   mutate(pct_nonfunctional = wp_nonfunctional/total_wp)
 ```
-
 
 ```{r}
 tm_shape(NGA_wp) +
@@ -65,22 +59,21 @@ tm_shape(NGA_wp) +
 
 ```
 
+#Percentile Map #step 1; exclude records with NA
 
-#Percentile Map
-#step 1; exclude records with NA
 ```{r}
 NGA_wp <- NGA_wp %>%
   drop_na()
 ```
 
 #step 2 creating customised classification and extracting values
+
 ```{r}
 percent <- c(0, .01, .1, .5, .9, .99, 1)
 var <- NGA_wp["pct_functional"] %>%
   st_set_geometry(NULL)
 quantile(var[,1], percent)
 ```
-
 
 ```{r}
 get.var <- function(vname, df){
@@ -90,7 +83,6 @@ get.var <- function(vname, df){
   return(v)
 }
 ```
-
 
 ```{r}
 percentmap <- function(vname, df, legtitle=NA, mtitle="Percentile Map"){
@@ -115,11 +107,6 @@ percentmap <- function(vname, df, legtitle=NA, mtitle="Percentile Map"){
   
 ```
 
-
-
 ```{r}
 percentmap("pct_functional", NGA_wp)
 ```
-
-
-
