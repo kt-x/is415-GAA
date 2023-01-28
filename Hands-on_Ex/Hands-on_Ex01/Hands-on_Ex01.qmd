@@ -22,38 +22,36 @@ mpsz = st_read(dsn = "data/geospatial/MP14_SUBZONE_WEB_PL",
                layer = "MP14_SUBZONE_WEB_PL")
 ```
 
-
 ```{r}
 cyclingpath = st_read(dsn = "data/geospatial/CyclingPathGazette", 
                          layer = "CyclingPathGazette")
 ```
 
-#importing in KML format
+## Importing in KML format
 
 ```{r}
 preschool = st_read("data/geospatial/preschools-location.kml")
 ```
 
+## Checking the Content of A Simple Feature Data Frame
 
-##Checking the Content of A Simple Feature Data Frame
-
-#Working with st_geometry()
+### Working with st_geometry()
 
 ```{r}
 st_geometry(mpsz)
 ```
 
-#Working with glimpse()
+### Working with glimpse()
+
 ```{r}
 glimpse(mpsz)
 ```
 
-#Working with head()
+### Working with head()
+
 ```{r}
 head(mpsz, n=5)  
 ```
-
-
 
 ## Plotting the Geospatial Data
 
@@ -69,8 +67,7 @@ plot(st_geometry(mpsz))
 plot(mpsz["PLN_AREA_N"])
 ```
 
-##Working with Projection
-#Assigning EPSG code to a simple feature data frame
+## Working with Projection #Assigning EPSG code to a simple feature data frame
 
 ```{r}
 st_crs(mpsz)
@@ -84,7 +81,7 @@ mpsz3414 <- st_set_crs(mpsz, 3414)
 st_crs(mpsz3414)
 ```
 
-#Transforming the projection of preschool from wgs84 to svy21.
+## Transforming the projection of preschool from wgs84 to svy21.
 
 ```{r}
 preschool3414 <- st_transform(preschool, 
@@ -92,7 +89,8 @@ preschool3414 <- st_transform(preschool,
 preschool3414
 ```
 
-#Importing and Converting An Aspatial Data
+## Importing and Converting An Aspatial Data
+
 ```{r}
 listings <- read_csv("data/aspatial/listings.csv")
 ```
@@ -101,7 +99,8 @@ listings <- read_csv("data/aspatial/listings.csv")
 list(listings) 
 ```
 
-#Creating a simple feature data frame from an aspatial data frame
+## Creating a simple feature data frame from an aspatial data frame
+
 ```{r}
 listings_sf <- st_as_sf(listings, 
                        coords = c("longitude", "latitude"),
@@ -113,10 +112,9 @@ listings_sf <- st_as_sf(listings,
 glimpse(listings_sf)
 ```
 
+## Geoprocessing with sf package
 
-##Geoprocessing with sf package
-
-#Buffering
+### Buffering
 
 ```{r}
 buffer_cycling <- st_buffer(cyclingpath, 
@@ -131,7 +129,8 @@ buffer_cycling$AREA <- st_area(buffer_cycling)
 sum(buffer_cycling$AREA)
 ```
 
-#Point-in-polygon count
+### Point-in-polygon count
+
 ```{r}
 mpsz3414$`PreSch Count`<- lengths(st_intersects(mpsz3414, preschool3414))
 ```
@@ -154,12 +153,11 @@ mpsz3414 <- mpsz3414 %>%
   mutate(`PreSch Density` = `PreSch Count`/Area * 1000000)
 ```
 
+## Explorotary Data Analysis (EDA)
 
-##Explorotary Data Analysis (EDA)
 ```{r}
 hist(mpsz3414$`PreSch Density`)
 ```
-
 
 ```{r}
 ggplot(data=mpsz3414, 
@@ -173,7 +171,6 @@ ggplot(data=mpsz3414,
       y = "Frequency")
 ```
 
-
 ```{r}
 ggplot(data=mpsz3414, 
        aes(y = `PreSch Count`, 
@@ -186,11 +183,3 @@ ggplot(data=mpsz3414,
       x = "Pre-school density (per km sq)",
       y = "Pre-school count")
 ```
-
-
-
-
-
-
-
-
