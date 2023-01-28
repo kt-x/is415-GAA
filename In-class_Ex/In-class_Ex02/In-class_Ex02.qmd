@@ -33,7 +33,6 @@ NGA <- st_read(dsn = "data/geospatial/",
 st_transform(crs = 26392)
 ```
 
-
 ```{r}
 wp_nga <- read_csv("data/aspatial/WPdx.csv") %>%
   filter(`#clean_country_name` == "Nigeria")
@@ -51,24 +50,23 @@ wp_sf <- st_sf(wp_nga, crs=4326)
 wp_sf
 ```
 
-
 ```{r}
 wp_sf <- wp_sf %>%
   st_transform(crs = 26392)
 ```
 
 ##exclude redundant fields
+
 ```{r}
 NGA <- NGA %>%
   select(c(3:4, 8:9))
 ```
 
-
 ##check for duplicates
+
 ```{r}
 NGA$ADM2_EN[duplicated(NGA$ADM2_EN) == TRUE]
 ```
-
 
 ```{R}
 NGA$ADM2_EN[94] <- "Bassa, Kogi"
@@ -85,14 +83,12 @@ NGA$ADM2_EN[693] <- "Surulere, Lagos"
 NGA$ADM2_EN[694] <- "Surulere, Oyo"
 ```
 
-
-
 #Data wrangling
+
 ```{r}
 freq(data=wp_sf, 
      input='#status_clean')
 ```
-
 
 ```{r}
 wp_sf_nga <- wp_sf %>%
@@ -102,8 +98,8 @@ wp_sf_nga <- wp_sf %>%
     status_clean, "unknown"))
 ```
 
-
 ##extract data points
+
 ```{r}
 wp_functional <- wp_sf_nga %>%
   filter(status_clean %in%
@@ -111,7 +107,6 @@ wp_functional <- wp_sf_nga %>%
              "Functional but not in use", 
              "Functional but needs repair"))
 ```
-
 
 ```{r}
 wp_nonfunctional <- wp_sf_nga %>%
@@ -122,12 +117,10 @@ wp_nonfunctional <- wp_sf_nga %>%
              "Non-Functional"))
 ```
 
-
 ```{r}
 wp_unkown <- wp_sf_nga %>%
   filter(status_clean == "unknown")
 ```
-
 
 ```{r}
 NGA_wp <- NGA %>%
@@ -146,37 +139,27 @@ NGA_wp <- NGA %>%
 ```
 
 ##save
+
 ```{r}
 write_rds(NGA_wp, "data/rds/NGA_wp.rds")
 ```
 
-
 ##ggplot2
+
 ```{r}
-ggplot(data=NGA_wp,
-       aes(x=total_wp)) + 
-  geom_histogram(bins = 20,
+ggplot(data = NGA_wp,
+       aes(x = total_wp)) + 
+  geom_histogram(bins=20,
                  color="black",
-                 fill = "light blue") + 
+                 fill="light blue") +
   geom_vline(aes(xintercept=mean(
-    total_wp, na.rm=T
-  )),
-  color="red",
-  linetype="dashed",
-  size=0.8
-  ) +
-  ggtitle("Distribution of total water points by LGA") + 
-  xlab("No.of water points") + 
+    total_wp, na.rm=T)),
+             color="red", 
+             linetype="dashed", 
+             size=0.8) +
+  ggtitle("Distribution of total water points by LGA") +
+  xlab("No. of water points") +
   ylab("No. of\nLGAs") +
-  theme(axix.title.y=element_text(angle = 0))
+  theme(axis.title.y=element_text(angle = 0))
+
 ```
-
-
-
-
-
-
-
-
-
-
