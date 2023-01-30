@@ -12,13 +12,13 @@ execute:
 editor: visual
 ---
 
-#Install and load packages
+# Install and load packages
 
 ```{r}
 pacman::p_load(maptools, sf, raster, spatstat, tmap)
 ```
 
-##Spatial Data Wrangling \# Importing the spatial data
+## Spatial Data Wrangling - Importing the spatial data
 
 ```{r}
 childcare_sf <- st_read("data/child-care-services-geojson.geojson") %>%
@@ -34,7 +34,7 @@ mpsz_sf <- st_read(dsn = "data",
                 layer = "MP14_SUBZONE_WEB_PL")
 ```
 
-##Mapping the geospatial data sets
+## Mapping the geospatial data sets
 
 ```{r}
 tmap_mode('view')
@@ -45,7 +45,7 @@ tm_shape(childcare_sf) + tm_dots()
 tmap_mode('plot')
 ```
 
-##Geospatial Data wrangling #Converting sf data frames to sp's Spatial\* class
+### Geospatial Data wrangling #Converting sf data frames to sp's Spatial\* class
 
 ```{r}
 childcare <- as_Spatial(childcare_sf)
@@ -65,7 +65,7 @@ mpsz
 sg
 ```
 
-##Converting the Spatial\* class into generic sp format
+### Converting the Spatial\* class into generic sp format
 
 ```{r}
 childcare_sp <- as(childcare, "SpatialPoints")
@@ -95,7 +95,7 @@ plot(childcare_ppp)
 summary(childcare_ppp)
 ```
 
-##Handling duplicated points
+### Handling duplicated points
 
 ```{r}
 any(duplicated(childcare_ppp))
@@ -120,7 +120,7 @@ tm_shape(childcare) +
 tmap_mode('plot')
 ```
 
-#jittering approach
+#### jittering approach
 
 ```{r}
 childcare_ppp_jit <- rjitter(childcare_ppp, 
@@ -133,7 +133,7 @@ childcare_ppp_jit <- rjitter(childcare_ppp,
 any(duplicated(childcare_ppp_jit))
 ```
 
-##Creating owin object
+### Creating owin object
 
 ```{r}
 sg_owin <- as(sg_sp, "owin")
@@ -147,7 +147,7 @@ plot(sg_owin)
 summary(sg_owin)
 ```
 
-##Combining point events object and owin object
+### Combining point events object and owin object
 
 ```{r}
 childcareSG_ppp = childcare_ppp[sg_owin]
@@ -157,7 +157,9 @@ childcareSG_ppp = childcare_ppp[sg_owin]
 summary(childcareSG_ppp)
 ```
 
-##First-order Spatial Point Patterns Analysis #Kernel Density Estimation \# Computing kernel density estimation using automatic bandwidth selection method
+# First-order Spatial Point Patterns Analysis
+
+#### #Kernel Density Estimation \# Computing kernel density estimation using automatic bandwidth selection method
 
 ```{r}
 kde_childcareSG_bw <- density(childcareSG_ppp,
@@ -175,7 +177,7 @@ bw <- bw.diggle(childcareSG_ppp)
 bw
 ```
 
-#Rescalling KDE values
+#### Rescalling KDE values
 
 ```{r}
 childcareSG_ppp.km <- rescale(childcareSG_ppp, 1000, "km")
@@ -186,7 +188,7 @@ kde_childcareSG.bw <- density(childcareSG_ppp.km, sigma=bw.diggle, edge=TRUE, ke
 plot(kde_childcareSG.bw)
 ```
 
-#Working with different automatic badwidth methods
+### Working with different automatic bandwidth methods
 
 ```{r}
  bw.CvL(childcareSG_ppp.km)
@@ -214,7 +216,7 @@ plot(kde_childcareSG.bw, main = "bw.diggle")
 plot(kde_childcareSG.ppl, main = "bw.ppl")
 ```
 
-##Working with different kernel methods
+### Working with different kernel methods
 
 ```{r}
 par(mfrow=c(2,2))
@@ -240,14 +242,14 @@ plot(density(childcareSG_ppp.km,
      main="Disc")
 ```
 
-##Computing KDE by using fixed bandwidth
+### Computing KDE by using fixed bandwidth
 
 ```{r}
 kde_childcareSG_600 <- density(childcareSG_ppp.km, sigma=0.6, edge=TRUE, kernel="gaussian")
 plot(kde_childcareSG_600)
 ```
 
-#Computing KDE by using adaptive bandwidth
+### Computing KDE by using adaptive bandwidth
 
 ```{r}
 kde_childcareSG_adaptive <- adaptive.density(childcareSG_ppp.km, method="kernel")
@@ -260,14 +262,14 @@ plot(kde_childcareSG.bw, main = "Fixed bandwidth")
 plot(kde_childcareSG_adaptive, main = "Adaptive bandwidth")
 ```
 
-##Converting KDE output into grid object
+### Converting KDE output into grid object
 
 ```{r}
 gridded_kde_childcareSG_bw <- as.SpatialGridDataFrame.im(kde_childcareSG.bw)
 spplot(gridded_kde_childcareSG_bw)
 ```
 
-#Converting gridded output into raster
+### Converting gridded output into raster
 
 ```{r}
 kde_childcareSG_bw_raster <- raster(gridded_kde_childcareSG_bw)
@@ -277,14 +279,14 @@ kde_childcareSG_bw_raster <- raster(gridded_kde_childcareSG_bw)
 kde_childcareSG_bw_raster
 ```
 
-#Assigning projection systems
+### Assigning projection systems
 
 ```{r}
 projection(kde_childcareSG_bw_raster) <- CRS("+init=EPSG:3414")
 kde_childcareSG_bw_raster
 ```
 
-##Visualising the output in tmap
+### Visualising the output in tmap
 
 ```{r}
 tm_shape(kde_childcareSG_bw_raster) + 
@@ -292,7 +294,7 @@ tm_shape(kde_childcareSG_bw_raster) +
   tm_layout(legend.position = c("right", "bottom"), frame = FALSE)
 ```
 
-#Comparing Spatial Point Patterns using KDE #Extracting study area
+### Comparing Spatial Point Patterns using KDE #Extracting study area
 
 ```{r}
 pg = mpsz[mpsz@data$PLN_AREA_N == "PUNGGOL",]
@@ -309,7 +311,7 @@ plot(ck, main = "Choa Chu Kang")
 plot(jw, main = "Jurong West")
 ```
 
-# Converting the spatial point data frame into generic sp format
+### Converting the spatial point data frame into generic sp format
 
 ```{r}
 pg_sp = as(pg, "SpatialPolygons")
@@ -318,7 +320,7 @@ ck_sp = as(ck, "SpatialPolygons")
 jw_sp = as(jw, "SpatialPolygons")
 ```
 
-#Creating owin object
+### Creating owin object
 
 ```{r}
 pg_owin = as(pg_sp, "owin")
@@ -327,7 +329,7 @@ ck_owin = as(ck_sp, "owin")
 jw_owin = as(jw_sp, "owin")
 ```
 
-# Combining childcare points and the study area
+### Combining childcare points and the study area
 
 ```{r}
 childcare_pg_ppp = childcare_ppp_jit[pg_owin]
@@ -351,7 +353,7 @@ plot(childcare_ck_ppp.km, main="Choa Chu Kang")
 plot(childcare_jw_ppp.km, main="Jurong West")
 ```
 
-#Computing KDE
+### Computing KDE
 
 ```{r}
 par(mfrow=c(2,2))
@@ -377,7 +379,7 @@ plot(density(childcare_jw_ppp.km,
      main="JUrong West")
 ```
 
-#Computing fixed bandwidth KDE
+### Computing fixed bandwidth KDE
 
 ```{r}
 par(mfrow=c(2,2))
@@ -405,7 +407,7 @@ plot(density(childcare_tm_ppp.km,
 
 ## Nearest Neighbour Analysis
 
-#Testing spatial point patterns using Clark and Evans Test
+### Testing spatial point patterns using Clark and Evans Test
 
 ```{r}
 clarkevans.test(childcareSG_ppp,
@@ -415,7 +417,7 @@ clarkevans.test(childcareSG_ppp,
                 nsim=99)
 ```
 
-#Clark and Evans Test: Choa Chu Kang planning area
+#### Clark and Evans Test: Choa Chu Kang planning area
 
 ```{r}
 clarkevans.test(childcare_ck_ppp,
@@ -425,7 +427,7 @@ clarkevans.test(childcare_ck_ppp,
                 nsim=999)
 ```
 
-#Clark and Evans Test: Tampines planning area
+#### Clark and Evans Test: Tampines planning area
 
 ```{r}
 clarkevans.test(childcare_tm_ppp,
@@ -435,4 +437,155 @@ clarkevans.test(childcare_tm_ppp,
                 nsim=999)
 ```
 
-# 2nd Order Spatial Point Patterns Analysis Methods
+# Second Order Spatial Point Patterns Analysis Methods
+
+## Analysing Spatial Point Process Using G-Function
+
+### Choa Chu Kang planning area Computing G-function estimation
+
+```{r}
+G_CK = Gest(childcare_ck_ppp, correction = "border")
+plot(G_CK, xlim=c(0,500))
+```
+
+### Performing Complete Spatial Randomness Test
+
+```{r}
+G_CK.csr <- envelope(childcare_ck_ppp, Gest, nsim = 999)
+```
+
+```{r}
+plot(G_CK.csr)
+```
+
+### Tampines planning area - Computing G-function estimation
+
+```{r}
+G_tm = Gest(childcare_tm_ppp, correction = "best")
+plot(G_tm)
+```
+
+### Performing Complete Spatial Randomness Test
+
+```{r}
+G_tm.csr <- envelope(childcare_tm_ppp, Gest, correction = "all", nsim = 999)
+```
+
+```{r}
+plot(G_tm.csr)
+```
+
+## Analysing Spatial Point Process Using F-Function 
+
+### Choa Chu Kang planning area
+
+```{r}
+F_CK = Fest(childcare_ck_ppp)
+plot(F_CK)
+```
+
+### Performing Complete Spatial Randomness Test Monte Carlo test with F-fucntion
+
+```{r}
+F_CK.csr <- envelope(childcare_ck_ppp, Fest, nsim = 999)
+```
+
+```{r}
+plot(F_CK.csr)
+```
+
+### Tampines planning area Computing F-function estimation
+
+```{r}
+F_tm = Fest(childcare_tm_ppp, correction = "best")
+plot(F_tm)
+```
+
+### Performing Complete Spatial Randomness Test
+
+```{r}
+F_tm.csr <- envelope(childcare_tm_ppp, Fest, correction = "all", nsim = 999)
+```
+
+```{r}
+plot(F_tm.csr)
+```
+
+## Analysing Spatial Point Process Using K-Function 
+
+### Choa Chu Kang planning area Computing K-fucntion estimate
+
+```{r}
+K_ck = Kest(childcare_ck_ppp, correction = "Ripley")
+plot(K_ck, . -r ~ r, ylab= "K(d)-r", xlab = "d(m)")
+```
+
+### Performing Complete Spatial Randomness Test
+
+```{r}
+K_ck.csr <- envelope(childcare_ck_ppp, Kest, nsim = 99, rank = 1, glocal=TRUE)
+```
+
+```{r}
+plot(K_ck.csr, . - r ~ r, xlab="d", ylab="K(d)-r")
+```
+
+### Tampines planning area Computing K-function estimation
+
+```{r}
+K_tm = Kest(childcare_tm_ppp, correction = "Ripley")
+plot(K_tm, . -r ~ r, 
+     ylab= "K(d)-r", xlab = "d(m)", 
+     xlim=c(0,1000))
+```
+
+### Performing Complete Spatial Randomness Test
+
+```{r}
+K_tm.csr <- envelope(childcare_tm_ppp, Kest, nsim = 99, rank = 1, glocal=TRUE)
+```
+
+```{r}
+plot(K_tm.csr, . - r ~ r, 
+     xlab="d", ylab="K(d)-r", xlim=c(0,500))
+```
+
+## Analysing Spatial Point Process Using L-Function 
+
+### Choa Chu Kang planning area Computing L Fucntion estimation
+
+```{r}
+L_ck = Lest(childcare_ck_ppp, correction = "Ripley")
+plot(L_ck, . -r ~ r, 
+     ylab= "L(d)-r", xlab = "d(m)")
+```
+
+### Performing Complete Spatial Randomness Test
+
+```{r}
+L_ck.csr <- envelope(childcare_ck_ppp, Lest, nsim = 99, rank = 1, glocal=TRUE)
+```
+
+```{r}
+plot(L_ck.csr, . - r ~ r, xlab="d", ylab="L(d)-r")
+```
+
+### Tampines planning area Computing L-function estimate
+
+```{r}
+L_tm = Lest(childcare_tm_ppp, correction = "Ripley")
+plot(L_tm, . -r ~ r, 
+     ylab= "L(d)-r", xlab = "d(m)", 
+     xlim=c(0,1000))
+```
+
+### Performing Complete Spatial Randomness Test
+
+```{r}
+L_tm.csr <- envelope(childcare_tm_ppp, Lest, nsim = 99, rank = 1, glocal=TRUE)
+```
+
+```{r}
+plot(L_tm.csr, . - r ~ r, 
+     xlab="d", ylab="L(d)-r", xlim=c(0,500))
+```
