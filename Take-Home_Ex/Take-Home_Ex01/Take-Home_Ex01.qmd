@@ -1,0 +1,45 @@
+---
+title: "Take-Home Exercise 1"
+date: "30 Jan 2023"
+date-modified: "`r Sys.Date()`"
+number-sections: true
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: visual
+---
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
