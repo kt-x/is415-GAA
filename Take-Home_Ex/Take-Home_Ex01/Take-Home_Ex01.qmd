@@ -11,8 +11,84 @@ execute:
 editor: visual
 ---
 
-```{r}
+# Overview
 
+## Context
+
+Water is an essential resource for people. The health of people depends on having access to clean water. It ensures peace and security, a clean environment, a sustainable economy, and a reduction in poverty. Yet more than 40% of the world's population lacks access to enough clean water. According to UN-Water, 1.8 billion people will be residing in nations or areas with a severe water shortage by 2025. Water scarcity is a serious threat to several sectors, including food security. Around 70% of the world's freshwater resources are used for agriculture.
+
+## Objectives
+
+Discover the geographical distribution of functional and non-function water points and their co-locations if any in Osun State, Nigeria.
+
+## Data
+
+| Type       | Name          | Format | Description                   | Source                        |
+|---------------|---------------|---------------|---------------|---------------|
+| Aspatial   | WPdx+         | csv    | Locations of water points     | WPdx Global Data Repositories |
+| Geospatial | geoBoundaries | SHP    | geoBoundaries data of Nigeria | geoBoundaries                 |
+| 1          | 1             | 1      | 1                             | 1                             |
+
+: Table 1: Data used
+
+# Importing and loading packages
+
+For this exercise, we'll be using the following packages: 
+
+
+\| Name \| Description \| \|------\|-------------\| \| sf \| Manage and process vector-based geospatial data in R. \| \| spatstat \| Perform 1st & 2nd spatial point patterns analysis + kernel density \| \| raster \| Reads, writes, manipulates, analyses, model of grid spatial data convert image output generate by spatstat into raster format \| \| maptools \| convert Spatial objects into ppp format of spatstat \| \| tmap \| plotting cartographic quality static point patterns maps or interactive maps by using leaflet API \| \| 1 \| 1 \|
+
+: Table 2: Packages used
+
+-   sf manage and process vector-based geospatial data in R.
+
+-   spatstat, which has a wide range of useful functions for point pattern analysis. In this hands-on exercise, it will be used to perform 1st- and 2nd-order spatial point patterns analysis and derive kernel density estimation (KDE) layer.
+
+-   raster which reads, writes, manipulates, analyses, model of gridded spatial data and convert image output generate by spatstat into raster format.
+
+-   maptools which provides a set of tools for manipulating geographic data and converting Spatial objects into ppp format of spatstat.
+
+-   tmap which provides functions for plotting cartographic quality static point patterns maps or interactive maps by using leaflet API.
+
+-   tidyverse
+
+```{r}
+pacman::p_load(maptools, sf, raster, spatstat, tmap, tidyverse)
+```
+
+# Spatial Data Wrangling
+
+## Data Geospatial
+```{r}
+NGA <- st_read(dsn = "data/geospatial/", 
+               layer = "nga_admbnda_adm2_osgof_20190417")%>%
+  
+st_transform(crs = 26392)
+```
+
+
+## Aspatial
+```{r}
+wp_nga <- read_csv("data/aspatial/WPdx.csv") %>%
+  filter(`#clean_country_name` == "Nigeria")
+```
+
+### Convert water point data into sf point features
+```{r}
+wp_nga$Geometry = st_as_sfc(wp_nga$`New Georeferenced Column`)
+wp_nga
+```
+
+### convert this df into sf object
+```{r}
+wp_sf <- st_sf(wp_nga, crs=4326)
+wp_sf
+```
+
+### Transforming into Nigeria projected coordinate system
+```{r}
+wp_sf <- wp_sf %>%
+  st_transform(crs = 26392)
 ```
 
 
@@ -20,11 +96,12 @@ editor: visual
 
 
 
-
-
-
-
-
+## Mapping the geospatial dataset
+```{r}
+#tmap_mode('view')
+#tm_shape(wp_nga)+
+#  tm_dots()
+```
 
 
 

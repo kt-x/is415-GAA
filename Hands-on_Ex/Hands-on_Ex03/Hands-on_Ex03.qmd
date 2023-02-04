@@ -475,7 +475,7 @@ G_tm.csr <- envelope(childcare_tm_ppp, Gest, correction = "all", nsim = 999)
 plot(G_tm.csr)
 ```
 
-## Analysing Spatial Point Process Using F-Function 
+## Analysing Spatial Point Process Using F-Function
 
 ### Choa Chu Kang planning area
 
@@ -511,7 +511,7 @@ F_tm.csr <- envelope(childcare_tm_ppp, Fest, correction = "all", nsim = 999)
 plot(F_tm.csr)
 ```
 
-## Analysing Spatial Point Process Using K-Function 
+## Analysing Spatial Point Process Using K-Function
 
 ### Choa Chu Kang planning area Computing K-fucntion estimate
 
@@ -550,7 +550,7 @@ plot(K_tm.csr, . - r ~ r,
      xlab="d", ylab="K(d)-r", xlim=c(0,500))
 ```
 
-## Analysing Spatial Point Process Using L-Function 
+## Analysing Spatial Point Process Using L-Function
 
 ### Choa Chu Kang planning area Computing L Fucntion estimation
 
