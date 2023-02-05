@@ -35,22 +35,17 @@ Discover the geographical distribution of functional and non-function water poin
 
 For this exercise, we'll be using the following packages: 
 
-
-\| Name \| Description \| \|------\|-------------\| \| sf \| Manage and process vector-based geospatial data in R. \| \| spatstat \| Perform 1st & 2nd spatial point patterns analysis + kernel density \| \| raster \| Reads, writes, manipulates, analyses, model of grid spatial data convert image output generate by spatstat into raster format \| \| maptools \| convert Spatial objects into ppp format of spatstat \| \| tmap \| plotting cartographic quality static point patterns maps or interactive maps by using leaflet API \| \| 1 \| 1 \|
-
-: Table 2: Packages used
-
--   sf: Manage and process vector-based geospatial data in R.
+-   sf: Manage and process vector-based geospatial data in R
 
 -   spatstat: Perform 1st & 2nd spatial point patterns analysis + kernel density
 
--   raster which reads, writes, manipulates, analyses, model of gridded spatial data and convert image output generate by spatstat into raster format.
+-   raster: Reads, writes, manipulates, analyses, model of grid spatial data convert image output generate by spatstat into raster format 
 
--   maptools which provides a set of tools for manipulating geographic data and converting Spatial objects into ppp format of spatstat.
+-   maptools: Convert Spatial objects into ppp format of spatstat
 
--   tmap which provides functions for plotting cartographic quality static point patterns maps or interactive maps by using leaflet API.
+-   tmap: plotting cartographic quality static point patterns maps or interactive maps by using leaflet API
 
--   tidyverse
+-   tidyverse: 
 
 ```{r}
 pacman::p_load(maptools, sf, raster, spatstat, tmap, tidyverse)
@@ -59,6 +54,9 @@ pacman::p_load(maptools, sf, raster, spatstat, tmap, tidyverse)
 # Spatial Data Wrangling
 
 ## Data Geospatial
+
+::: panel-tabset
+#### Import NGA
 ```{r}
 NGA <- st_read(dsn = "data/geospatial/", 
                layer = "nga_admbnda_adm2_osgof_20190417")%>%
@@ -66,6 +64,11 @@ NGA <- st_read(dsn = "data/geospatial/",
 st_transform(crs = 26392)
 ```
 
+#### Glimpse NGA
+```{r}
+glimpse(NGA)
+```
+:::
 
 ## Aspatial
 ```{r}
@@ -121,11 +124,18 @@ NGA$ADM2_EN[694] <- "Surulere, Oyo"
 ```
 
 
-# EDA for Water Point Data
+### EDA for Water Point Data
 ```{r}
 #freq(data = wp_sf,
 #     input = '#status_clean')
 ```
+
+
+
+
+
+
+
 
 
 
@@ -144,62 +154,66 @@ tmap_mode('plot')
 # Geospatial Data wrangling
 
 ## Converting sf data frames to sp’s Spatial* class
+::: panel-tabset
+#### Code
 ```{r}
 wp_sc <- as_Spatial(wp_sf)
 NGA_sc <- as_Spatial(NGA)
 ```
 
-View the details
+#### wp_sc
 ```{r}
 wp_sc
 ```
-
+#### NGA_sc
 ```{r}
 NGA_sc
 ```
+:::
+
+
 
 ## Converting the Spatial* class into generic sp format
-
+::: panel-tabset
+#### Code
 ```{r}
 wp_sp <- as(wp_sc, "SpatialPoints")
 nga_sp <- as(NGA_sc, "SpatialPolygons")
 ```
 
-
+#### wp_sp
 ```{r}
 wp_sp
 ```
-
+#### nga_sp
 ```{r}
 nga_sp
 ```
-
+:::
 
 ## Converting the generic sp format into spatstat’s ppp format
+::: panel-tabset
+#### Code
 ```{r}
 wp_ppp <- as(wp_sp, "ppp")
 wp_ppp
 ```
 
-Plot and examine the difference
+#### Plot
 ```{r}
 plot(wp_ppp)
 ```
 
-Summary 
+#### Summary 
 ```{r}
 summary(wp_ppp)
 ```
-
+:::
 
 ## Handling duplicates
 ```{r}
 any(duplicated(wp_ppp))
 ```
-```{r}
-multiplicity(wp_ppp)
-```
-
 
 ```{r}
 sum(multiplicity(wp_ppp) > 1)
@@ -279,9 +293,27 @@ plot(kde_wpNGA.bw)
 ```
 
 
+### Compare the output of using bw.diggle and bw.ppl methods
+Baddeley et. (2016) suggested the use of the bw.ppl() algorithm because in ther experience it tends to produce the more appropriate values when the pattern consists predominantly of tight clusters. But they also insist that if the purpose of once study is to detect a single tight cluster in the midst of random noise then the bw.diggle() method seems to work best.
+```{r}
+kde_wpNGA.ppl <- density(wpNGA_ppp.km, 
+                               sigma=bw.ppl, 
+                               edge=TRUE,
+                               kernel="gaussian")
+par(mfrow=c(1,2))
+plot(kde_wpNGA.bw, main = "bw.diggle")
+plot(kde_wpNGA.ppl, main = "bw.ppl")
+```
 
 
+## Fixed and Adaptive KDE
 
+### Computing KDE by using adaptive bandwidth
+Fixed bandwidth method is very sensitive to highly skew distribution of spatial point patterns over geographical units for example urban versus rural. One way to overcome this problem is by using adaptive bandwidth instead.
+```{r}
+kde_wpNGA_adaptive <- adaptive.density(wpNGA_ppp.km, method="kernel")
+plot(kde_wpNGA_adaptive)
+```
 
 
 
