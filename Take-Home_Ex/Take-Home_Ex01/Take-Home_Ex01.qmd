@@ -40,9 +40,9 @@ For this exercise, we'll be using the following packages:
 
 : Table 2: Packages used
 
--   sf manage and process vector-based geospatial data in R.
+-   sf: Manage and process vector-based geospatial data in R.
 
--   spatstat, which has a wide range of useful functions for point pattern analysis. In this hands-on exercise, it will be used to perform 1st- and 2nd-order spatial point patterns analysis and derive kernel density estimation (KDE) layer.
+-   spatstat: Perform 1st & 2nd spatial point patterns analysis + kernel density
 
 -   raster which reads, writes, manipulates, analyses, model of gridded spatial data and convert image output generate by spatstat into raster format.
 
@@ -92,26 +92,191 @@ wp_sf <- wp_sf %>%
 ```
 
 
+### Data Cleaning
 
+#### Select specific fields 
+```{r}
+NGA <- NGA %>%
+  select(c(3:4, 8:9))
+```
+
+#### Check for duplicates
+```{r}
+NGA$ADM2_EN[duplicated(NGA$ADM2_EN)==TRUE]
+```
+Replace values
+```{r}
+NGA$ADM2_EN[94] <- "Bassa, Kogi"
+NGA$ADM2_EN[95] <- "Bassa, Plateau"
+NGA$ADM2_EN[304] <- "Ifelodun, Kwara"
+NGA$ADM2_EN[305] <- "Ifelodun, Osun"
+NGA$ADM2_EN[355] <- "Irepodun, Kwara"
+NGA$ADM2_EN[356] <- "Irepodun, Osun"
+NGA$ADM2_EN[519] <- "Nasarawa, Kano"
+NGA$ADM2_EN[520] <- "Nasarawa, Nasarawa"
+NGA$ADM2_EN[546] <- "Obi, Benue"
+NGA$ADM2_EN[547] <- "Obi, Nasarawa"
+NGA$ADM2_EN[693] <- "Surulere, Lagos"
+NGA$ADM2_EN[694] <- "Surulere, Oyo"
+```
+
+
+# EDA for Water Point Data
+```{r}
+#freq(data = wp_sf,
+#     input = '#status_clean')
+```
 
 
 
 ## Mapping the geospatial dataset
 ```{r}
-#tmap_mode('view')
-#tm_shape(wp_nga)+
-#  tm_dots()
+tmap_mode('view')
+tm_shape(NGA)+
+  tm_dots()
+```
+
+```{r}
+tmap_mode('plot')
 ```
 
 
+# Geospatial Data wrangling
+
+## Converting sf data frames to sp’s Spatial* class
+```{r}
+wp_sc <- as_Spatial(wp_sf)
+NGA_sc <- as_Spatial(NGA)
+```
+
+View the details
+```{r}
+wp_sc
+```
+
+```{r}
+NGA_sc
+```
+
+## Converting the Spatial* class into generic sp format
+
+```{r}
+wp_sp <- as(wp_sc, "SpatialPoints")
+nga_sp <- as(NGA_sc, "SpatialPolygons")
+```
 
 
+```{r}
+wp_sp
+```
+
+```{r}
+nga_sp
+```
 
 
+## Converting the generic sp format into spatstat’s ppp format
+```{r}
+wp_ppp <- as(wp_sp, "ppp")
+wp_ppp
+```
+
+Plot and examine the difference
+```{r}
+plot(wp_ppp)
+```
+
+Summary 
+```{r}
+summary(wp_ppp)
+```
 
 
+## Handling duplicates
+```{r}
+any(duplicated(wp_ppp))
+```
+```{r}
+multiplicity(wp_ppp)
+```
 
 
+```{r}
+sum(multiplicity(wp_ppp) > 1)
+```
+The output shows that there are 0 duplicated point events.
+
+
+Plot wp data
+```{r}
+#tmap_mode('view')
+#tm_shape(wp_sc) +
+#  tm_dots(alpha=0.4, 
+#          size=0.05)
+```
+
+
+## Create owin object
+owin object is designed to represent this polygonal region. We will be using to convert nigeria Spatial Polygon object into owin object of spatstat.
+```{r}
+nga_owin <- as(nga_sp, "owin")
+```
+
+```{r}
+plot(nga_owin)
+```
+
+Summary
+```{r}
+summary(nga_owin)
+```
+
+### Combining point events object and owin object
+```{r}
+wpNGA_ppp = wp_ppp[nga_owin]
+```
+
+
+```{r}
+summary(wpNGA_ppp)
+```
+
+
+# First-order Spatial Point Patterns Analysis
+
+## Kernel Density Estimation
+
+
+### Computing kernel density estimation using automatic bandwidth selection method
+```{r}
+kde_wpNGA_bw <- density(wpNGA_ppp,
+                          sigma=bw.diggle,
+                          edge=TRUE,
+                          kernel="gaussian") 
+```
+
+```{r}
+plot(kde_wpNGA_bw)
+```
+
+The density values of the output range from 0 to 0.000035 which is way too small to comprehend. This is because the default unit of measurement of svy21 is in meter. As a result, the density values computed is in “number of points per square meter”.
+
+Before we move on to next section, it is good to know that you can retrieve the bandwidth used to compute the kde layer by using the code chunk below.
+
+```{r}
+bw <- bw.diggle(wpNGA_ppp)
+bw
+```
+
+###  Rescalling KDE values
+```{r}
+wpNGA_ppp.km <- rescale(wpNGA_ppp, 1000, "km")
+```
+
+```{r}
+kde_wpNGA.bw <- density(wpNGA_ppp.km, sigma=bw.diggle, edge=TRUE, kernel="gaussian")
+plot(kde_wpNGA.bw)
+```
 
 
 
