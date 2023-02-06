@@ -1,0 +1,75 @@
+---
+title: "In-class_Ex05"
+date: "6 Feb 2023"
+date-modified: "`r Sys.Date()`"
+number-sections: true
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: visual
+---
+
+# Install and load packages
+```{r}
+pacman::p_load(tidyverse, sf, sfdep, tmap)
+```
+
+
+# 
+```{r}
+studyArea <- st_read(dsn = "data", layer = "study_area") %>%
+  st_transform(3829)
+```
+
+
+```{r}
+stores <- st_read(dsn = "data", layer = "stores") %>%
+  st_transform(3829)
+```
+
+
+```{r}
+tmap_mode("view")
+tm_shape(studyArea) + 
+  tm_polygons() + 
+tm_shape(stores) + 
+  tm_dots(col = "Name", 
+          size = 0.01, 
+          border.col = "black", 
+          border.lwd = 0.5) + 
+  tm_view(set.zoom.limits = c(12, 16))
+```
+
+# Local Colocation Quotients (LCLQ)
+```{r}
+nb <- include_self(
+  st_knn(st_geometry(stores), 6)
+)
+
+wt <- st_kernel_weights(nb, 
+                        stores, 
+                        "gaussian",
+                        adaptive = TRUE)
+
+FamilyMart <- stores %>%
+  filter(Name == "Family Mart")
+A <- FamilyMart$Name
+SevenEleven <- stores %>%
+  filter(Name == "7-Eleven")
+B<- SevenEleven$Name
+
+LCLQ <- local_colocation(A, B, nb, wt, 49)
+
+LCLQ_stores <- cbind(stores, LCLQ)
+#cannot do left-join/right-join cause no unique identifier
+tmap_mode("view")
+
+
+```
+
+
+
+
+
