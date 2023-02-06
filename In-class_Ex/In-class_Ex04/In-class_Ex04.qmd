@@ -12,16 +12,17 @@ editor: visual
 ---
 
 Install and load packages
+
 ```{r}
 pacman::p_load(maptools, sf, raster, spatstat, tmap)
 ```
 
 Import data
+
 ```{r}
 childcare_sf <- st_read("data/child-care-services-geojson.geojson") %>%
   st_transform(crs = 3414)
 ```
-
 
 ```{r}
 sg_sf <- st_read(dsn = "data", layer="CostalOutline")
@@ -31,116 +32,41 @@ sg_sf <- st_read(dsn = "data", layer="CostalOutline")
 mpsz_sf <- st_read(dsn = "data", 
                 layer = "MP14_SUBZONE_WEB_PL")
 ```
+
 Mapping the geospatial data sets
+
 ```{r}
 tmap_mode('view')
 ```
 
 ```{r}
 tm_shape(childcare_sf)+
-  tm_dots()
+  tm_dots(alph = 0.5,
+          size = 0.01) + 
+  tm_view(set.zoom.limits = c(11,14))
+#c(11, 14) 11 is the max zoom out, 14 is the max zoom in
 ```
 
 Data wrangling
+
 ```{r}
 childcare <- as_Spatial(childcare_sf)
 mpsz <- as_Spatial(mpsz_sf)
 sg <- as_Spatial(sg_sf)
 ```
 
-
-
 ```{r}
 childcare_sp <- as(childcare, "SpatialPoints")
 sg_sp <- as(sg, "SpatialPolygons")
 ```
 
-
-
 just only x and y coordinates points
+
 ```{r}
 childcare_ppp <- as(childcare_sp, "ppp")
 childcare_ppp
 ```
 
-
 ```{r}
 
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

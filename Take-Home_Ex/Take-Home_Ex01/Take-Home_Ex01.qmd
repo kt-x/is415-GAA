@@ -296,13 +296,13 @@ plot(kde_wpNGA.bw)
 ### Compare the output of using bw.diggle and bw.ppl methods
 Baddeley et. (2016) suggested the use of the bw.ppl() algorithm because in ther experience it tends to produce the more appropriate values when the pattern consists predominantly of tight clusters. But they also insist that if the purpose of once study is to detect a single tight cluster in the midst of random noise then the bw.diggle() method seems to work best.
 ```{r}
-kde_wpNGA.ppl <- density(wpNGA_ppp.km, 
-                               sigma=bw.ppl, 
-                               edge=TRUE,
-                               kernel="gaussian")
-par(mfrow=c(1,2))
-plot(kde_wpNGA.bw, main = "bw.diggle")
-plot(kde_wpNGA.ppl, main = "bw.ppl")
+#kde_wpNGA.ppl <- density(wpNGA_ppp.km, 
+#                              sigma=bw.ppl, 
+#                               edge=TRUE,
+#                               kernel="gaussian")
+#par(mfrow=c(1,2))
+#plot(kde_wpNGA.bw, main = "bw.diggle")
+#plot(kde_wpNGA.ppl, main = "bw.ppl")
 ```
 
 
@@ -311,8 +311,8 @@ plot(kde_wpNGA.ppl, main = "bw.ppl")
 ### Computing KDE by using adaptive bandwidth
 Fixed bandwidth method is very sensitive to highly skew distribution of spatial point patterns over geographical units for example urban versus rural. One way to overcome this problem is by using adaptive bandwidth instead.
 ```{r}
-kde_wpNGA_adaptive <- adaptive.density(wpNGA_ppp.km, method="kernel")
-plot(kde_wpNGA_adaptive)
+#kde_wpNGA_adaptive <- adaptive.density(wpNGA_ppp.km, method="kernel")
+#plot(kde_wpNGA_adaptive)
 ```
 
 
