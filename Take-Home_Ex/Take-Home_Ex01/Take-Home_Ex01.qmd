@@ -21,6 +21,36 @@ Water is an essential resource for people. The health of people depends on havin
 
 Discover the geographical distribution of functional and non-function water points and their co-locations if any in Osun State, Nigeria.
 
+## Task
+
+The specific tasks of this take-home exercise are as follows:
+
+**Exploratory Spatial Data Analysis (ESDA)**
+
+-   Derive kernel density maps of functional and non-functional water points. Using appropriate tmap functions
+
+-   Display the kernel density maps on openstreetmap of Osub State, Nigeria.
+
+-   Describe the spatial patterns revealed by the kernel density maps. Highlight the advantage of kernel density map over point map.
+
+**Second-order Spatial Point Patterns Analysis**
+
+With reference to the spatial point patterns observed in ESDA:
+
+-   Formulate the null hypothesis and alternative hypothesis and select the confidence level.
+
+-   Perform the test by using appropriate Second order spatial point patterns analysis technique.
+
+-   With reference to the analysis results, draw statistical conclusions.
+
+**Spatial Correlation Analysis**
+
+-   Confirm statistically if the spatial distribution of functional and non-functional water points are independent from each other.
+
+-   Formulate the null hypothesis and alternative hypothesis and select the confidence level.
+
+-   Perform the test by using appropriate Second order spatial point patterns analysis technique. With reference to the analysis results, draw statistical conclusions.
+
 ## Data
 
 | Type       | Name          | Format | Description                   | Source                        |
@@ -33,23 +63,29 @@ Discover the geographical distribution of functional and non-function water poin
 
 # Importing and loading packages
 
-For this exercise, we'll be using the following packages: 
+For this exercise, we'll be using the following packages:
 
 -   sf: Manage and process vector-based geospatial data in R
 
 -   spatstat: Perform 1st & 2nd spatial point patterns analysis + kernel density
 
--   raster: Reads, writes, manipulates, analyses, model of grid spatial data convert image output generate by spatstat into raster format 
+-   raster: Reads, writes, manipulates, analyses, model of grid spatial data convert image output generate by spatstat into raster format
 
 -   maptools: Convert Spatial objects into ppp format of spatstat
 
 -   tmap: plotting cartographic quality static point patterns maps or interactive maps by using leaflet API
 
--   tidyverse: 
+-   tidyverse:
+
+-   funModeling:
+
+We will be using p_load function of pacman package to install and load required packages.
 
 ```{r}
-pacman::p_load(maptools, sf, raster, spatstat, tmap, tidyverse)
+pacman::p_load(maptools, sf, raster, spatstat, tmap, tidyverse, funModeling)
 ```
+
+------------------------------------------------------------------------
 
 # Spatial Data Wrangling
 
@@ -57,6 +93,9 @@ pacman::p_load(maptools, sf, raster, spatstat, tmap, tidyverse)
 
 ::: panel-tabset
 #### Import NGA
+
+We will be using st_read function to read our geospatial data.
+
 ```{r}
 NGA <- st_read(dsn = "data/geospatial/", 
                layer = "nga_admbnda_adm2_osgof_20190417")%>%
@@ -65,81 +104,439 @@ st_transform(crs = 26392)
 ```
 
 #### Glimpse NGA
+
 ```{r}
 glimpse(NGA)
 ```
 :::
 
-## Aspatial
+## Importing WPdx
+
+We will be using read_csv() function to read the WPdx file and using filter function to only show Nigeria country data.
+
 ```{r}
 wp_nga <- read_csv("data/aspatial/WPdx.csv") %>%
   filter(`#clean_country_name` == "Nigeria")
 ```
 
 ### Convert water point data into sf point features
+
 ```{r}
 wp_nga$Geometry = st_as_sfc(wp_nga$`New Georeferenced Column`)
 wp_nga
 ```
 
-### convert this df into sf object
+### Convert this df into sf object
+
 ```{r}
 wp_sf <- st_sf(wp_nga, crs=4326)
 wp_sf
 ```
 
 ### Transforming into Nigeria projected coordinate system
+
 ```{r}
 wp_sf <- wp_sf %>%
   st_transform(crs = 26392)
 ```
 
-
 ### Data Cleaning
 
-#### Select specific fields 
+#### Select specific fields
+
+Lets start by selecting specific fields that will be helpful in this exercise.
+
 ```{r}
 NGA <- NGA %>%
   select(c(3:4, 8:9))
 ```
 
-#### Check for duplicates
-```{r}
-NGA$ADM2_EN[duplicated(NGA$ADM2_EN)==TRUE]
-```
-Replace values
-```{r}
-NGA$ADM2_EN[94] <- "Bassa, Kogi"
-NGA$ADM2_EN[95] <- "Bassa, Plateau"
-NGA$ADM2_EN[304] <- "Ifelodun, Kwara"
-NGA$ADM2_EN[305] <- "Ifelodun, Osun"
-NGA$ADM2_EN[355] <- "Irepodun, Kwara"
-NGA$ADM2_EN[356] <- "Irepodun, Osun"
-NGA$ADM2_EN[519] <- "Nasarawa, Kano"
-NGA$ADM2_EN[520] <- "Nasarawa, Nasarawa"
-NGA$ADM2_EN[546] <- "Obi, Benue"
-NGA$ADM2_EN[547] <- "Obi, Nasarawa"
-NGA$ADM2_EN[693] <- "Surulere, Lagos"
-NGA$ADM2_EN[694] <- "Surulere, Oyo"
-```
-
-
 ### EDA for Water Point Data
+
+::: panel-tabset
+#### 1. Overview
+
+Next, we want to first have a visual of the water point data by creating a frequency chart.
+
 ```{r}
-#freq(data = wp_sf,
-#     input = '#status_clean')
+freq(data = wp_sf,
+     input = '#status_clean')
 ```
 
+#### 2. Rename to wp_sf_nga
 
+Seems like there are several different categories of water points. With reference to Objectives, we will be focusing on Functional and Non-Functional while still taking into account of the unknown water points. But first, let's rename this spatial frame.
 
+```{r}
+wp_sf_nga <- wp_sf %>% 
+  rename(status_clean = '#status_clean') %>%
+  select(status_clean) %>%
+  mutate(status_clean = replace_na(
+    status_clean, "unknown"))
+```
 
+#### 3. Functional wp
 
+After that, we filter and assign the wp_functional
 
+```{r}
+wp_functional <- wp_sf_nga %>%
+  filter(status_clean %in%
+           c("Functional",
+             "Functional but not in use",
+             "Functional but needs repair"))
+freq(data = wp_functional,
+     input = 'status_clean')
+```
 
+#### 4. Non-Functional wp
 
+Sames goes for the Non-Functional
 
+```{r}
+wp_nonfunctional <- wp_sf_nga %>%
+  filter(status_clean %in%
+           c("Abandoned/Decommissioned",
+             "Abandoned",
+             "Non-Functional due to dry season",
+             "Non-Functional",
+             "Non functional due to dry season"))
+freq(data = wp_nonfunctional,
+     input = 'status_clean')
+```
+
+#### 5. Unknown wp
+
+Sames goes for the Unknown
+
+```{r}
+wp_unknown <- wp_sf_nga %>%
+  filter(status_clean == "unknown")
+
+freq(data = wp_unknown,
+     input = 'status_clean')
+
+```
+:::
+
+### Performing Point-in-Polygon Count
+
+Next, we want to find out the number of total, functional, nonfunctional and unknown water points in each LGA. First, it identifies the functional water points in each LGA by using st_intersects() of sf package. Next, length() is used to calculate the number of functional water points that fall inside each LGA.
+
+```{r}
+NGA_wp <- NGA %>% 
+  mutate(`total_wp` = lengths(
+    st_intersects(NGA, wp_sf_nga))) %>%
+  mutate(`wp_functional` = lengths(
+    st_intersects(NGA, wp_functional))) %>%
+  mutate(`wp_nonfunctional` = lengths(
+    st_intersects(NGA, wp_nonfunctional))) %>%
+  mutate(`wp_unknown` = lengths(
+    st_intersects(NGA, wp_unknown)))
+```
+
+------------------------------------------------------------------------
+
+# Geospatial Data wrangling
+
+Moving to data wrangling on geospatial data, basically we need to convert simple feature data frame to sp spatial class.
+
+## Converting sf data frames to sp's Spatial\* class
+
+::: panel-tabset
+### Code
+
+Convert to sp object/class using as_Spatial(). Take a look at the following 2 tabs (wp_sc, NGA_sc), notice the properties is "SpatialPolygonsDataFrame".
+
+```{r}
+wp_sc <- as_Spatial(wp_sf)
+NGA_sc <- as_Spatial(NGA)
+```
+
+### wp_sc
+
+```{r}
+wp_sc
+```
+
+### NGA_sc
+
+```{r}
+NGA_sc
+```
+:::
+
+## Converting the Spatial\* class into generic sp format
+
+WHY? Because spatstat requires the analytical data in ppp object form. There is no direct way to convert a Spatial\* classes into ppp object. We need to convert the Spatial classes\* into Spatial object first.
+
+::: panel-tabset
+#### Code
+
+Converts the Spatial\* classes into generic sp objects. Take a look at the following 2 tabs (wp_sc, NGA_sc), notice the properties is "SpatialPoints" and "SpatialPolygons" respectively.
+
+```{r}
+wp_sp <- as(wp_sc, "SpatialPoints")
+nga_sp <- as(NGA_sc, "SpatialPolygons")
+```
+
+#### wp_sp
+
+```{r}
+wp_sp
+```
+
+#### nga_sp
+
+```{r}
+nga_sp
+```
+:::
+
+## Converting the generic sp format into spatstat's ppp format
+
+Next, we will use as.ppp() function of spatstat to convert the spatial data into spatstat's ppp object format.
+
+::: panel-tabset
+#### Code
+
+```{r}
+wp_ppp <- as(wp_sp, "ppp")
+wp_ppp
+```
+
+#### Plot
+
+```{r}
+plot(wp_ppp)
+```
+
+#### Summary
+
+```{r}
+summary(wp_ppp)
+```
+:::
+
+### Check for duplicates
+
+```{r}
+any(duplicated(wp_ppp))
+```
+
+If so, check for the number of duplicates
+
+```{r}
+sum(multiplicity(wp_ppp) > 1)
+```
+
+To resolve this problem, we will be using the jittering approach, which will add a small perturbation to the duplicate points so that they do not occupy the exact same space.
+
+```{r}
+wp_ppp_jit <- rjitter(wp_ppp, 
+                      retry=TRUE,
+                      nsim=1, 
+                      drop=TRUE)
+```
+
+Then, check again for duplicates
+
+```{r}
+any(duplicated(wp_ppp_jit))
+```
+
+## Create owin object
+
+owin object is designed to represent this polygonal region. We will be using to convert nigeria Spatial Polygon object into owin object of spatstat.
+
+::: panel-tabset
+### Code
+
+```{r}
+nga_owin <- as(nga_sp, "owin")
+```
+
+### Plot
+
+```{r}
+plot(nga_owin)
+```
+
+### Summary
+
+```{r}
+summary(nga_owin)
+```
+:::
+
+### Combining point events object and owin object
+
+::: panel-tabset
+#### Code
+
+```{r}
+wpNGA_ppp = wp_ppp[nga_owin]
+```
+
+#### Summary
+
+```{r}
+summary(wpNGA_ppp)
+```
+:::
+
+------------------------------------------------------------------------
+
+# First-order Spatial Point Patterns Analysis
+
+## Kernel Density Estimation
+
+In this section, Computing Functional and Non-Functional water points in Osun in Nigeria. \### Computing kernel density estimation using automatic bandwidth selection method
+
+Baddeley et. (2016) suggested the use of the bw.ppl() algorithm because in ther experience it tends to produce the more appropriate values when the pattern consists predominantly of tight clusters. But they also insist that if the purpose of once study is to detect a single tight cluster in the midst of random noise then the bw.diggle() method seems to work best.
+
+```{r}
+kde_wpNGA_bw <- density(wpNGA_ppp,
+                          sigma=bw.diggle,
+                          edge=TRUE,
+                          kernel="gaussian") 
+plot(kde_wpNGA_bw)
+```
+
+The density values of the output range from 0 to 0.000035 which is way too small to comprehend. This is because the default unit of measurement of svy21 is in meter. As a result, the density values computed is in "number of points per square meter".
+
+Before moving to the next section, let's retrieve the bandwidth used to compute the kde layer.
+
+```{r}
+bw <- bw.diggle(wpNGA_ppp)
+bw
+```
+
+### Rescalling KDE values
+
+Using bw.diggle()
+
+WHY? Because
+
+```{r}
+wpNGA_ppp.km <- rescale(wpNGA_ppp, 1000, "km")
+```
+
+```{r}
+kde_wpNGA.bw <- density(wpNGA_ppp.km, sigma=bw.diggle, edge=TRUE, kernel="gaussian")
+plot(kde_wpNGA.bw)
+```
+
+## Adaptive KDE
+
+### Computing KDE by using adaptive bandwidth
+
+Fixed bandwidth method is very sensitive to highly skew distribution of spatial point patterns over geographical units for example urban versus rural. Hence, for this exercise, we will be using adaptive bandwidth instead.
+
+```{r}
+kde_wpNGA_adaptive <- adaptive.density(wpNGA_ppp.km, method="kernel")
+plot(kde_wpNGA_adaptive)
+```
+
+### Converting KDE output into grid object
+
+To make the KDE output is suitable for mapping purposes.
+
+```{r}
+gridded_kde_wpNGA_bw <- as.SpatialGridDataFrame.im(kde_wpNGA.bw)
+spplot(gridded_kde_wpNGA_bw)
+```
+
+#### Converting gridded output into raster
+
+Next, we will convert the gridded kernal density objects into RasterLayer object by using raster() of raster package.
+
+::: panel-tabset
+##### 1. Convert
+
+```{r}
+kde_wpNGA_bw_raster <- raster(gridded_kde_wpNGA_bw)
+kde_wpNGA_bw_raster
+```
+
+##### 2. Assigning projection systems
+
+WHY? - crs property is NA during the convert
+
+```{r}
+projection(kde_wpNGA_bw_raster) <- CRS("+init=EPSG:3414")
+kde_wpNGA_bw_raster
+```
+
+##### 3. tmap visual
+
+Lets display the raster in cartographic quality map using tmap package.
+
+```{r}
+tm_shape(kde_wpNGA_bw_raster) + 
+  tm_raster("v") +
+  tm_layout(legend.position = c("right", "bottom"), frame = FALSE)
+```
+:::
+
+### Spatial Point Patterns using KDE
+
+#### Extract Osun
+
+In this section, we will be comparing KDE of water points at Osun as the study area.
+
+```{r}
+osun = wp_sc[wp_sc$clean_adm1 == "Osun",]
+
+plot(osun, main = "Osun")
+```
+
+#### Converting the spatial point data frame into generic sp format
+
+```{r}
+osun_sp = as(osun, "SpatialPolygons")
+```
+
+#### Creating owin object
+
+```{r}
+osun_owin = as(osun_sp, "owin")
+```
+
+#### Combining wp points and Osun (Study Area)
+
+```{r}
+wp_osun_ppp = wp_ppp_jit[osun_owin]
+```
+
+Next, rescale() function is used to trasnform the unit of measurement from metre to kilometre.
+
+```{r}
+wp_osun_ppp.km = rescale(wp_osun_ppp, 1000, "km")
+```
+
+used to plot these four study areas and the locations of the childcare centres.
+
+```{r}
+plot(childcare_pg_ppp.km, main="Punggol")
+```
+
+#### Computing KDE
+
+The code chunk below will be used to compute the KDE of these four planning area. bw.diggle method is used to derive the bandwidth of each
+
+```{r}
+plot(density(wp_osun_ppp.km, 
+             sigma=bw.diggle, 
+             edge=TRUE, 
+             kernel="gaussian"),
+     main="Osun")
+```
+
+------------------------------------------------------------------------
 
 ## Mapping the geospatial dataset
+
 ```{r}
 tmap_mode('view')
 tm_shape(NGA)+
@@ -150,78 +547,31 @@ tm_shape(NGA)+
 tmap_mode('plot')
 ```
 
-
-# Geospatial Data wrangling
-
-## Converting sf data frames to sp’s Spatial* class
-::: panel-tabset
-#### Code
-```{r}
-wp_sc <- as_Spatial(wp_sf)
-NGA_sc <- as_Spatial(NGA)
-```
-
-#### wp_sc
-```{r}
-wp_sc
-```
-#### NGA_sc
-```{r}
-NGA_sc
-```
-:::
-
-
-
-## Converting the Spatial* class into generic sp format
-::: panel-tabset
-#### Code
-```{r}
-wp_sp <- as(wp_sc, "SpatialPoints")
-nga_sp <- as(NGA_sc, "SpatialPolygons")
-```
-
-#### wp_sp
-```{r}
-wp_sp
-```
-#### nga_sp
-```{r}
-nga_sp
-```
-:::
-
-## Converting the generic sp format into spatstat’s ppp format
-::: panel-tabset
-#### Code
-```{r}
-wp_ppp <- as(wp_sp, "ppp")
-wp_ppp
-```
-
-#### Plot
-```{r}
-plot(wp_ppp)
-```
-
-#### Summary 
-```{r}
-summary(wp_ppp)
-```
-:::
-
-## Handling duplicates
-```{r}
-any(duplicated(wp_ppp))
-```
+#### Check for duplicates
 
 ```{r}
-sum(multiplicity(wp_ppp) > 1)
+#NGA$ADM1_EN[duplicated(NGA$ADM1_EN)==TRUE]
 ```
-The output shows that there are 0 duplicated point events.
 
+Replace values
+
+```{r}
+#NGA$ADM2_EN[94] <- "Bassa, Kogi"
+#NGA$ADM2_EN[95] <- "Bassa, Plateau"
+#NGA$ADM2_EN[304] <- "Ifelodun, Kwara"
+#NGA$ADM2_EN[305] <- "Ifelodun, Osun"
+#NGA$ADM2_EN[355] <- "Irepodun, Kwara"
+#NGA$ADM2_EN[356] <- "Irepodun, Osun"
+#NGA$ADM2_EN[519] <- "Nasarawa, Kano"
+#NGA$ADM2_EN[520] <- "Nasarawa, Nasarawa"
+#NGA$ADM2_EN[546] <- "Obi, Benue"
+#NGA$ADM2_EN[547] <- "Obi, Nasarawa"
+#NGA$ADM2_EN[693] <- "Surulere, Lagos"
+#NGA$ADM2_EN[694] <- "Surulere, Oyo"
+```
 
 Plot wp data
+
 ```{r}
 #tmap_mode('view')
 #tm_shape(wp_sc) +
@@ -229,72 +579,8 @@ Plot wp data
 #          size=0.05)
 ```
 
-
-## Create owin object
-owin object is designed to represent this polygonal region. We will be using to convert nigeria Spatial Polygon object into owin object of spatstat.
-```{r}
-nga_owin <- as(nga_sp, "owin")
-```
-
-```{r}
-plot(nga_owin)
-```
-
-Summary
-```{r}
-summary(nga_owin)
-```
-
-### Combining point events object and owin object
-```{r}
-wpNGA_ppp = wp_ppp[nga_owin]
-```
-
-
-```{r}
-summary(wpNGA_ppp)
-```
-
-
-# First-order Spatial Point Patterns Analysis
-
-## Kernel Density Estimation
-
-
-### Computing kernel density estimation using automatic bandwidth selection method
-```{r}
-kde_wpNGA_bw <- density(wpNGA_ppp,
-                          sigma=bw.diggle,
-                          edge=TRUE,
-                          kernel="gaussian") 
-```
-
-```{r}
-plot(kde_wpNGA_bw)
-```
-
-The density values of the output range from 0 to 0.000035 which is way too small to comprehend. This is because the default unit of measurement of svy21 is in meter. As a result, the density values computed is in “number of points per square meter”.
-
-Before we move on to next section, it is good to know that you can retrieve the bandwidth used to compute the kde layer by using the code chunk below.
-
-```{r}
-bw <- bw.diggle(wpNGA_ppp)
-bw
-```
-
-###  Rescalling KDE values
-```{r}
-wpNGA_ppp.km <- rescale(wpNGA_ppp, 1000, "km")
-```
-
-```{r}
-kde_wpNGA.bw <- density(wpNGA_ppp.km, sigma=bw.diggle, edge=TRUE, kernel="gaussian")
-plot(kde_wpNGA.bw)
-```
-
-
 ### Compare the output of using bw.diggle and bw.ppl methods
-Baddeley et. (2016) suggested the use of the bw.ppl() algorithm because in ther experience it tends to produce the more appropriate values when the pattern consists predominantly of tight clusters. But they also insist that if the purpose of once study is to detect a single tight cluster in the midst of random noise then the bw.diggle() method seems to work best.
+
 ```{r}
 #kde_wpNGA.ppl <- density(wpNGA_ppp.km, 
 #                              sigma=bw.ppl, 
@@ -304,16 +590,3 @@ Baddeley et. (2016) suggested the use of the bw.ppl() algorithm because in ther 
 #plot(kde_wpNGA.bw, main = "bw.diggle")
 #plot(kde_wpNGA.ppl, main = "bw.ppl")
 ```
-
-
-## Fixed and Adaptive KDE
-
-### Computing KDE by using adaptive bandwidth
-Fixed bandwidth method is very sensitive to highly skew distribution of spatial point patterns over geographical units for example urban versus rural. One way to overcome this problem is by using adaptive bandwidth instead.
-```{r}
-#kde_wpNGA_adaptive <- adaptive.density(wpNGA_ppp.km, method="kernel")
-#plot(kde_wpNGA_adaptive)
-```
-
-
-
