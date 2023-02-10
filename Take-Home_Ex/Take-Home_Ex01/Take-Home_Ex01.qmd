@@ -101,6 +101,7 @@ NGA <- st_read(dsn = "data/geospatial/",
                layer = "nga_admbnda_adm2_osgof_20190417")%>%
   
 st_transform(crs = 26392)
+
 ```
 
 #### Glimpse NGA
@@ -108,7 +109,15 @@ st_transform(crs = 26392)
 ```{r}
 glimpse(NGA)
 ```
+
+#### Glimpse NGA
+
+```{r}
+NGA |> filter(ADM1_EN == "Osun")
+```
+
 :::
+
 
 ## Importing WPdx
 
@@ -144,11 +153,12 @@ wp_sf <- wp_sf %>%
 
 #### Select specific fields
 
-Lets start by selecting specific fields that will be helpful in this exercise.
+Lets start by selecting specific fields that will be helpful in this exercise and select Osun state using the filter() function.
 
 ```{r}
 NGA <- NGA %>%
-  select(c(3:4, 8:9))
+  select(c(3:4, 8:9)) %>%
+  filter(ADM1_EN == "Osun")
 ```
 
 ### EDA for Water Point Data
