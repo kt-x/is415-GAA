@@ -77,7 +77,7 @@ For this exercise, we'll be using the following packages:
 
 -   tidyverse:
 
--   funModeling:
+-   funModeling: Plot charts for easier interpretations
 
 We will be using p_load function of pacman package to install and load required packages.
 
@@ -108,12 +108,6 @@ st_transform(crs = 26392)
 
 ```{r}
 glimpse(NGA)
-```
-
-#### Glimpse NGA
-
-```{r}
-NGA |> filter(ADM1_EN == "Osun")
 ```
 
 :::
@@ -160,6 +154,13 @@ NGA <- NGA %>%
   select(c(3:4, 8:9)) %>%
   filter(ADM1_EN == "Osun")
 ```
+
+```{r}
+#tmap_mode("plot")
+#qtm(nga_owin, 
+#    fill = "wp_functional")
+```
+
 
 ### EDA for Water Point Data
 
@@ -259,15 +260,26 @@ Moving to data wrangling on geospatial data, basically we need to convert simple
 Convert to sp object/class using as_Spatial(). Take a look at the following 2 tabs (wp_sc, NGA_sc), notice the properties is "SpatialPolygonsDataFrame".
 
 ```{r}
-wp_sc <- as_Spatial(wp_sf)
+#wp_sc <- as_Spatial(wp_sf)
+wp_sc_functional <- as_Spatial(wp_functional)
+wp_sc_nonfunctional <- as_Spatial(wp_nonfunctional)
 NGA_sc <- as_Spatial(NGA)
 ```
 
 ### wp_sc
 
 ```{r}
-wp_sc
+#wp_sc
+wp_sc_functional
 ```
+
+### wp_sc_nonfunctional
+
+```{r}
+#wp_sc
+wp_sc_nonfunctional
+```
+
 
 ### NGA_sc
 
@@ -286,14 +298,18 @@ WHY? Because spatstat requires the analytical data in ppp object form. There is 
 Converts the Spatial\* classes into generic sp objects. Take a look at the following 2 tabs (wp_sc, NGA_sc), notice the properties is "SpatialPoints" and "SpatialPolygons" respectively.
 
 ```{r}
-wp_sp <- as(wp_sc, "SpatialPoints")
+#wp_sp <- as(wp_sc, "SpatialPoints")
+wp_sp_functional <- as(wp_sc_functional, "SpatialPoints")
+wp_sp_nonfunctional <- as(wp_sc_nonfunctional, "SpatialPoints")
 nga_sp <- as(NGA_sc, "SpatialPolygons")
 ```
 
 #### wp_sp
 
 ```{r}
-wp_sp
+#wp_sp
+wp_sp_functional
+wp_sp_nonfunctional
 ```
 
 #### nga_sp
@@ -311,39 +327,60 @@ Next, we will use as.ppp() function of spatstat to convert the spatial data into
 #### Code
 
 ```{r}
-wp_ppp <- as(wp_sp, "ppp")
-wp_ppp
+#wp_ppp <- as(wp_sp, "ppp")
+wp_ppp_functional <- as(wp_sp_functional, "ppp")
+wp_ppp_nonfunctional <- as(wp_sp_nonfunctional, "ppp")
+
+#wp_ppp
+wp_ppp_functional
+wp_ppp_nonfunctional
 ```
 
 #### Plot
 
 ```{r}
-plot(wp_ppp)
+#plot(wp_ppp)
+
+plot(wp_ppp_functional)
+plot(wp_ppp_nonfunctional)
 ```
 
 #### Summary
 
 ```{r}
-summary(wp_ppp)
+#summary(wp_ppp)
 ```
 :::
 
 ### Check for duplicates
 
 ```{r}
-any(duplicated(wp_ppp))
+#any(duplicated(wp_ppp))
+
+any(duplicated(wp_ppp_functional))
+any(duplicated(wp_ppp_nonfunctional))
 ```
 
 If so, check for the number of duplicates
 
 ```{r}
-sum(multiplicity(wp_ppp) > 1)
+sum(multiplicity(wp_ppp_functional) > 1)
+sum(multiplicity(wp_ppp_nonfunctional) > 1)
 ```
 
 To resolve this problem, we will be using the jittering approach, which will add a small perturbation to the duplicate points so that they do not occupy the exact same space.
 
 ```{r}
-wp_ppp_jit <- rjitter(wp_ppp, 
+#wp_ppp_jit <- rjitter(wp_ppp, 
+#                      retry=TRUE,
+#                      nsim=1, 
+#                      drop=TRUE)
+
+wp_ppp_functional_jit <- rjitter(wp_ppp_functional, 
+                      retry=TRUE,
+                      nsim=1, 
+                      drop=TRUE)
+wp_ppp_nonfunctional_jit <- rjitter(wp_ppp_nonfunctional, 
                       retry=TRUE,
                       nsim=1, 
                       drop=TRUE)
@@ -352,7 +389,8 @@ wp_ppp_jit <- rjitter(wp_ppp,
 Then, check again for duplicates
 
 ```{r}
-any(duplicated(wp_ppp_jit))
+any(duplicated(wp_ppp_functional_jit))
+any(duplicated(wp_ppp_nonfunctional_jit))
 ```
 
 ## Create owin object
@@ -385,13 +423,26 @@ summary(nga_owin)
 #### Code
 
 ```{r}
-wpNGA_ppp = wp_ppp[nga_owin]
+#wpNGA_ppp = wp_ppp[nga_owin]
+
+wpNGA_ppp_functional = wp_ppp_functional[nga_owin]
+wpNGA_ppp_nonfunctional= wp_ppp_nonfunctional[nga_owin]
 ```
+
+#### Plot
+```{r}
+#plot(wpNGA_ppp)
+
+plot(wpNGA_ppp_functional)
+plot(wpNGA_ppp_nonfunctional)
+```
+
+
 
 #### Summary
 
 ```{r}
-summary(wpNGA_ppp)
+#summary(wpNGA_ppp)
 ```
 :::
 
@@ -401,40 +452,63 @@ summary(wpNGA_ppp)
 
 ## Kernel Density Estimation
 
-In this section, Computing Functional and Non-Functional water points in Osun in Nigeria. \### Computing kernel density estimation using automatic bandwidth selection method
+In this section, Computing Functional and Non-Functional water points in Osun in Nigeria. 
+
+### Computing kernel density estimation using automatic bandwidth selection method
 
 Baddeley et. (2016) suggested the use of the bw.ppl() algorithm because in ther experience it tends to produce the more appropriate values when the pattern consists predominantly of tight clusters. But they also insist that if the purpose of once study is to detect a single tight cluster in the midst of random noise then the bw.diggle() method seems to work best.
 
 ```{r}
-kde_wpNGA_bw <- density(wpNGA_ppp,
+kde_wpNGA_functional.bw <- density(wpNGA_ppp_functional,
                           sigma=bw.diggle,
                           edge=TRUE,
                           kernel="gaussian") 
-plot(kde_wpNGA_bw)
+plot(kde_wpNGA_functional.bw)
+kde_wpNGA_nonfunctional.bw <- density(wpNGA_ppp_nonfunctional,
+                          sigma=bw.diggle,
+                          edge=TRUE,
+                          kernel="gaussian") 
+plot(kde_wpNGA_nonfunctional.bw)
 ```
 
-The density values of the output range from 0 to 0.000035 which is way too small to comprehend. This is because the default unit of measurement of svy21 is in meter. As a result, the density values computed is in "number of points per square meter".
+The density values of the output range is too small to comprehend. This is because the default unit of measurement of svy21 is in meter. As a result, the density values computed is in "number of points per square meter".
 
-Before moving to the next section, let's retrieve the bandwidth used to compute the kde layer.
+Before moving to the next section, let's retrieve the bandwidth used to compute the KDE layer.
 
 ```{r}
-bw <- bw.diggle(wpNGA_ppp)
-bw
+#bw <- bw.diggle(wpNGA_ppp)
+#bw
+
+bw_functional <- bw.diggle(wpNGA_ppp_functional)
+bw_functional
+bw_nonfunctional <- bw.diggle(wpNGA_ppp_nonfunctional)
+bw_nonfunctional
 ```
 
 ### Rescalling KDE values
 
 Using bw.diggle()
 
-WHY? Because
+WHY? Because 
 
 ```{r}
-wpNGA_ppp.km <- rescale(wpNGA_ppp, 1000, "km")
+wpNGA_ppp_functional.km <- rescale(wpNGA_ppp_functional, 1000, "km")
+wpNGA_ppp_nonfunctional.km <- rescale(wpNGA_ppp_nonfunctional, 1000, "km")
 ```
 
 ```{r}
-kde_wpNGA.bw <- density(wpNGA_ppp.km, sigma=bw.diggle, edge=TRUE, kernel="gaussian")
-plot(kde_wpNGA.bw)
+#kde_wpNGA.bw <- density(wpNGA_ppp.km, sigma=bw.diggle, edge=TRUE, #kernel="gaussian")
+#plot(kde_wpNGA.bw)
+kde_wpNGA_functional.bw <- density(wpNGA_ppp_functional.km,
+                          sigma=bw.diggle,
+                          edge=TRUE,
+                          kernel="gaussian") 
+plot(kde_wpNGA_functional.bw)
+kde_wpNGA_nonfunctional.bw <- density(wpNGA_ppp_nonfunctional.km,
+                          sigma=bw.diggle,
+                          edge=TRUE,
+                          kernel="gaussian") 
+plot(kde_wpNGA_nonfunctional.bw)
 ```
 
 ## Adaptive KDE
@@ -444,8 +518,13 @@ plot(kde_wpNGA.bw)
 Fixed bandwidth method is very sensitive to highly skew distribution of spatial point patterns over geographical units for example urban versus rural. Hence, for this exercise, we will be using adaptive bandwidth instead.
 
 ```{r}
-kde_wpNGA_adaptive <- adaptive.density(wpNGA_ppp.km, method="kernel")
-plot(kde_wpNGA_adaptive)
+#kde_wpNGA_adaptive <- adaptive.density(wpNGA_ppp.km, method="kernel")
+#plot(kde_wpNGA_adaptive)
+
+kde_wpNGA_functional_adaptive <- adaptive.density(wpNGA_ppp_functional.km, method="kernel")
+plot(kde_wpNGA_functional_adaptive)
+kde_wpNGA_nonfunctional_adaptive <- adaptive.density(wpNGA_ppp_nonfunctional.km, method="kernel")
+plot(kde_wpNGA_nonfunctional_adaptive)
 ```
 
 ### Converting KDE output into grid object
@@ -453,8 +532,13 @@ plot(kde_wpNGA_adaptive)
 To make the KDE output is suitable for mapping purposes.
 
 ```{r}
-gridded_kde_wpNGA_bw <- as.SpatialGridDataFrame.im(kde_wpNGA.bw)
-spplot(gridded_kde_wpNGA_bw)
+#gridded_kde_wpNGA_bw <- as.SpatialGridDataFrame.im(kde_wpNGA.bw)
+#spplot(gridded_kde_wpNGA_bw)
+
+gridded_kde_wpNGA_func_bw <- as.SpatialGridDataFrame.im(kde_wpNGA_functional.bw)
+spplot(gridded_kde_wpNGA_func_bw)
+gridded_kde_wpNGA_nfunc_bw <- as.SpatialGridDataFrame.im(kde_wpNGA_nonfunctional.bw)
+spplot(gridded_kde_wpNGA_nfunc_bw)
 ```
 
 #### Converting gridded output into raster
@@ -465,8 +549,13 @@ Next, we will convert the gridded kernal density objects into RasterLayer object
 ##### 1. Convert
 
 ```{r}
-kde_wpNGA_bw_raster <- raster(gridded_kde_wpNGA_bw)
-kde_wpNGA_bw_raster
+#kde_wpNGA_bw_raster <- raster(gridded_kde_wpNGA_bw)
+#kde_wpNGA_bw_raster
+
+kde_wpNGA_func_bw_raster <- raster(gridded_kde_wpNGA_func_bw)
+kde_wpNGA_func_bw_raster
+kde_wpNGA_nfunc_bw_raster <- raster(gridded_kde_wpNGA_nfunc_bw)
+kde_wpNGA_nfunc_bw_raster
 ```
 
 ##### 2. Assigning projection systems
@@ -474,8 +563,13 @@ kde_wpNGA_bw_raster
 WHY? - crs property is NA during the convert
 
 ```{r}
-projection(kde_wpNGA_bw_raster) <- CRS("+init=EPSG:3414")
-kde_wpNGA_bw_raster
+#projection(kde_wpNGA_bw_raster) <- CRS("+init=EPSG:3414")
+#kde_wpNGA_bw_raster
+
+projection(kde_wpNGA_func_bw_raster) <- CRS("+init=EPSG:3414")
+kde_wpNGA_func_bw_raster
+projection(kde_wpNGA_nfunc_bw_raster) <- CRS("+init=EPSG:3414")
+kde_wpNGA_nfunc_bw_raster
 ```
 
 ##### 3. tmap visual
@@ -483,7 +577,16 @@ kde_wpNGA_bw_raster
 Lets display the raster in cartographic quality map using tmap package.
 
 ```{r}
-tm_shape(kde_wpNGA_bw_raster) + 
+#tm_shape(kde_wpNGA_bw_raster) + 
+#  tm_raster("v") +
+#  tm_layout(legend.position = c("right", "bottom"), frame = FALSE)
+
+
+tm_shape(kde_wpNGA_func_bw_raster) + 
+  tm_raster("v") +
+  tm_layout(legend.position = c("right", "bottom"), frame = FALSE)
+
+tm_shape(kde_wpNGA_nfunc_bw_raster) + 
   tm_raster("v") +
   tm_layout(legend.position = c("right", "bottom"), frame = FALSE)
 ```
@@ -496,7 +599,8 @@ tm_shape(kde_wpNGA_bw_raster) +
 In this section, we will be comparing KDE of water points at Osun as the study area.
 
 ```{r}
-osun = wp_sc[wp_sc$clean_adm1 == "Osun",]
+#osun = NGA_sc[wp_sc$clean_adm1 == "Osun",]
+osun = NGA_sc
 
 plot(osun, main = "Osun")
 ```
@@ -516,19 +620,22 @@ osun_owin = as(osun_sp, "owin")
 #### Combining wp points and Osun (Study Area)
 
 ```{r}
-wp_osun_ppp = wp_ppp_jit[osun_owin]
+wp_osun_ppp_func = wp_ppp_functional_jit[osun_owin]
+wp_osun_ppp_nfunc = wp_ppp_nonfunctional_jit[osun_owin]
 ```
 
 Next, rescale() function is used to trasnform the unit of measurement from metre to kilometre.
 
 ```{r}
-wp_osun_ppp.km = rescale(wp_osun_ppp, 1000, "km")
+wp_osun_ppp_func.km = rescale(wp_osun_ppp_func, 1000, "km")
+wp_osun_ppp_nfunc.km = rescale(wp_osun_ppp_nfunc, 1000, "km")
 ```
 
 used to plot these four study areas and the locations of the childcare centres.
 
 ```{r}
-plot(childcare_pg_ppp.km, main="Punggol")
+plot(wp_osun_ppp_func.km, main="Osun")
+plot(wp_osun_ppp_nfunc.km, main="Osun")
 ```
 
 #### Computing KDE
@@ -536,25 +643,74 @@ plot(childcare_pg_ppp.km, main="Punggol")
 The code chunk below will be used to compute the KDE of these four planning area. bw.diggle method is used to derive the bandwidth of each
 
 ```{r}
-plot(density(wp_osun_ppp.km, 
+plot(density(wp_osun_ppp_func.km,
+             sigma=bw.diggle, 
+             edge=TRUE, 
+             kernel="gaussian"),
+     main="Osun")
+
+plot(density(wp_osun_ppp_nfunc.km,
              sigma=bw.diggle, 
              edge=TRUE, 
              kernel="gaussian"),
      main="Osun")
 ```
 
+
+# Second-order Spatial Point Patterns
+
+## Analysing Spatial Point Process Using G-Function
+In this section, the G function measures the distances between any two events and their respective nearest neighbours. Using spatstat package's Gest() and envelope() to run a Monte Carlo simulation test, which is used to predict the probability of a range of outcomes when the possibility of random variables is present.
+
+### Computing G-function estimation
+```{r}
+func_osun = Gest(wp_osun_ppp_func, correction = "border")
+plot(func_osun, xlim=c(0,500))
+```
+
+
+
+### Performing Complete Spatial Randomness Test
+
+To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
+
+Ho = The distribution of functional in Osun, Nigeria are randomly distributed.
+
+H1= The distribution of functional in Osun, Nigeria are NOT randomly distributed.
+
+The null hypothesis will be rejected if p-value is smaller than alpha value of 0.001.
+
+Monte Carlo test with G-fucntion
+
+```{r}
+func_osun.csr <- envelope(wp_osun_ppp_func, Gest, nsim = 999)
+```
+
+
+```{r}
+plot(func_osun.csr)
+```
+
+
+
+
+
+
+
+
+
 ------------------------------------------------------------------------
 
 ## Mapping the geospatial dataset
 
 ```{r}
-tmap_mode('view')
-tm_shape(NGA)+
-  tm_dots()
+#tmap_mode('view')
+#tm_shape(NGA)+
+#  tm_dots()
 ```
 
 ```{r}
-tmap_mode('plot')
+#tmap_mode('plot')
 ```
 
 #### Check for duplicates
