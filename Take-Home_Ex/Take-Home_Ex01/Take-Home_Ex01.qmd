@@ -614,18 +614,25 @@ Well it seems like theres isnt signficant changes to the functional BUT if u tak
 
 To make the KDE output is suitable for mapping purposes.
 
+::: panel-tabset
+
+#### Functional
 ```{r}
 #gridded_kde_wpNGA_bw <- as.SpatialGridDataFrame.im(kde_wpNGA.bw)
 #spplot(gridded_kde_wpNGA_bw)
 
 gridded_kde_wpNGA_func_bw <- as.SpatialGridDataFrame.im(kde_wpNGA_functional.bw)
-
-gridded_kde_wpNGA_nfunc_bw <- as.SpatialGridDataFrame.im(kde_wpNGA_nonfunctional.bw)
-
-par(mfrow=c(1,2))
 spplot(gridded_kde_wpNGA_func_bw)
+```
+
+#### 2. Non-Functional
+```{r}
+gridded_kde_wpNGA_nfunc_bw <- as.SpatialGridDataFrame.im(kde_wpNGA_nonfunctional.bw)
 spplot(gridded_kde_wpNGA_nfunc_bw)
 ```
+
+:::
+
 
 #### Converting gridded output into raster
 
@@ -666,7 +673,6 @@ Lets display the raster in cartographic quality map using tmap package.
 tm_shape(kde_wpNGA_func_bw_raster) + 
   tm_raster("v") +
   tm_layout(legend.position = c("right", "bottom"), frame = FALSE)
-  tm_view(set.zoom.limits = c(8, 16))
 
 ```
 
@@ -675,7 +681,6 @@ tm_shape(kde_wpNGA_func_bw_raster) +
 tm_shape(kde_wpNGA_nfunc_bw_raster) + 
   tm_raster("v") +
   tm_layout(legend.position = c("right", "bottom"), frame = FALSE)
-  tm_view(set.zoom.limits = c(8, 16))
 ```
 
 :::
@@ -756,10 +761,8 @@ plot(density(wp_osun_ppp_nfunc.km,
 In this section, the G function measures the distances between any two events and their respective nearest neighbours. Using spatstat package's Gest() and envelope() to run a Monte Carlo simulation test, which is used to predict the probability of a range of outcomes when the possibility of random variables is present.
 
 ::: panel-tabset
-
-###Functional
-
-#### Computing G-function estimation 
+## Functional
+### 1. Computing G-function estimation (Functional) 
 Lets start with the functional.
 ```{r}
 G_func_osun = Gest(wp_osun_ppp_func, correction = "border")
@@ -768,7 +771,7 @@ plot(G_func_osun, xlim=c(0,500))
 
 
 
-#### Performing Complete Spatial Randomness Test
+### 2. Performing Complete Spatial Randomness Test (Functional) 
 
 Next, we will be conducting a hypothesis test to confirm the observed spatial patterns above. The hypothesis and test are as follows:
 
@@ -796,10 +799,8 @@ From func_osun.csr, it is observed that at 95% confidence interval, the G(r) far
 
 
 
-
-### Non-Functional
-
-#### Computing G-function estimation 
+## Non-Functional
+### 3. Computing G-function estimation (Non-Functional) 
 Next, Non-functional 
 ```{r}
 G_nfunc_osun = Gest(wp_osun_ppp_nfunc, correction = "border")
@@ -807,7 +808,7 @@ plot(G_nfunc_osun, xlim=c(0,500))
 ```
 
 
-#### Performing Complete Spatial Randomness Test
+### 4. Performing Complete Spatial Randomness Test (Non-Functional) 
 
 Next, we will be conducting a hypothesis test to confirm the observed spatial patterns above. The hypothesis and test are as follows:
 
@@ -844,9 +845,9 @@ Lets also investigate whether the spatial distribution of functional and non-fun
 
 ### Computing G-function estimation 
 ```{r}
-L_func_osun.csr = Lest(wp_osun_ppp_func, correction = "Ripley")
-plot(L_func_osun.csr, . -r ~ r, 
-     ylab= "L(d)-r", xlab = "d(m)")
+# L_func_osun.csr = Lest(wp_osun_ppp_func, correction = "Ripley")
+# plot(L_func_osun.csr, . -r ~ r, 
+#      ylab= "L(d)-r", xlab = "d(m)")
 ```
 
 
@@ -862,12 +863,12 @@ The null hypothesis will be rejected if p-value is smaller than alpha value of 0
 Monte Carlo test with L-function
 
 ```{r}
-L_func_osun.csr <- envelope(wp_osun_ppp_func, Lest, nsim = 39, rank = 1, glocal=TRUE)
+#L_func_osun.csr <- envelope(wp_osun_ppp_func, Lest, nsim = 39, rank = 1, glocal=TRUE)
 ```
 
 ### Plot the result from L-function
 ```{r}
-plot(L_func_osun.csr, . - r ~ r, xlab="d", ylab="L(d)-r")
+#plot(L_func_osun.csr, . - r ~ r, xlab="d", ylab="L(d)-r")
 ```
 
 CONCLUSION
@@ -880,8 +881,8 @@ From the plot above, the empirical k-cross line is far outside from the envelope
 
 ### Computing G-function estimation 
 ```{r}
-L_nfunc_osun.csr = Lest(wp_osun_ppp_nfunc, correction = "Ripley")
-plot(L_nfunc_osun.csr, . -r ~ r, ylab= "L(d)-r", xlab = "d(m)")
+# L_nfunc_osun.csr = Lest(wp_osun_ppp_nfunc, correction = "Ripley")
+# plot(L_nfunc_osun.csr, . -r ~ r, ylab= "L(d)-r", xlab = "d(m)")
 ```
 
 
