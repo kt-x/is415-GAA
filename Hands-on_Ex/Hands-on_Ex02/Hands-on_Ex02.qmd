@@ -2,6 +2,7 @@
 title: "Hands-on Exercise 2: Choropleth Mapping with R"
 execute: 
   warning: false
+  eval: true
 date: "`r Sys.Date()`" 
 ---
 

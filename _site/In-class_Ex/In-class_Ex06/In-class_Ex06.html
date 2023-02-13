@@ -232,8 +232,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="toc-section-number">1</span>  Overview</a>
   <ul class="collapse">
   <li><a href="#install-and-load-packages" id="toc-install-and-load-packages" class="nav-link" data-scroll-target="#install-and-load-packages"><span class="toc-section-number">1.1</span>  Install and load packages</a></li>
-  <li><a href="#import-geospatial-data" id="toc-import-geospatial-data" class="nav-link" data-scroll-target="#import-geospatial-data"><span class="toc-section-number">1.2</span>  Import Geospatial Data</a></li>
-  <li><a href="#import-aspatial-data" id="toc-import-aspatial-data" class="nav-link" data-scroll-target="#import-aspatial-data"><span class="toc-section-number">1.3</span>  Import Aspatial Data</a></li>
+  </ul></li>
+  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data"><span class="toc-section-number">2</span>  DATA</a>
+  <ul class="collapse">
+  <li><a href="#import-geospatial-data" id="toc-import-geospatial-data" class="nav-link" data-scroll-target="#import-geospatial-data"><span class="toc-section-number">2.1</span>  Import Geospatial Data</a></li>
+  <li><a href="#import-aspatial-data" id="toc-import-aspatial-data" class="nav-link" data-scroll-target="#import-aspatial-data"><span class="toc-section-number">2.2</span>  Import Aspatial Data</a></li>
+  <li><a href="#combine-both-df-using-left-join" id="toc-combine-both-df-using-left-join" class="nav-link" data-scroll-target="#combine-both-df-using-left-join"><span class="toc-section-number">2.3</span>  Combine both df using left-join</a></li>
+  <li><a href="#plotting-chrorpleth-map" id="toc-plotting-chrorpleth-map" class="nav-link" data-scroll-target="#plotting-chrorpleth-map"><span class="toc-section-number">2.4</span>  Plotting Chrorpleth map</a></li>
+  </ul></li>
+  <li><a href="#identify-neighbours" id="toc-identify-neighbours" class="nav-link" data-scroll-target="#identify-neighbours"><span class="toc-section-number">3</span>  Identify neighbours</a>
+  <ul class="collapse">
+  <li><a href="#contibuity-neighbours-method" id="toc-contibuity-neighbours-method" class="nav-link" data-scroll-target="#contibuity-neighbours-method"><span class="toc-section-number">3.1</span>  Contibuity neighbours method</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -275,11 +284,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="install-and-load-packages" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="install-and-load-packages"><span class="header-section-number">1.1</span> Install and load packages</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, spdep, tmap, tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, sfdep, tmap, tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="import-geospatial-data" class="level2" data-number="1.2">
-<h2 data-number="1.2" class="anchored" data-anchor-id="import-geospatial-data"><span class="header-section-number">1.2</span> Import Geospatial Data</h2>
+</section>
+<section id="data" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> DATA</h1>
+<section id="import-geospatial-data" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="import-geospatial-data"><span class="header-section-number">2.1</span> Import Geospatial Data</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>hunan <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"data/geospatial"</span>, </span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">layer =</span> <span class="st">"Hunan"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -295,10 +307,79 @@ Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
 </section>
-<section id="import-aspatial-data" class="level2" data-number="1.3">
-<h2 data-number="1.3" class="anchored" data-anchor-id="import-aspatial-data"><span class="header-section-number">1.3</span> Import Aspatial Data</h2>
+<section id="import-aspatial-data" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="import-aspatial-data"><span class="header-section-number">2.2</span> Import Aspatial Data</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>hunan2012 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/aspatial/Hunan_2012.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>hunan2012 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/aspatial/Hunan_2012.csv"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>hunan2012</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 88 × 29
+   County    City     avg_w…¹ depos…²    FAI Gov_Rev Gov_Exp    GDP GDPPC    GIO
+   &lt;chr&gt;     &lt;chr&gt;      &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 Anhua     Yiyang     30544  10967   6832.    457.   2703  13225  14567  9277.
+ 2 Anren     Chenzhou   28058   4599.  6386.    221.   1455.  4941. 12761  4189.
+ 3 Anxiang   Changde    31935   5517.  3541     244.   1780. 12482  23667  5109.
+ 4 Baojing   Hunan W…   30843   2250   1005.    193.   1379.  4088. 14563  3624.
+ 5 Chaling   Zhuzhou    31251   8241.  6508.    620.   1947  11585  20078  9158.
+ 6 Changning Hengyang   28518  10860   7920     770.   2632. 19886  24418 37392 
+ 7 Changsha  Changsha   54540  24332  33624    5350    7886. 88009  88656 51361 
+ 8 Chengbu   Shaoyang   28597   2581.  1922.    161.   1192.  2570. 10132  1681.
+ 9 Chenxi    Huaihua    33580   4990   5818.    460.   1724.  7755. 17026  6644.
+10 Cili      Zhangji…   33099   8117.  4498.    500.   2306. 11378  18714  5843.
+# … with 78 more rows, 19 more variables: Loan &lt;dbl&gt;, NIPCR &lt;dbl&gt;, Bed &lt;dbl&gt;,
+#   Emp &lt;dbl&gt;, EmpR &lt;dbl&gt;, EmpRT &lt;dbl&gt;, Pri_Stu &lt;dbl&gt;, Sec_Stu &lt;dbl&gt;,
+#   Household &lt;dbl&gt;, Household_R &lt;dbl&gt;, NOIP &lt;dbl&gt;, Pop_R &lt;dbl&gt;, RSCG &lt;dbl&gt;,
+#   Pop_T &lt;dbl&gt;, Agri &lt;dbl&gt;, Service &lt;dbl&gt;, Disp_Inc &lt;dbl&gt;, RORP &lt;dbl&gt;,
+#   ROREmp &lt;dbl&gt;, and abbreviated variable names ¹​avg_wage, ²​deposite</code></pre>
+</div>
+</div>
+</section>
+<section id="combine-both-df-using-left-join" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="combine-both-df-using-left-join"><span class="header-section-number">2.3</span> Combine both df using left-join</h2>
+<p>Always do left-join cause its best to put the sf df the left side then right side is the tibble</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>hunan_GDPPC <span class="ot">&lt;-</span> <span class="fu">left_join</span>(hunan, hunan2012) <span class="sc">|&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">7</span>, <span class="dv">15</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>NOTE: during joining,must have a common field (unique identifier) then another thing to take note is to make sure both columns have same number of attributes(?)</p>
+</section>
+<section id="plotting-chrorpleth-map" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="plotting-chrorpleth-map"><span class="header-section-number">2.4</span> Plotting Chrorpleth map</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(hunan_GDPPC)<span class="sc">+</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"GDPPC"</span>, </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>, </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">palette =</span> <span class="st">"Blues"</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">title =</span> <span class="st">"GDPPC"</span>) <span class="sc">+</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Distribution of GDP per capita by district"</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">main.title.size =</span> <span class="fl">1.0</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.height =</span> <span class="fl">0.45</span>, </span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.width =</span> <span class="fl">0.35</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">frame =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_compass</span>(<span class="at">type=</span><span class="st">"8star"</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_scale_bar</span>() <span class="sc">+</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_grid</span>(<span class="at">alpha =</span><span class="fl">0.2</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="In-class_Ex06_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="identify-neighbours" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Identify neighbours</h1>
+<section id="contibuity-neighbours-method" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="contibuity-neighbours-method"><span class="header-section-number">3.1</span> Contibuity neighbours method</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>cn_queen <span class="ot">&lt;-</span> hunan_GDPPC <span class="sc">|&gt;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_contiguity</span>(geometry), <span class="at">.before =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>.before = 1 is to put the newly created column at the first column onwards.</p>
+<p>#Neighbour list by Rook’s method</p>
+<div class="cell">
+
 </div>
 
 
