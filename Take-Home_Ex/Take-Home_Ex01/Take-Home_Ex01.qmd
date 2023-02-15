@@ -21,7 +21,6 @@ Water is an essential resource for people. The health of people depends on havin
 
 Discover the geographical distribution of functional and non-function water points and their co-locations if any in Osun State, Nigeria.
 
-
 **Exploratory Spatial Data Analysis (ESDA)**
 
 -   Derive kernel density maps of functional and non-functional water points. Using appropriate tmap functions
@@ -110,15 +109,12 @@ NGA <- NGA %>%
   filter(ADM1_EN == "Osun")
 ```
 
-
 #### 3. Glimpse NGA
 
 ```{r}
 glimpse(NGA)
 ```
-
 :::
-
 
 ## Importing WPdx
 
@@ -151,11 +147,11 @@ wp_sf <- wp_sf %>%
   st_transform(crs = 26392)
 ```
 
-
 ### EDA for Water Point Data
 
 ::: panel-tabset
 #### 1. Overview
+
 Next, we want to first have a visual of the water point data by creating a frequency chart. (Reference to In-class exercise 2)
 
 ```{r}
@@ -234,8 +230,6 @@ NGA_wp <- NGA %>%
   mutate(`wp_unknown` = lengths(
     st_intersects(NGA, wp_unknown)))
 ```
-
-
 
 ------------------------------------------------------------------------
 
@@ -327,13 +321,13 @@ par(mfrow=c(1,2))
 plot(wp_ppp_functional)
 plot(wp_ppp_nonfunctional)
 ```
-
 :::
 
 ### Check for duplicates
 
 ::: panel-tabset
 #### T / F value
+
 ```{r}
 #any(duplicated(wp_ppp))
 
@@ -342,6 +336,7 @@ any(duplicated(wp_ppp_nonfunctional))
 ```
 
 #### Sum of duplicates
+
 If so, check for the number of duplicates
 
 ```{r}
@@ -351,6 +346,7 @@ sum(multiplicity(wp_ppp_nonfunctional) > 1)
 ```
 
 #### Jittery Approach
+
 To resolve this problem, we will be using the jittering approach, which will add a small perturbation to the duplicate points so that they do not occupy the exact same space.
 
 ```{r}
@@ -375,9 +371,7 @@ Then, check again for duplicates
 any(duplicated(wp_ppp_functional_jit))
 any(duplicated(wp_ppp_nonfunctional_jit))
 ```
-
 :::
-
 
 ## Create owin object
 
@@ -416,6 +410,7 @@ wpNGA_ppp_nonfunctional= wp_ppp_nonfunctional[nga_owin]
 ```
 
 #### Plot
+
 ```{r}
 #plot(wpNGA_ppp)
 
@@ -423,18 +418,17 @@ par(mfrow=c(1,2))
 plot(wpNGA_ppp_functional)
 plot(wpNGA_ppp_nonfunctional)
 ```
-
-
 :::
 
-
 ### tmap plots
-We can further plot our water points (functional & non-functional) using tmap().
 
+We can further plot our water points (functional & non-functional) using tmap().
 
 ::: panel-tabset
 #### Overview
-Lets put both functional and non functional water points together. Also, Set the base map to be "OpenStreetMap". 
+
+Lets put both functional and non functional water points together. Also, Set the base map to be "OpenStreetMap".
+
 ```{r}
 tmap_mode("view")
 tm_basemap("OpenStreetMap") +
@@ -453,10 +447,10 @@ tm_shape(wp_nonfunctional) +
   tm_view(set.zoom.limits = c(8, 16))
 ```
 
-
-From this point map, even with the different colours points, it is difficult to intrepet the clusters of the functional and non-functional water points. Lets go to the next tab to look at only functional points. 
+From this point map, even with the different colours points, it is difficult to intrepet the clusters of the functional and non-functional water points. Lets go to the next tab to look at only functional points.
 
 #### wp_functional
+
 ```{r}
 tmap_mode("view")
 tm_basemap("OpenStreetMap") +
@@ -470,11 +464,10 @@ tm_shape(wp_functional) +
   tm_view(set.zoom.limits = c(8, 16))
 ```
 
-
 At a macro view (zoom out), there are A LOT of functional water points. While zooming in, it looks like there's some clusters of water points such as the border between Ife Central and Ife East. Lets take a look at the next tab, wp_nonfunctional.
 
-
 #### wp_nonfunctional
+
 ```{r}
 tmap_mode("view")
 tm_basemap("OpenStreetMap") +
@@ -489,20 +482,17 @@ tm_shape(wp_nonfunctional) +
 ```
 
 Again, at a macro view (zoom out), there are A LOT of functional water points. While zooming in, it looks like there's some clusters of water points such as the border between Ife Central and Ife East, which seems like the same cluster as shown in wp_functional. This highlights that point map might not suitable in identifying the clusters due to the overlapping points and categorisation. Thus, lets proceed onto the First-Order of Spatial Point Patterns Analysis to plot Kernel density maps which could provide more meaningful insights.
-
 :::
-
 
 ------------------------------------------------------------------------
 
 # First-order Spatial Point Patterns Analysis
-Now that we have the point maps from the previous section, moving forward, lets see how would the kernel density maps would display the water points in Osun. 
 
+Now that we have the point maps from the previous section, moving forward, lets see how would the kernel density maps would display the water points in Osun.
 
 ## Kernel Density Estimation
 
-In this section, We will be computing Functional and Non-Functional water points in Osun. 
-
+In this section, We will be computing Functional and Non-Functional water points in Osun.
 
 ### Computing kernel density estimation using automatic bandwidth selection method
 
@@ -530,6 +520,7 @@ Before moving to the next section, let's retrieve the bandwidth used to compute 
 
 ::: panel-tabset
 #### bw_functional
+
 ```{r}
 #bw <- bw.diggle(wpNGA_ppp)
 #bw
@@ -541,8 +532,6 @@ bw_functional
 bw_nonfunctional <- bw.diggle(wpNGA_ppp_nonfunctional)
 bw_nonfunctional
 ```
-
-
 :::
 
 ### Rescalling KDE values
@@ -572,8 +561,7 @@ plot(kde_wpNGA_functional.bw)
 plot(kde_wpNGA_nonfunctional.bw)
 ```
 
-Unlike the point map, from the above KDE maps, it highlight the signifcant clusters and much easier to identify the clusters of functional and non-functional water points clusters. 
-
+Unlike the point map, from the above KDE maps, it highlight the signifcant clusters and much easier to identify the clusters of functional and non-functional water points clusters.
 
 ## Adaptive KDE
 
@@ -583,7 +571,9 @@ Fixed bandwidth method is very sensitive to highly skew distribution of spatial 
 
 ::: panel-tabset
 #### kde_wpNGA_functional_adaptive
+
 Lets look at functional wp in adaptive bandwidth then move on the next tab for the non-functional.
+
 ```{r}
 #kde_wpNGA_adaptive <- adaptive.density(wpNGA_ppp.km, method="kernel")
 #plot(kde_wpNGA_adaptive)
@@ -597,6 +587,7 @@ plot(kde_wpNGA_functional.bw)
 ```
 
 #### kde_wpNGA_nonfunctional_adaptive
+
 ```{r}
 kde_wpNGA_nonfunctional_adaptive <- adaptive.density(wpNGA_ppp_nonfunctional.km, method="kernel")
 plot(kde_wpNGA_nonfunctional_adaptive)
@@ -604,19 +595,16 @@ plot(kde_wpNGA_nonfunctional_adaptive)
 plot(kde_wpNGA_nonfunctional.bw)
 ```
 
-
-OBSERVATION
-Well it seems like theres isnt signficant changes to the functional BUT if u take a closer look at the non-functional map, some points are now lower in density with this adaptive bandwidth.
+OBSERVATION Well it seems like theres isnt signficant changes to the functional BUT if u take a closer look at the non-functional map, some points are now lower in density with this adaptive bandwidth.
 :::
-
 
 ### Converting KDE output into grid object
 
 To make the KDE output is suitable for mapping purposes.
 
 ::: panel-tabset
-
 #### Functional
+
 ```{r}
 #gridded_kde_wpNGA_bw <- as.SpatialGridDataFrame.im(kde_wpNGA.bw)
 #spplot(gridded_kde_wpNGA_bw)
@@ -626,13 +614,12 @@ spplot(gridded_kde_wpNGA_func_bw)
 ```
 
 #### 2. Non-Functional
+
 ```{r}
 gridded_kde_wpNGA_nfunc_bw <- as.SpatialGridDataFrame.im(kde_wpNGA_nonfunctional.bw)
 spplot(gridded_kde_wpNGA_nfunc_bw)
 ```
-
 :::
-
 
 #### Converting gridded output into raster
 
@@ -677,15 +664,13 @@ tm_shape(kde_wpNGA_func_bw_raster) +
 ```
 
 ##### 4. tmap (non-functional)
+
 ```{r}
 tm_shape(kde_wpNGA_nfunc_bw_raster) + 
   tm_raster("v") +
   tm_layout(legend.position = c("right", "bottom"), frame = FALSE)
 ```
-
 :::
-
-
 
 ### Spatial Point Patterns using KDE
 
@@ -753,25 +738,25 @@ plot(density(wp_osun_ppp_nfunc.km,
      main="Osun Non-Functional")
 ```
 
-
-
 # Second-order Spatial Point Patterns
 
 ## Analysing Spatial Point Process Using G-Function
+
 In this section, the G function measures the distances between any two events and their respective nearest neighbours. Using spatstat package's Gest() and envelope() to run a Monte Carlo simulation test, which is used to predict the probability of a range of outcomes when the possibility of random variables is present.
 
 ::: panel-tabset
 ## Functional
-### 1. Computing G-function estimation (Functional) 
+
+### 1. Computing G-function estimation (Functional)
+
 Lets start with the functional.
+
 ```{r}
 G_func_osun = Gest(wp_osun_ppp_func, correction = "border")
 plot(G_func_osun, xlim=c(0,500))
 ```
 
-
-
-### 2. Performing Complete Spatial Randomness Test (Functional) 
+### 2. Performing Complete Spatial Randomness Test (Functional)
 
 Next, we will be conducting a hypothesis test to confirm the observed spatial patterns above. The hypothesis and test are as follows:
 
@@ -787,28 +772,24 @@ Monte Carlo test with G-function
 G_func_osun.csr <- envelope(wp_osun_ppp_func, Gest, nsim = 39)
 ```
 
-
 ```{r}
 plot(G_func_osun.csr)
 ```
 
-
-Conclusion
-From func_osun.csr, it is observed that at 95% confidence interval, the G(r) far above the G(theo) and the envelope. This implies that the functional water points in Osun, Nigeria are clustered. Thus, we can reject the null hypothesis that the distribution of functional water points are randomly distributed.
-
-
-
+Conclusion From func_osun.csr, it is observed that at 95% confidence interval, the G(r) far above the G(theo) and the envelope. This implies that the functional water points in Osun, Nigeria are clustered. Thus, we can reject the null hypothesis that the distribution of functional water points are randomly distributed.
 
 ## Non-Functional
-### 3. Computing G-function estimation (Non-Functional) 
-Next, Non-functional 
+
+### 3. Computing G-function estimation (Non-Functional)
+
+Next, Non-functional
+
 ```{r}
 G_nfunc_osun = Gest(wp_osun_ppp_nfunc, correction = "border")
 plot(G_nfunc_osun, xlim=c(0,500))
 ```
 
-
-### 4. Performing Complete Spatial Randomness Test (Non-Functional) 
+### 4. Performing Complete Spatial Randomness Test (Non-Functional)
 
 Next, we will be conducting a hypothesis test to confirm the observed spatial patterns above. The hypothesis and test are as follows:
 
@@ -824,37 +805,33 @@ Monte Carlo test with G-function
 G_nfunc_osun.csr <- envelope(wp_osun_ppp_nfunc, Gest, nsim = 39)
 ```
 
-
 ```{r}
 plot(G_nfunc_osun.csr)
 ```
 
-Conclusion
-From nfunc_osun.csr, it is observed that at 95% confidence interval, the G(r) far above the G(theo) and the envelope. This implies that the non-functional water points in Osun, Nigeria are clustered. Thus, we can reject the null hypothesis that the distribution of non-functional water points are randomly distributed.
-
-
+Conclusion From nfunc_osun.csr, it is observed that at 95% confidence interval, the G(r) far above the G(theo) and the envelope. This implies that the non-functional water points in Osun, Nigeria are clustered. Thus, we can reject the null hypothesis that the distribution of non-functional water points are randomly distributed.
 :::
 
-
 # Analysing Spatial Point Process Using L-Function
+
 Lets also investigate whether the spatial distribution of functional and non-functional water points are independent from each other.
 
 ::: panel-tabset
-
 ## Functional
 
-### Computing G-function estimation 
+### Computing G-function estimation
+
 ```{r}
 # L_func_osun.csr = Lest(wp_osun_ppp_func, correction = "Ripley")
 # plot(L_func_osun.csr, . -r ~ r, 
 #      ylab= "L(d)-r", xlab = "d(m)")
 ```
 
-
 ### Performing Complete Spatial Randomness Test
+
 Again, we will be conducting a hypothesis test to confirm the observed spatial patterns above. The hypothesis and test are as follows:
 
-Ho = The distribution of functional water points in Osun, Nigeria are spatially independent. 
+Ho = The distribution of functional water points in Osun, Nigeria are spatially independent.
 
 H1= The distribution of functional water points in Osun, Nigeria are NOT spatially independent.
 
@@ -867,55 +844,49 @@ Monte Carlo test with L-function
 ```
 
 ### Plot the result from L-function
+
 ```{r}
 #plot(L_func_osun.csr, . - r ~ r, xlab="d", ylab="L(d)-r")
 ```
 
-CONCLUSION
-From the plot above, the empirical k-cross line is far outside from the envelope of the 95% confidence level, and for that scale, we reject the null hypothesis. Moreover, it is not even within the envelope in all distance(m). We can infer that the distribution of functional water points in Osun, Nigeria are NOT spatially independent.
-
+CONCLUSION From the plot above, the empirical k-cross line is far outside from the envelope of the 95% confidence level, and for that scale, we reject the null hypothesis. Moreover, it is not even within the envelope in all distance(m). We can infer that the distribution of functional water points in Osun, Nigeria are NOT spatially independent.
 
 ## Non-Functional
 
-- NOTE: erm I was unable to run the output in time for this section for submission..so i had to comment these codes out in order to render
+-   NOTE: erm I was unable to run the output in time for this section for submission..so i had to comment these codes out in order to render
 
-### Computing G-function estimation 
+### Computing G-function estimation
+
 ```{r}
 # L_nfunc_osun.csr = Lest(wp_osun_ppp_nfunc, correction = "Ripley")
 # plot(L_nfunc_osun.csr, . -r ~ r, ylab= "L(d)-r", xlab = "d(m)")
 ```
 
-
 ### Performing Complete Spatial Randomness Test
+
 Again, we will be conducting a hypothesis test to confirm the observed spatial patterns above. The hypothesis and test are as follows:
 
-Ho = The distribution of non-functional water points in Osun, Nigeria are spatially independent. 
+Ho = The distribution of non-functional water points in Osun, Nigeria are spatially independent.
 
-H1= The distribution of non-functional water points in Osun, Nigeria are spatially independent. 
+H1= The distribution of non-functional water points in Osun, Nigeria are spatially independent.
 
 The null hypothesis will be rejected if p-value is smaller than alpha value of 0.05.
 
 Monte Carlo test with L-function
+
 ```{r}
 #L_nfunc_osun.csr <- envelope(wp_osun_ppp_nfunc, Lest, nsim = 39, rank = 1, glocal=TRUE)
 ```
 
-
 ### Plot the result from L-function
+
 ```{r}
 #plot(L_nfunc_osun.csr, . - r ~ r, xlab="d", ylab="L(d)-r")
 ```
 
 CONCLUSION
-
 :::
 
-
-
-
-
-
 # Acknowledgement
+
 Thank you Prof Kam for our IS415 Geospatial Analytics and Applications course materials & resources
-
-

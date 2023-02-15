@@ -202,6 +202,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <a class="dropdown-item" href="../../Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html">
  <span class="dropdown-text">Take-Home Exercise 1</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../Take-Home_Ex/Take-Home_Ex02/Take-Home_Ex02.html">
+ <span class="dropdown-text">Take-Home Exercise 2</span></a>
+  </li>  
     </ul>
   </li>
 </ul>
@@ -243,6 +247,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#identify-neighbours" id="toc-identify-neighbours" class="nav-link" data-scroll-target="#identify-neighbours"><span class="toc-section-number">3</span>  Identify neighbours</a>
   <ul class="collapse">
   <li><a href="#contibuity-neighbours-method" id="toc-contibuity-neighbours-method" class="nav-link" data-scroll-target="#contibuity-neighbours-method"><span class="toc-section-number">3.1</span>  Contibuity neighbours method</a></li>
+  <li><a href="#neighbour-list-by-rooks-method" id="toc-neighbour-list-by-rooks-method" class="nav-link" data-scroll-target="#neighbour-list-by-rooks-method"><span class="toc-section-number">3.2</span>  Neighbour list by Rook’s method</a></li>
+  <li><a href="#contiguity-rook-method" id="toc-contiguity-rook-method" class="nav-link" data-scroll-target="#contiguity-rook-method"><span class="toc-section-number">3.3</span>  Contiguity rook method</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -270,7 +276,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">February 13, 2023</p>
+      <p class="date-modified">February 15, 2023</p>
     </div>
   </div>
     
@@ -372,14 +378,34 @@ Geodetic CRS:  WGS 84</code></pre>
 <h1 data-number="3"><span class="header-section-number">3</span> Identify neighbours</h1>
 <section id="contibuity-neighbours-method" class="level2" data-number="3.1">
 <h2 data-number="3.1" class="anchored" data-anchor-id="contibuity-neighbours-method"><span class="header-section-number">3.1</span> Contibuity neighbours method</h2>
+<p>.before = 1 is to put the newly created column at the first column onwards.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>cn_queen <span class="ot">&lt;-</span> hunan_GDPPC <span class="sc">|&gt;</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_contiguity</span>(geometry), <span class="at">.before =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>.before = 1 is to put the newly created column at the first column onwards.</p>
-<p>#Neighbour list by Rook’s method</p>
+</section>
+<section id="neighbour-list-by-rooks-method" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="neighbour-list-by-rooks-method"><span class="header-section-number">3.2</span> Neighbour list by Rook’s method</h2>
+<p>queen = false is to know that the default queen is false then its rook.</p>
 <div class="cell">
-
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>cn_rook <span class="ot">&lt;-</span> hunan_GDPPC <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_contiguity</span>(geometry), <span class="at">queen =</span> <span class="cn">FALSE</span>, <span class="at">.before =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>wm_q <span class="ot">=</span> hunan_GDPPC <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_contiguity</span>(geometry), </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">wt =</span> <span class="fu">st_weights</span>(nb), </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="contiguity-rook-method" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="contiguity-rook-method"><span class="header-section-number">3.3</span> Contiguity rook method</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>wm_r <span class="ot">=</span> hunan_GDPPC <span class="sc">|&gt;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_contiguity</span>(geometry), </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">queen =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">wt =</span> <span class="fu">st_weights</span>(nb), </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 

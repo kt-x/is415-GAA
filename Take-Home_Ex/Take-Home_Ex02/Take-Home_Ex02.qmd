@@ -1,0 +1,45 @@
+---
+title: "Take-Home_Ex02"
+date: "13 Feb 2023"
+date-modified: "`r Sys.Date()`"
+number-sections: true
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: visual
+---
+
+# Overview
+
+## Context
+
+As a result of the COVID-19 outbreak in Indonesia, a widespread immunization campaign is currently being conducted there. The program was launched on January 13, 2021, when President Joko Widodo had his vaccination at the presidential palace. Indonesia is ranked third in Asia and fifth overall for total dosages administered.
+
+Wikipedia states that as of February 5, 2023, at 18:00 WIB (UTC+7), 204,266,655 individuals had received the first dose of the vaccine and 175,131,893 individuals had received the full course of vaccination; 69,597,474 of these individuals had received the booster dose or third dose, and 1,585,164 had received the fourth dose. With 103.46% of the population fully immunized, Jakarta has the highest rate, followed by Bali and the Special Region of Yogyakarta with 85.45% and 83.02%, respectively.
+
+## Objectives
+
+Exploratory Spatial Data Analysis (ESDA) hold tremendous potential to address complex problems facing society. In this study, you are tasked to apply appropriate Local Indicators of Spatial Association (LISA) and Emerging Hot Spot Analysis (EHSA) to undercover the spatio-temporal trends of COVID-19 vaccination in DKI Jakarta.
+
+## Task
+
+Choropleth Mapping and Analysis
+
+-   Compute the monthly vaccination rate from July 2021 to June 2022 at sub-district (also known as kelurahan in Bahasa Indonesia) level,
+
+-   Prepare the monthly vaccination rate maps by using appropriate tmap functions,
+
+-   Describe the spatial patterns revealed by the choropleth maps (not more than 200 words).
+
+## Data used
+| Type       | Name          | Format | Description                   | Source                        |
+|---------------|---------------|---------------|---------------|---------------|
+| Aspatial   | WPdx+         | csv    | Locations of water points     | WPdx Global Data Repositories |
+| Geospatial | geoBoundaries | SHP    | geoBoundaries data of Nigeria | geoBoundaries                 |
+
+: Table 1: Data used
+
+# Importing and loading packages
+

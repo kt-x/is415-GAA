@@ -70,19 +70,38 @@ tm_shape(hunan_GDPPC)+
 # Identify neighbours
 
 ## Contibuity neighbours method
+.before = 1 is to put the newly created column at the first column onwards.
 ```{r}
 cn_queen <- hunan_GDPPC |>
   mutate(nb = st_contiguity(geometry), .before = 1)
 ```
 
-.before = 1 is to put the newly created column at the first column onwards.
+
 
 ## Neighbour list by Rook's method
+queen = false is to know that the default queen is false then its rook.
 ```{r}
+cn_rook <- hunan_GDPPC |>
+  mutate(nb = st_contiguity(geometry), queen = FALSE, .before = 1)
 
 ```
 
 
+```{r}
+wm_q = hunan_GDPPC |>
+  mutate(nb = st_contiguity(geometry), 
+         wt = st_weights(nb), 
+         .before = 1)
+```
 
 
+
+## Contiguity rook method
+```{r}
+wm_r = hunan_GDPPC |>
+  mutate(nb = st_contiguity(geometry), 
+         queen = FALSE,
+         wt = st_weights(nb), 
+         .before = 1)
+```
 
