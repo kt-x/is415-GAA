@@ -34,12 +34,79 @@ Choropleth Mapping and Analysis
 -   Describe the spatial patterns revealed by the choropleth maps (not more than 200 words).
 
 ## Data used
-| Type       | Name          | Format | Description                   | Source                        |
+
+| Type       | Name                                     | Format | Description                   | Source                                   |
 |---------------|---------------|---------------|---------------|---------------|
-| Aspatial   | WPdx+         | csv    | Locations of water points     | WPdx Global Data Repositories |
-| Geospatial | geoBoundaries | SHP    | geoBoundaries data of Nigeria | geoBoundaries                 |
+| Aspatial   | Riwayat File Vaksinasi DKI Jakarta       | csv    | Daily vaccination data        | Open Data Vaksinasi Provinsi DKI Jakarta |
+| Geospatial | DKI Jakarta administration boundary 2019 | SHP    | geoBoundaries data of Jakarta | Indonesia Geospatial                     |
 
 : Table 1: Data used
 
-# Importing and loading packages
+For the Aspatial Data, I decided to use the dataset available on 1st Sept 2022 for this exercise. 
+
+## Packages used
+
+For this exercise, we'll be using the following packages:
+
+-   sf: Manage and process vector-based geospatial data in R
+
+-   sfdep: 
+
+-   maptools: Convert Spatial objects into ppp format of spatstat
+
+-   tmap: Plotting cartographic quality static point patterns maps or interactive maps by using leaflet API
+
+-   tidyverse: a collection of functions, data, and documentation that extends the capabilities of base R.
+
+-   knitr: 
+
+-   readxl: The readxl package makes it easy to get data out of Excel and into R
+
+We will be using p_load function of pacman package to install and load required packages.
+
+```{r}
+pacman::p_load(sf, sfdep, tmap, maptools, tidyverse, knitr, readxl)
+```
+
+# Import Data
+
+## Importing Geospatial
+
+::: panel-tabset
+
+### Import
+```{r}
+jkt <- st_read(dsn = "data/geospatial/BATAS DESA DESEMBER 2019 DUKCAPIL DKI JAKARTA", 
+                layer = "BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA")
+```
+
+### Glimpse
+```{r}
+glimpse(jkt)
+```
+
+::: 
+
+## Importing Aspatial
+
+::: panel-tabset
+
+### Import
+```{r}
+vaccinated <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 September 2022).xlsx")
+```
+
+### Glimpse
+```{r}
+glimpse(vaccinated)
+```
+
+:::
+
+## Perform relational join
+```{r}
+# jkt_2022 <- left_join(jkt,hunan2012)%>%
+#   select(1:4, 7, 15)
+```
+
 
