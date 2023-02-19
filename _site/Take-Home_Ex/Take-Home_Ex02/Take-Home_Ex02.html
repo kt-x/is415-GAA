@@ -241,11 +241,32 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#data-used" id="toc-data-used" class="nav-link" data-scroll-target="#data-used"><span class="toc-section-number">1.4</span>  Data used</a></li>
   <li><a href="#packages-used" id="toc-packages-used" class="nav-link" data-scroll-target="#packages-used"><span class="toc-section-number">1.5</span>  Packages used</a></li>
   </ul></li>
-  <li><a href="#import-data" id="toc-import-data" class="nav-link" data-scroll-target="#import-data"><span class="toc-section-number">2</span>  Import Data</a>
+  <li><a href="#data-wrangling-geospatial-data" id="toc-data-wrangling-geospatial-data" class="nav-link" data-scroll-target="#data-wrangling-geospatial-data"><span class="toc-section-number">2</span>  Data wrangling: Geospatial data</a>
   <ul class="collapse">
   <li><a href="#importing-geospatial" id="toc-importing-geospatial" class="nav-link" data-scroll-target="#importing-geospatial"><span class="toc-section-number">2.1</span>  Importing Geospatial</a></li>
-  <li><a href="#importing-aspatial" id="toc-importing-aspatial" class="nav-link" data-scroll-target="#importing-aspatial"><span class="toc-section-number">2.2</span>  Importing Aspatial</a></li>
-  <li><a href="#perform-relational-join" id="toc-perform-relational-join" class="nav-link" data-scroll-target="#perform-relational-join"><span class="toc-section-number">2.3</span>  Perform relational join</a></li>
+  <li><a href="#data-pre-processing" id="toc-data-pre-processing" class="nav-link" data-scroll-target="#data-pre-processing"><span class="toc-section-number">2.2</span>  Data Pre-processing</a>
+  <ul class="collapse">
+  <li><a href="#validity-of-geometry" id="toc-validity-of-geometry" class="nav-link" data-scroll-target="#validity-of-geometry"><span class="toc-section-number">2.2.1</span>  Validity of geometry</a></li>
+  <li><a href="#missing-values" id="toc-missing-values" class="nav-link" data-scroll-target="#missing-values"><span class="toc-section-number">2.2.2</span>  Missing values</a></li>
+  <li><a href="#validate-transform-jkt-crs" id="toc-validate-transform-jkt-crs" class="nav-link" data-scroll-target="#validate-transform-jkt-crs"><span class="toc-section-number">2.2.3</span>  Validate &amp; Transform jkt CRS</a></li>
+  </ul></li>
+  <li><a href="#visualise-data" id="toc-visualise-data" class="nav-link" data-scroll-target="#visualise-data"><span class="toc-section-number">2.3</span>  Visualise data</a>
+  <ul class="collapse">
+  <li><a href="#remove-outer-islands" id="toc-remove-outer-islands" class="nav-link" data-scroll-target="#remove-outer-islands"><span class="toc-section-number">2.3.1</span>  Remove outer islands</a></li>
+  <li><a href="#select-filter" id="toc-select-filter" class="nav-link" data-scroll-target="#select-filter"><span class="toc-section-number">2.3.2</span>  Select &amp; Filter</a></li>
+  <li><a href="#rename-the-fields" id="toc-rename-the-fields" class="nav-link" data-scroll-target="#rename-the-fields"><span class="toc-section-number">2.3.3</span>  Rename the fields</a></li>
+  </ul></li>
+  <li><a href="#eda" id="toc-eda" class="nav-link" data-scroll-target="#eda"><span class="toc-section-number">2.4</span>  EDA</a></li>
+  </ul></li>
+  <li><a href="#data-wrangling-with-aspatial-data" id="toc-data-wrangling-with-aspatial-data" class="nav-link" data-scroll-target="#data-wrangling-with-aspatial-data"><span class="toc-section-number">3</span>  Data wrangling with Aspatial Data</a>
+  <ul class="collapse">
+  <li><a href="#importing-aspatial" id="toc-importing-aspatial" class="nav-link" data-scroll-target="#importing-aspatial"><span class="toc-section-number">3.1</span>  Importing Aspatial</a>
+  <ul class="collapse">
+  <li><a href="#from-july-2021-to-dec-2021" id="toc-from-july-2021-to-dec-2021" class="nav-link" data-scroll-target="#from-july-2021-to-dec-2021"><span class="toc-section-number">3.1.1</span>  From July 2021 to Dec 2021</a></li>
+  <li><a href="#from-jan-2022-to-june-2022" id="toc-from-jan-2022-to-june-2022" class="nav-link" data-scroll-target="#from-jan-2022-to-june-2022"><span class="toc-section-number">3.1.2</span>  From Jan 2022 to June 2022</a></li>
+  <li><a href="#glimpse-1" id="toc-glimpse-1" class="nav-link" data-scroll-target="#glimpse-1"><span class="toc-section-number">3.1.3</span>  Glimpse</a></li>
+  </ul></li>
+  <li><a href="#perform-relational-join" id="toc-perform-relational-join" class="nav-link" data-scroll-target="#perform-relational-join"><span class="toc-section-number">3.2</span>  Perform relational join</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -273,7 +294,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">February 15, 2023</p>
+      <p class="date-modified">February 19, 2023</p>
     </div>
   </div>
     
@@ -359,8 +380,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </section>
 </section>
-<section id="import-data" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Import Data</h1>
+<section id="data-wrangling-geospatial-data" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Data wrangling: Geospatial data</h1>
 <section id="importing-geospatial" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="importing-geospatial"><span class="header-section-number">2.1</span> Importing Geospatial</h2>
 <div class="panel-tabset">
@@ -556,67 +577,347 @@ $ geometry   &lt;MULTIPOLYGON [°]&gt; MULTIPOLYGON (((106.8164 -6..., MULTIPOLY
 </div>
 </div>
 </section>
-<section id="importing-aspatial" class="level2" data-number="2.2">
-<h2 data-number="2.2" class="anchored" data-anchor-id="importing-aspatial"><span class="header-section-number">2.2</span> Importing Aspatial</h2>
+<section id="data-pre-processing" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="data-pre-processing"><span class="header-section-number">2.2</span> Data Pre-processing</h2>
+<p>We got to first ensure 2 things: validity of geomeetries and if there are missing values that could affect the later section of calculations and visualisations.</p>
+<p>Reference was taken from the senior sample submissions for the code for this section, with credit to <a href="https://is415-msty.netlify.app/posts/2021-09-10-take-home-exercise-1/">Take-Home Exercise 1: Analysing and Visualising Spatio-temporal Patterns of COVID-19 in DKI Jakarta, Indonesia by MEGAN SIM TZE YEN.</a></p>
+<section id="validity-of-geometry" class="level3" data-number="2.2.1">
+<h3 data-number="2.2.1" class="anchored" data-anchor-id="validity-of-geometry"><span class="header-section-number">2.2.1</span> Validity of geometry</h3>
+<p>Using st_is_valid function to check</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">which</span>(<span class="fu">st_is_valid</span>(jkt) <span class="sc">==</span> <span class="cn">FALSE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0</code></pre>
+</div>
+</div>
+<p>Since theres no invalids geometrics, we move to missing values</p>
+</section>
+<section id="missing-values" class="level3" data-number="2.2.2">
+<h3 data-number="2.2.2" class="anchored" data-anchor-id="missing-values"><span class="header-section-number">2.2.2</span> Missing values</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>jkt[<span class="fu">rowSums</span>(<span class="fu">is.na</span>(jkt))<span class="sc">!=</span><span class="dv">0</span>,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 2 features and 161 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 106.8412 ymin: -6.154036 xmax: 106.8612 ymax: -6.144973
+Geodetic CRS:  WGS 84
+    OBJECT_ID KODE_DESA             DESA   KODE    PROVINSI KAB_KOTA KECAMATAN
+243     25645  31888888     DANAU SUNTER 318888 DKI JAKARTA     &lt;NA&gt;      &lt;NA&gt;
+244     25646  31888888 DANAU SUNTER DLL 318888 DKI JAKARTA     &lt;NA&gt;      &lt;NA&gt;
+    DESA_KELUR JUMLAH_PEN JUMLAH_KK LUAS_WILAY KEPADATAN PERPINDAHA JUMLAH_MEN
+243       &lt;NA&gt;          0         0          0         0          0          0
+244       &lt;NA&gt;          0         0          0         0          0          0
+    PERUBAHAN WAJIB_KTP SILAM KRISTEN KHATOLIK HINDU BUDHA KONGHUCU KEPERCAYAA
+243         0         0     0       0        0     0     0        0          0
+244         0         0     0       0        0     0     0        0          0
+    PRIA WANITA BELUM_KAWI KAWIN CERAI_HIDU CERAI_MATI U0 U5 U10 U15 U20 U25
+243    0      0          0     0          0          0  0  0   0   0   0   0
+244    0      0          0     0          0          0  0  0   0   0   0   0
+    U30 U35 U40 U45 U50 U55 U60 U65 U70 U75 TIDAK_BELU BELUM_TAMA TAMAT_SD SLTP
+243   0   0   0   0   0   0   0   0   0   0          0          0        0    0
+244   0   0   0   0   0   0   0   0   0   0          0          0        0    0
+    SLTA DIPLOMA_I DIPLOMA_II DIPLOMA_IV STRATA_II STRATA_III BELUM_TIDA
+243    0         0          0          0         0          0          0
+244    0         0          0          0         0          0          0
+    APARATUR_P TENAGA_PEN WIRASWASTA PERTANIAN NELAYAN AGAMA_DAN PELAJAR_MA
+243          0          0          0         0       0         0          0
+244          0          0          0         0       0         0          0
+    TENAGA_KES PENSIUNAN LAINNYA GENERATED KODE_DES_1 BELUM_ MENGUR_ PELAJAR_
+243          0         0       0      &lt;NA&gt;       &lt;NA&gt;      0       0        0
+244          0         0       0      &lt;NA&gt;       &lt;NA&gt;      0       0        0
+    PENSIUNA_1 PEGAWAI_ TENTARA KEPOLISIAN PERDAG_ PETANI PETERN_ NELAYAN_1
+243          0        0       0          0       0      0       0         0
+244          0        0       0          0       0      0       0         0
+    INDUSTR_ KONSTR_ TRANSP_ KARYAW_ KARYAW1 KARYAW1_1 KARYAW1_12 BURUH BURUH_
+243        0       0       0       0       0         0          0     0      0
+244        0       0       0       0       0         0          0     0      0
+    BURUH1 BURUH1_1 PEMBANT_ TUKANG TUKANG_1 TUKANG_12 TUKANG__13 TUKANG__14
+243      0        0        0      0        0         0          0          0
+244      0        0        0      0        0         0          0          0
+    TUKANG__15 TUKANG__16 TUKANG__17 PENATA PENATA_ PENATA1_1 MEKANIK SENIMAN_
+243          0          0          0      0       0         0       0        0
+244          0          0          0      0       0         0       0        0
+    TABIB PARAJI_ PERANCA_ PENTER_ IMAM_M PENDETA PASTOR WARTAWAN USTADZ JURU_M
+243     0       0        0       0      0       0      0        0      0      0
+244     0       0        0       0      0       0      0        0      0      0
+    PROMOT ANGGOTA_ ANGGOTA1 ANGGOTA1_1 PRESIDEN WAKIL_PRES ANGGOTA1_2
+243      0        0        0          0        0          0          0
+244      0        0        0          0        0          0          0
+    ANGGOTA1_3 DUTA_B GUBERNUR WAKIL_GUBE BUPATI WAKIL_BUPA WALIKOTA WAKIL_WALI
+243          0      0        0          0      0          0        0          0
+244          0      0        0          0      0          0        0          0
+    ANGGOTA1_4 ANGGOTA1_5 DOSEN GURU PILOT PENGACARA_ NOTARIS ARSITEK AKUNTA_
+243          0          0     0    0     0          0       0       0       0
+244          0          0     0    0     0          0       0       0       0
+    KONSUL_ DOKTER BIDAN PERAWAT APOTEK_ PSIKIATER PENYIA_ PENYIA1 PELAUT
+243       0      0     0       0       0         0       0       0      0
+244       0      0     0       0       0         0       0       0      0
+    PENELITI SOPIR PIALAN PARANORMAL PEDAGA_ PERANG_ KEPALA_ BIARAW_ WIRASWAST_
+243        0     0      0          0       0       0       0       0          0
+244        0     0      0          0       0       0       0       0          0
+    LAINNYA_12 LUAS_DESA KODE_DES_3 DESA_KEL_1 KODE_12
+243          0         0       &lt;NA&gt;       &lt;NA&gt;       0
+244          0         0       &lt;NA&gt;       &lt;NA&gt;       0
+                          geometry
+243 MULTIPOLYGON (((106.8612 -6...
+244 MULTIPOLYGON (((106.8504 -6...</code></pre>
+</div>
+</div>
+<p>From the output, Columns with missing values (KAB_KOTA (City), KECAMATAN (District) and DESA_KELUR (Village)) as well as other fields since its from the same 2 rows (243 &amp; 244), we can just remove these.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>jkt <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(jkt,<span class="fu">c</span>(<span class="st">"DESA_KELUR"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="validate-transform-jkt-crs" class="level3" data-number="2.2.3">
+<h3 data-number="2.2.3" class="anchored" data-anchor-id="validate-transform-jkt-crs"><span class="header-section-number">2.2.3</span> Validate &amp; Transform jkt CRS</h3>
+<p>Moving on, we gotta to validate the CRS of jarkarta</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># retrieves the crs</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(jkt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Coordinate Reference System:
+  User input: WGS 84 
+  wkt:
+GEOGCRS["WGS 84",
+    DATUM["World Geodetic System 1984",
+        ELLIPSOID["WGS 84",6378137,298.257223563,
+            LENGTHUNIT["metre",1]]],
+    PRIMEM["Greenwich",0,
+        ANGLEUNIT["degree",0.0174532925199433]],
+    CS[ellipsoidal,2],
+        AXIS["latitude",north,
+            ORDER[1],
+            ANGLEUNIT["degree",0.0174532925199433]],
+        AXIS["longitude",east,
+            ORDER[2],
+            ANGLEUNIT["degree",0.0174532925199433]],
+    ID["EPSG",4326]]</code></pre>
+</div>
+</div>
+<p>So the assigned coordinates system is WGS 84 (aka World Geodetic System 1984) therefore, we got to change it to crs of Indonesia, DGN95 using the code of 23845.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>jkt <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(jkt, <span class="dv">23845</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(jkt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Coordinate Reference System:
+  User input: EPSG:23845 
+  wkt:
+PROJCRS["DGN95 / Indonesia TM-3 zone 54.1",
+    BASEGEOGCRS["DGN95",
+        DATUM["Datum Geodesi Nasional 1995",
+            ELLIPSOID["WGS 84",6378137,298.257223563,
+                LENGTHUNIT["metre",1]]],
+        PRIMEM["Greenwich",0,
+            ANGLEUNIT["degree",0.0174532925199433]],
+        ID["EPSG",4755]],
+    CONVERSION["Indonesia TM-3 zone 54.1",
+        METHOD["Transverse Mercator",
+            ID["EPSG",9807]],
+        PARAMETER["Latitude of natural origin",0,
+            ANGLEUNIT["degree",0.0174532925199433],
+            ID["EPSG",8801]],
+        PARAMETER["Longitude of natural origin",139.5,
+            ANGLEUNIT["degree",0.0174532925199433],
+            ID["EPSG",8802]],
+        PARAMETER["Scale factor at natural origin",0.9999,
+            SCALEUNIT["unity",1],
+            ID["EPSG",8805]],
+        PARAMETER["False easting",200000,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8806]],
+        PARAMETER["False northing",1500000,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8807]]],
+    CS[Cartesian,2],
+        AXIS["easting (X)",east,
+            ORDER[1],
+            LENGTHUNIT["metre",1]],
+        AXIS["northing (Y)",north,
+            ORDER[2],
+            LENGTHUNIT["metre",1]],
+    USAGE[
+        SCOPE["Cadastre."],
+        AREA["Indonesia - onshore east of 138°E."],
+        BBOX[-9.19,138,-1.49,141.01]],
+    ID["EPSG",23845]]</code></pre>
+</div>
+</div>
+<p>It changed.</p>
+</section>
+</section>
+<section id="visualise-data" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="visualise-data"><span class="header-section-number">2.3</span> Visualise data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">st_geometry</span>(jkt))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Take-Home_Ex02_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>From the plot, jkt has both the mainland and outer islands but since outer islands are not within the objectives and tasks, so we can remove those.</p>
+<p>Using google translate/google len, 3 location-based relevant fields are KAB_KOTA (City), KECAMATAN (District) and DESA_KELUR (Village). Let’s to the macro lens to city level since district would be too much of unique values.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(jkt<span class="sc">$</span><span class="st">"KAB_KOTA"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "JAKARTA BARAT"    "JAKARTA PUSAT"    "KEPULAUAN SERIBU" "JAKARTA UTARA"   
+[5] "JAKARTA TIMUR"    "JAKARTA SELATAN" </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(jkt) <span class="sc">+</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="st">"KAB_KOTA"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Take-Home_Ex02_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<section id="remove-outer-islands" class="level3" data-number="2.3.1">
+<h3 data-number="2.3.1" class="anchored" data-anchor-id="remove-outer-islands"><span class="header-section-number">2.3.1</span> Remove outer islands</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>jkt <span class="ot">&lt;-</span> <span class="fu">filter</span>(jkt, KAB_KOTA <span class="sc">!=</span> <span class="st">"KEPULAUAN SERIBU"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="select-filter" class="level3" data-number="2.3.2">
+<h3 data-number="2.3.2" class="anchored" data-anchor-id="select-filter"><span class="header-section-number">2.3.2</span> Select &amp; Filter</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>jkt <span class="ot">&lt;-</span> jkt[, <span class="dv">0</span><span class="sc">:</span><span class="dv">9</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="rename-the-fields" class="level3" data-number="2.3.3">
+<h3 data-number="2.3.3" class="anchored" data-anchor-id="rename-the-fields"><span class="header-section-number">2.3.3</span> Rename the fields</h3>
+<p>For easier and faster progress of assignment, lets rename the columns names</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># with reference to: https://www.codegrepper.com/code-examples/r/rename+column+name+in+r</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>jkt <span class="ot">&lt;-</span> jkt <span class="sc">%&gt;%</span> </span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rename</span>(</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Object_ID=</span>OBJECT_ID,</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">Province=</span>PROVINSI, </span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">City=</span>KAB_KOTA, </span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">District=</span>KECAMATAN, </span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Village_Code=</span>KODE_DESA, </span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Village=</span>DESA, </span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">Sub_District=</span>DESA_KELUR,</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">Code=</span>KODE, </span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">Total_Population=</span>JUMLAH_PEN</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="eda" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="eda"><span class="header-section-number">2.4</span> EDA</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(jkt) <span class="sc">+</span> </span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="st">"City"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Take-Home_Ex02_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="data-wrangling-with-aspatial-data" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Data wrangling with Aspatial Data</h1>
+<section id="importing-aspatial" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="importing-aspatial"><span class="header-section-number">3.1</span> Importing Aspatial</h2>
+<p>For the Choropleth mapping, the time frame to plot the map is from July 2021 to June 2022, i will be using the first day of the month of each month. ::: panel-tabset</p>
+<section id="from-july-2021-to-dec-2021" class="level3" data-number="3.1.1">
+<h3 data-number="3.1.1" class="anchored" data-anchor-id="from-july-2021-to-dec-2021"><span class="header-section-number">3.1.1</span> From July 2021 to Dec 2021</h3>
 <div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Import</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Glimpse</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">1st Jul 2021</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">1st Aug 2021</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false">1st Sept 2021</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false">1st Oct 2021</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-5" role="tab" aria-controls="tabset-2-5" aria-selected="false">1st Nov 2021</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-6" role="tab" aria-controls="tabset-2-6" aria-selected="false">1st Dec 2021</a></li></ul>
 <div class="tab-content">
 <div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>vaccinated <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 September 2022).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>jkt_jul2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Juli 2021).xlsx"</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co">#jkt_july2021 |&gt; select(4)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(vaccinated)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Rows: 268
-Columns: 34
-$ `KODE KELURAHAN`                             &lt;chr&gt; NA, "3172051003", "317304…
-$ `WILAYAH KOTA`                               &lt;chr&gt; NA, "JAKARTA UTARA", "JAK…
-$ KECAMATAN                                    &lt;chr&gt; NA, "PADEMANGAN", "TAMBOR…
-$ KELURAHAN                                    &lt;chr&gt; "TOTAL", "ANCOL", "ANGKE"…
-$ SASARAN                                      &lt;dbl&gt; 8941211, 23947, 29381, 29…
-$ `BELUM VAKSIN`                               &lt;dbl&gt; 1384555, 4290, 4867, 5454…
-$ `JUMLAH\r\nDOSIS 1`                          &lt;dbl&gt; 7556656, 19657, 24514, 23…
-$ `JUMLAH\r\nDOSIS 2`                          &lt;dbl&gt; 6785905, 17166, 21308, 20…
-$ `JUMLAH\r\nDOSIS 3`                          &lt;dbl&gt; 3722996, 8941, 12207, 970…
-$ `TOTAL VAKSIN\r\nDIBERIKAN`                  &lt;dbl&gt; 18065557, 45764, 58029, 5…
-$ `LANSIA\r\nDOSIS 1`                          &lt;dbl&gt; 655760, 1586, 2492, 1472,…
-$ `LANSIA\r\nDOSIS 2`                          &lt;dbl&gt; 617388, 1449, 2374, 1386,…
-$ `LANSIA\r\nDOSIS 3`                          &lt;dbl&gt; 617388, 1449, 2374, 1386,…
-$ `LANSIA TOTAL \r\nVAKSIN DIBERIKAN`          &lt;dbl&gt; 1681266, 3955, 6623, 3632…
-$ `PELAYAN PUBLIK\r\nDOSIS 1`                  &lt;dbl&gt; 1489398, 3995, 3941, 4629…
-$ `PELAYAN PUBLIK\r\nDOSIS 2`                  &lt;dbl&gt; 1383176, 3651, 3540, 4202…
-$ `PELAYAN PUBLIK\r\nDOSIS 3`                  &lt;dbl&gt; 542881, 1558, 1598, 1515,…
-$ `PELAYAN PUBLIK TOTAL\r\nVAKSIN DIBERIKAN`   &lt;dbl&gt; 3415455, 9204, 9079, 1034…
-$ `GOTONG ROYONG\r\nDOSIS 1`                   &lt;dbl&gt; 88422, 180, 179, 262, 102…
-$ `GOTONG ROYONG\r\nDOSIS 2`                   &lt;dbl&gt; 86373, 174, 180, 260, 99,…
-$ `GOTONG ROYONG\r\nDOSIS 3`                   &lt;dbl&gt; 52420, 116, 130, 148, 70,…
-$ `GOTONG ROYONG TOTAL\r\nVAKSIN DIBERIKAN`    &lt;dbl&gt; 227215, 470, 489, 670, 27…
-$ `TENAGA KESEHATAN\r\nDOSIS 1`                &lt;dbl&gt; 115955, 141, 135, 351, 12…
-$ `TENAGA KESEHATAN\r\nDOSIS 2`                &lt;dbl&gt; 112600, 130, 131, 333, 12…
-$ `TENAGA KESEHATAN\r\nDOSIS 3`                &lt;dbl&gt; 97013, 123, 114, 279, 99,…
-$ `TENAGA KESEHATAN TOTAL\r\nVAKSIN DIBERIKAN` &lt;dbl&gt; 325568, 394, 380, 963, 34…
-$ `TAHAPAN 3\r\nDOSIS 1`                       &lt;dbl&gt; 4335126, 11442, 15025, 14…
-$ `TAHAPAN 3\r\nDOSIS 2`                       &lt;dbl&gt; 3796399, 9703, 12681, 117…
-$ `TAHAPAN 3\r\nDOSIS 3`                       &lt;dbl&gt; 2551932, 6076, 8401, 6785…
-$ `TAHAPAN 3 TOTAL\r\nVAKSIN DIBERIKAN`        &lt;dbl&gt; 10683457, 27221, 36107, 3…
-$ `REMAJA\r\nDOSIS 1`                          &lt;dbl&gt; 871995, 2313, 2742, 2869,…
-$ `REMAJA\r\nDOSIS 2`                          &lt;dbl&gt; 789969, 2059, 2402, 2575,…
-$ `REMAJA\r\nDOSIS 3`                          &lt;dbl&gt; 70632, 148, 207, 199, 76,…
-$ `REMAJA TOTAL\r\nVAKSIN DIBERIKAN`           &lt;dbl&gt; 1732596, 4520, 5351, 5643…</code></pre>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>jkt_aug2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (1 Agustus 2021).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>jkt_sept2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 September 2021).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>jkt_oct2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Oktober 2021).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-2-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-5-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>jkt_nov2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 November 2021).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-2-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-6-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>jkt_dec2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Desember 2021).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="perform-relational-join" class="level2" data-number="2.3">
-<h2 data-number="2.3" class="anchored" data-anchor-id="perform-relational-join"><span class="header-section-number">2.3</span> Perform relational join</h2>
+<section id="from-jan-2022-to-june-2022" class="level3" data-number="3.1.2">
+<h3 data-number="3.1.2" class="anchored" data-anchor-id="from-jan-2022-to-june-2022"><span class="header-section-number">3.1.2</span> From Jan 2022 to June 2022</h3>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">1st Jan 2022</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">1st Feb 2022</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false">1st Mar 2022</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-4" role="tab" aria-controls="tabset-3-4" aria-selected="false">1st Apr 2022</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-5" role="tab" aria-controls="tabset-3-5" aria-selected="false">1st May 2022</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-6" role="tab" aria-controls="tabset-3-6" aria-selected="false">1st June 2022</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># jkt_2022 &lt;- left_join(jkt,hunan2012)%&gt;%</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   select(1:4, 7, 15)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>jkt_jan2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Januari 2022).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>jkt_feb2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Februari 2022).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>jkt_mar2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (02 Maret 2022).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-3-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-4-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>jkt_apr2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 April 2022).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-3-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-5-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>jkt_may2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Mei 2022).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-3-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-6-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>jkt_jun2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Juni 2022).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="glimpse-1" class="level3" data-number="3.1.3">
+<h3 data-number="3.1.3" class="anchored" data-anchor-id="glimpse-1"><span class="header-section-number">3.1.3</span> Glimpse</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co">#glimpse(jkt_july2021)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="perform-relational-join" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="perform-relational-join"><span class="header-section-number">3.2</span> Perform relational join</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># jkt_jul2021 &lt;- left_join(jkt,jkt_jul2021)%&gt;%</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   select(1:4, 7, 15)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># basemap &lt;- tm_shape(jkt_jul2021) +</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   tm_polygons() +</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   tm_text("KECAMATAN", size=0.5)</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="co"># subdistrict &lt;- qtm(jkt_jul2021, "TOTAL VAKSIN DIBERIKAN")</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="co"># tmap_arrange(basemap, subdistrict, asp=1, ncol=2)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 

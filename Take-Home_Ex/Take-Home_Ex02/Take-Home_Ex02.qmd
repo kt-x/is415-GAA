@@ -42,7 +42,7 @@ Choropleth Mapping and Analysis
 
 : Table 1: Data used
 
-For the Aspatial Data, I decided to use the dataset available on 1st Sept 2022 for this exercise. 
+For the Aspatial Data, I decided to use the dataset available on 1st Sept 2022 for this exercise.
 
 ## Packages used
 
@@ -50,7 +50,7 @@ For this exercise, we'll be using the following packages:
 
 -   sf: Manage and process vector-based geospatial data in R
 
--   sfdep: 
+-   sfdep:
 
 -   maptools: Convert Spatial objects into ppp format of spatstat
 
@@ -58,7 +58,7 @@ For this exercise, we'll be using the following packages:
 
 -   tidyverse: a collection of functions, data, and documentation that extends the capabilities of base R.
 
--   knitr: 
+-   knitr:
 
 -   readxl: The readxl package makes it easy to get data out of Excel and into R
 
@@ -68,45 +68,240 @@ We will be using p_load function of pacman package to install and load required 
 pacman::p_load(sf, sfdep, tmap, maptools, tidyverse, knitr, readxl)
 ```
 
-# Import Data
+# Data wrangling: Geospatial data
 
 ## Importing Geospatial
 
 ::: panel-tabset
-
 ### Import
+
 ```{r}
 jkt <- st_read(dsn = "data/geospatial/BATAS DESA DESEMBER 2019 DUKCAPIL DKI JAKARTA", 
                 layer = "BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA")
 ```
 
 ### Glimpse
+
 ```{r}
 glimpse(jkt)
 ```
+:::
 
-::: 
+## Data Pre-processing
+
+We got to first ensure 2 things: validity of geomeetries and if there are missing values that could affect the later section of calculations and visualisations. 
+
+Reference was taken from the senior sample submissions for the code for this section, with credit to [Take-Home Exercise 1: Analysing and Visualising Spatio-temporal Patterns of COVID-19 in DKI Jakarta, Indonesia by MEGAN SIM TZE YEN.](https://is415-msty.netlify.app/posts/2021-09-10-take-home-exercise-1/)
+
+
+
+### Validity of geometry 
+Using st_is_valid function to check 
+```{r}
+length(which(st_is_valid(jkt) == FALSE))
+```
+
+Since theres no invalids geometrics, we move to missing values
+
+### Missing values
+
+```{r}
+jkt[rowSums(is.na(jkt))!=0,]
+```
+
+From the output, Columns with missing values (KAB_KOTA (City), KECAMATAN (District) and DESA_KELUR (Village)) as well as other fields since its from the same 2 rows (243 & 244), we can just remove these.
+
+```{r}
+jkt <- na.omit(jkt,c("DESA_KELUR"))
+```
+
+
+### Validate & Transform jkt CRS
+Moving on, we gotta to validate the CRS of jarkarta
+
+```{r}
+# retrieves the crs
+st_crs(jkt)
+```
+
+
+So the assigned coordinates system is WGS 84 (aka World Geodetic System 1984) therefore, we got to change it to crs of Indonesia, DGN95 using the code of 23845.
+
+```{r}
+jkt <- st_transform(jkt, 23845)
+```
+
+```{r}
+st_crs(jkt)
+```
+
+It changed.
+
+## Visualise data
+
+```{r}
+plot(st_geometry(jkt))
+```
+
+From the plot, jkt has both the mainland and outer islands but since outer islands are not within the objectives and tasks, so we can remove those.
+
+Using google translate/google len, 3 location-based relevant fields are KAB_KOTA (City), KECAMATAN (District) and DESA_KELUR (Village). Let's to the macro lens to city level since district would be too much of unique values. 
+
+```{r}
+unique(jkt$"KAB_KOTA")
+```
+
+```{r}
+tm_shape(jkt) + 
+  tm_polygons("KAB_KOTA")
+```
+
+### Remove outer islands
+```{r}
+jkt <- filter(jkt, KAB_KOTA != "KEPULAUAN SERIBU")
+```
+
+### Select & Filter
+```{r}
+jkt <- jkt[, 0:9]
+```
+
+### Rename the fields
+For easier and faster progress of assignment, lets rename the columns names 
+```{r}
+# with reference to: https://www.codegrepper.com/code-examples/r/rename+column+name+in+r
+
+jkt <- jkt %>% 
+  dplyr::rename(
+    Object_ID=OBJECT_ID,
+    Province=PROVINSI, 
+    City=KAB_KOTA, 
+    District=KECAMATAN, 
+    Village_Code=KODE_DESA, 
+    Village=DESA, 
+    Sub_District=DESA_KELUR,
+    Code=KODE, 
+    Total_Population=JUMLAH_PEN
+    )
+```
+
+
+## EDA
+```{r}
+tm_shape(jkt) + 
+  tm_polygons("City")
+```
+
+
+# Data wrangling with Aspatial Data
 
 ## Importing Aspatial
 
+For the Choropleth mapping, the time frame to plot the map is from July 2021 to June 2022, i will be using the first day of the month of each month. ::: panel-tabset
+
+### From July 2021 to Dec 2021
+
 ::: panel-tabset
+#### 1st Jul 2021
 
-### Import
 ```{r}
-vaccinated <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 September 2022).xlsx")
+jkt_jul2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Juli 2021).xlsx")
+#jkt_july2021 |> select(4)
 ```
 
-### Glimpse
+#### 1st Aug 2021
+
 ```{r}
-glimpse(vaccinated)
+jkt_aug2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (1 Agustus 2021).xlsx")
 ```
 
+#### 1st Sept 2021
+
+```{r}
+jkt_sept2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 September 2021).xlsx")
+```
+
+#### 1st Oct 2021
+
+```{r}
+jkt_oct2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Oktober 2021).xlsx")
+```
+
+#### 1st Nov 2021
+
+```{r}
+jkt_nov2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 November 2021).xlsx")
+```
+
+#### 1st Dec 2021
+
+```{r}
+jkt_dec2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Desember 2021).xlsx")
+```
+::: 
+
+
+### From Jan 2022 to June 2022
+
+::: panel-tabset
+#### 1st Jan 2022
+
+```{r}
+jkt_jan2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Januari 2022).xlsx")
+```
+
+#### 1st Feb 2022
+
+```{r}
+jkt_feb2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Februari 2022).xlsx")
+```
+
+#### 1st Mar 2022
+
+```{r}
+jkt_mar2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (02 Maret 2022).xlsx")
+```
+
+#### 1st Apr 2022
+
+```{r}
+jkt_apr2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 April 2022).xlsx")
+```
+
+#### 1st May 2022
+
+```{r}
+jkt_may2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Mei 2022).xlsx")
+```
+
+#### 1st June 2022
+
+```{r}
+jkt_jun2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Juni 2022).xlsx")
+```
 :::
 
-## Perform relational join
+
+### Glimpse
+
 ```{r}
-# jkt_2022 <- left_join(jkt,hunan2012)%>%
+#glimpse(jkt_july2021)
+```
+
+
+
+## Perform relational join
+
+```{r}
+# jkt_jul2021 <- left_join(jkt,jkt_jul2021)%>%
 #   select(1:4, 7, 15)
 ```
 
-
+```{r}
+# basemap <- tm_shape(jkt_jul2021) +
+#   tm_polygons() +
+#   tm_text("KECAMATAN", size=0.5)
+# 
+# subdistrict <- qtm(jkt_jul2021, "TOTAL VAKSIN DIBERIKAN")
+# tmap_arrange(basemap, subdistrict, asp=1, ncol=2)
+```
