@@ -130,7 +130,7 @@
     "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html#nearest-neighbour-analysis",
     "title": "Hands-on_Ex03",
     "section": "2.1 Nearest Neighbour Analysis",
-    "text": "2.1 Nearest Neighbour Analysis\n\n2.1.1 Testing spatial point patterns using Clark and Evans Test\n\nclarkevans.test(childcareSG_ppp,\n                correction=\"none\",\n                clipregion=\"sg_owin\",\n                alternative=c(\"clustered\"),\n                nsim=99)\n\n\n    Clark-Evans test\n    No edge correction\n    Monte Carlo test based on 99 simulations of CSR with fixed n\n\ndata:  childcareSG_ppp\nR = 0.54756, p-value = 0.01\nalternative hypothesis: clustered (R < 1)\n\n\n\n2.1.1.1 Clark and Evans Test: Choa Chu Kang planning area\n\nclarkevans.test(childcare_ck_ppp,\n                correction=\"none\",\n                clipregion=NULL,\n                alternative=c(\"two.sided\"),\n                nsim=999)\n\n\n    Clark-Evans test\n    No edge correction\n    Monte Carlo test based on 999 simulations of CSR with fixed n\n\ndata:  childcare_ck_ppp\nR = 0.93778, p-value = 0.094\nalternative hypothesis: two-sided\n\n\n\n\n2.1.1.2 Clark and Evans Test: Tampines planning area\n\nclarkevans.test(childcare_tm_ppp,\n                correction=\"none\",\n                clipregion=NULL,\n                alternative=c(\"two.sided\"),\n                nsim=999)\n\n\n    Clark-Evans test\n    No edge correction\n    Monte Carlo test based on 999 simulations of CSR with fixed n\n\ndata:  childcare_tm_ppp\nR = 0.80662, p-value = 0.004\nalternative hypothesis: two-sided"
+    "text": "2.1 Nearest Neighbour Analysis\n\n2.1.1 Testing spatial point patterns using Clark and Evans Test\n\nclarkevans.test(childcareSG_ppp,\n                correction=\"none\",\n                clipregion=\"sg_owin\",\n                alternative=c(\"clustered\"),\n                nsim=99)\n\n\n    Clark-Evans test\n    No edge correction\n    Monte Carlo test based on 99 simulations of CSR with fixed n\n\ndata:  childcareSG_ppp\nR = 0.54756, p-value = 0.01\nalternative hypothesis: clustered (R < 1)\n\n\n\n2.1.1.1 Clark and Evans Test: Choa Chu Kang planning area\n\nclarkevans.test(childcare_ck_ppp,\n                correction=\"none\",\n                clipregion=NULL,\n                alternative=c(\"two.sided\"),\n                nsim=999)\n\n\n    Clark-Evans test\n    No edge correction\n    Monte Carlo test based on 999 simulations of CSR with fixed n\n\ndata:  childcare_ck_ppp\nR = 0.91668, p-value = 0.042\nalternative hypothesis: two-sided\n\n\n\n\n2.1.1.2 Clark and Evans Test: Tampines planning area\n\nclarkevans.test(childcare_tm_ppp,\n                correction=\"none\",\n                clipregion=NULL,\n                alternative=c(\"two.sided\"),\n                nsim=999)\n\n\n    Clark-Evans test\n    No edge correction\n    Monte Carlo test based on 999 simulations of CSR with fixed n\n\ndata:  childcare_tm_ppp\nR = 0.82116, p-value = 0.002\nalternative hypothesis: two-sided"
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html#analysing-spatial-point-process-using-g-function",
@@ -438,7 +438,35 @@
     "href": "In-class_Ex/In-class_Ex07/In-class_Ex07(EHSA).html",
     "title": "In-class_Ex07 (EHSA)",
     "section": "",
-    "text": "1 hot spot and cold spot"
+    "text": "pacman::p_load(sf, tmap, sfdep, tidyverse, plotly)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex07/In-class_Ex07(EHSA).html#geospatial",
+    "href": "In-class_Ex/In-class_Ex07/In-class_Ex07(EHSA).html#geospatial",
+    "title": "In-class_Ex07 (EHSA)",
+    "section": "0.2 geospatial",
+    "text": "0.2 geospatial\n\nhunan <- st_read(dsn = \"data/geospatial\",\n                 layer = \"Hunan\")\n\nReading layer `Hunan' from data source \n  `C:\\kt-x\\is415-GAA\\In-class_Ex\\In-class_Ex07\\data\\geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 88 features and 7 fields\nGeometry type: POLYGON\nDimension:     XY\nBounding box:  xmin: 108.7831 ymin: 24.6342 xmax: 114.2544 ymax: 30.12812\nGeodetic CRS:  WGS 84"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex07/In-class_Ex07(EHSA).html#aspatial",
+    "href": "In-class_Ex/In-class_Ex07/In-class_Ex07(EHSA).html#aspatial",
+    "title": "In-class_Ex07 (EHSA)",
+    "section": "0.3 aspatial",
+    "text": "0.3 aspatial\n\nhunan2012 <- read_csv(\"data/aspatial/Hunan_2012.csv\")"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex07/In-class_Ex07(EHSA).html#left-join",
+    "href": "In-class_Ex/In-class_Ex07/In-class_Ex07(EHSA).html#left-join",
+    "title": "In-class_Ex07 (EHSA)",
+    "section": "0.4 left-join",
+    "text": "0.4 left-join\n\n#ensure there are same number of observations\nhunan_GDPPC <- left_join(hunan,hunan2012) %>%\n  select(1:4, 7, 15)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex07/In-class_Ex07(EHSA).html#create-a-time-series-cube",
+    "href": "In-class_Ex/In-class_Ex07/In-class_Ex07(EHSA).html#create-a-time-series-cube",
+    "title": "In-class_Ex07 (EHSA)",
+    "section": "1.1 create a time series cube",
+    "text": "1.1 create a time series cube\n\n# GDPPC_st <- space(GDPPC, hunan,\n#                   .loc_col = \"County\",\n#                   .time_col = \"Year\")\n\n\n# GDPPC_NB <- GDPPC_st |>\n#   activate(\"geometry\") |>\n#   mutate(\n#     nb = include_self(st_contiguity(geometry)),\n#     wt = st_weights(nb)\n#   )|>\n#   set_nbs(\"nb\") |>\n#   set_wts(\"wt\")"
   },
   {
     "objectID": "In-class_Ex/In-class_Ex07/In-class_Ex07.html",
@@ -502,6 +530,13 @@
     "title": "In-class_Ex07",
     "section": "2.8 visualising p value of HCSA",
     "text": "2.8 visualising p value of HCSA\n\ntmap_mode(\"plot\")\ntm_shape(HCSA) + \n  tm_fill(\"p_sim\") + \n  tm_borders(alpha = 0.5)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex07/In-class_Ex07.html#create-a-time-series-cube",
+    "href": "In-class_Ex/In-class_Ex07/In-class_Ex07.html#create-a-time-series-cube",
+    "title": "In-class_Ex07",
+    "section": "3.1 create a time series cube",
+    "text": "3.1 create a time series cube\n\n# GDPPC_st <- space(GDPPC, hunan, \n#                   .loc_col = \"County\", \n#                   .time_col = \"Year\")\n\n\n# GDPPC_NB <- GDPPC_st |>\n#   activate(\"geometry\") |>\n#   mutate(\n#     nb = include_self(st_contiguity(geometry)), \n#     wt = st_weights(nb)\n#   )|>\n#   set_nbs(\"nb\") |>\n#   set_wts(\"wt\")"
   },
   {
     "objectID": "index.html",
@@ -628,12 +663,5 @@
     "title": "Take-Home_Ex02",
     "section": "3.2 Perform relational join",
     "text": "3.2 Perform relational join\n\n# jkt_jul2021 <- left_join(jkt,jkt_jul2021)%>%\n#   select(1:4, 7, 15)\n\n\n# basemap <- tm_shape(jkt_jul2021) +\n#   tm_polygons() +\n#   tm_text(\"KECAMATAN\", size=0.5)\n# \n# subdistrict <- qtm(jkt_jul2021, \"TOTAL VAKSIN DIBERIKAN\")\n# tmap_arrange(basemap, subdistrict, asp=1, ncol=2)"
-  },
-  {
-    "objectID": "In-class_Ex/In-class_Ex07/In-class_Ex07.html#create-a-time-series-cube",
-    "href": "In-class_Ex/In-class_Ex07/In-class_Ex07.html#create-a-time-series-cube",
-    "title": "In-class_Ex07",
-    "section": "3.1 create a time series cube",
-    "text": "3.1 create a time series cube\n\n# GDPPC_st <- space(GDPPC, hunan, \n#                   .loc_col = \"County\", \n#                   .time_col = \"Year\")\n\n\n# GDPPC_NB <- GDPPC_st |>\n#   activate(\"geometry\") |>\n#   mutate(\n#     nb = include_self(st_contiguity(geometry)), \n#     wt = st_weights(nb)\n#   )|>\n#   set_nbs(\"nb\") |>\n#   set_wts(\"wt\")"
   }
 ]

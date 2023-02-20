@@ -12,27 +12,27 @@ editor: visual
 ---
 ## Prep packages
 ```{r}
-#pacman::p_load(sf, tmap, sfdep, tidyverse, plotly)
+pacman::p_load(sf, tmap, sfdep, tidyverse, plotly)
 ```
 
 ## geospatial 
 ```{r}
-# hunan <- st_read(dsn = "data/geospatial", 
-#                  layer = "Hunan")
+hunan <- st_read(dsn = "data/geospatial",
+                 layer = "Hunan")
 ```
 
 
 ## aspatial
 ```{r}
-# hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
 ```
 
 
 ## left-join
 ```{r}
-# ensure there are same number of observations
-# hunan_GDPPC <- left_join(hunan,hunan2012) %>%
-#   select(1:4, 7, 15)
+#ensure there are same number of observations
+hunan_GDPPC <- left_join(hunan,hunan2012) %>%
+  select(1:4, 7, 15)
 ```
 
 
@@ -41,8 +41,8 @@ editor: visual
 
 ## create a time series cube
 ```{r}
-# GDPPC_st <- space(GDPPC, hunan, 
-#                   .loc_col = "County", 
+# GDPPC_st <- space(GDPPC, hunan,
+#                   .loc_col = "County",
 #                   .time_col = "Year")
 ```
 
@@ -51,7 +51,7 @@ editor: visual
 # GDPPC_NB <- GDPPC_st |>
 #   activate("geometry") |>
 #   mutate(
-#     nb = include_self(st_contiguity(geometry)), 
+#     nb = include_self(st_contiguity(geometry)),
 #     wt = st_weights(nb)
 #   )|>
 #   set_nbs("nb") |>
