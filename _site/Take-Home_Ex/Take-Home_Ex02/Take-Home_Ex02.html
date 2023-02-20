@@ -268,13 +268,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </ul></li>
   <li><a href="#data-wrangling-with-aspatial-data" id="toc-data-wrangling-with-aspatial-data" class="nav-link" data-scroll-target="#data-wrangling-with-aspatial-data"><span class="toc-section-number">3</span>  Data wrangling with Aspatial Data</a>
   <ul class="collapse">
-  <li><a href="#importing-aspatial" id="toc-importing-aspatial" class="nav-link" data-scroll-target="#importing-aspatial"><span class="toc-section-number">3.1</span>  Importing Aspatial</a>
+  <li><a href="#inspect-aspatial-data" id="toc-inspect-aspatial-data" class="nav-link" data-scroll-target="#inspect-aspatial-data"><span class="toc-section-number">3.1</span>  Inspect Aspatial Data</a></li>
+  <li><a href="#importing-aspatial" id="toc-importing-aspatial" class="nav-link" data-scroll-target="#importing-aspatial"><span class="toc-section-number">3.2</span>  Importing Aspatial</a>
   <ul class="collapse">
-  <li><a href="#from-july-2021-to-dec-2021" id="toc-from-july-2021-to-dec-2021" class="nav-link" data-scroll-target="#from-july-2021-to-dec-2021"><span class="toc-section-number">3.1.1</span>  From July 2021 to Dec 2021</a></li>
-  <li><a href="#from-jan-2022-to-june-2022" id="toc-from-jan-2022-to-june-2022" class="nav-link" data-scroll-target="#from-jan-2022-to-june-2022"><span class="toc-section-number">3.1.2</span>  From Jan 2022 to June 2022</a></li>
-  <li><a href="#glimpse-1" id="toc-glimpse-1" class="nav-link" data-scroll-target="#glimpse-1"><span class="toc-section-number">3.1.3</span>  Glimpse</a></li>
+  <li><a href="#from-july-2021-to-dec-2021" id="toc-from-july-2021-to-dec-2021" class="nav-link" data-scroll-target="#from-july-2021-to-dec-2021"><span class="toc-section-number">3.2.1</span>  From July 2021 to Dec 2021</a></li>
+  <li><a href="#from-jan-2022-to-june-2022" id="toc-from-jan-2022-to-june-2022" class="nav-link" data-scroll-target="#from-jan-2022-to-june-2022"><span class="toc-section-number">3.2.2</span>  From Jan 2022 to June 2022</a></li>
   </ul></li>
-  <li><a href="#perform-relational-join" id="toc-perform-relational-join" class="nav-link" data-scroll-target="#perform-relational-join"><span class="toc-section-number">3.2</span>  Perform relational join</a></li>
+  <li><a href="#perform-relational-join" id="toc-perform-relational-join" class="nav-link" data-scroll-target="#perform-relational-join"><span class="toc-section-number">3.3</span>  Perform relational join</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -826,106 +826,517 @@ PROJCRS["DGN95 / Indonesia TM-3 zone 54.1",
 </section>
 <section id="data-wrangling-with-aspatial-data" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Data wrangling with Aspatial Data</h1>
-<section id="importing-aspatial" class="level2" data-number="3.1">
-<h2 data-number="3.1" class="anchored" data-anchor-id="importing-aspatial"><span class="header-section-number">3.1</span> Importing Aspatial</h2>
-<p>For the Choropleth mapping, the time frame to plot the map is from July 2021 to June 2022, i will be using the first day of the month of each month. ::: panel-tabset</p>
-<section id="from-july-2021-to-dec-2021" class="level3" data-number="3.1.1">
-<h3 data-number="3.1.1" class="anchored" data-anchor-id="from-july-2021-to-dec-2021"><span class="header-section-number">3.1.1</span> From July 2021 to Dec 2021</h3>
+<section id="inspect-aspatial-data" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="inspect-aspatial-data"><span class="header-section-number">3.1</span> Inspect Aspatial Data</h2>
+<p>For the Choropleth mapping, the time frame to plot the map is from July 2021 to June 2022, i will be using the first day of the month of each month.</p>
+<p>Before we import, lets see one of the data first.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">#July 2021</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>jkt_jul2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Juli 2021).xlsx"</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(jkt_jul2021)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 268
+Columns: 21
+$ `KODE KELURAHAN`                             &lt;chr&gt; NA, "3172051003", "317304…
+$ `WILAYAH KOTA`                               &lt;chr&gt; NA, "JAKARTA UTARA", "JAK…
+$ KECAMATAN                                    &lt;chr&gt; NA, "PADEMANGAN", "TAMBOR…
+$ KELURAHAN                                    &lt;chr&gt; "TOTAL", "ANCOL", "ANGKE"…
+$ SASARAN                                      &lt;dbl&gt; 7739060, 20393, 25785, 25…
+$ `BELUM VAKSIN`                               &lt;dbl&gt; 5041111, 13272, 16477, 18…
+$ `JUMLAH\r\nDOSIS 1`                          &lt;dbl&gt; 2696017, 7114, 9299, 6301…
+$ `JUMLAH\r\nDOSIS 2`                          &lt;dbl&gt; 1181740, 3287, 3221, 2644…
+$ `TOTAL VAKSIN\r\nDIBERIKAN`                  &lt;dbl&gt; 3877757, 10401, 12520, 89…
+$ `LANSIA\r\nDOSIS 1`                          &lt;dbl&gt; 502873, 1297, 2003, 820, …
+$ `LANSIA\r\nDOSIS 2`                          &lt;dbl&gt; 449073, 1128, 1746, 703, …
+$ `LANSIA TOTAL \r\nVAKSIN DIBERIKAN`          &lt;dbl&gt; 951946, 2425, 3749, 1523,…
+$ `PELAYAN PUBLIK\r\nDOSIS 1`                  &lt;dbl&gt; 2084559, 5672, 7121, 5170…
+$ `PELAYAN PUBLIK\r\nDOSIS 2`                  &lt;dbl&gt; 655641, 2053, 1364, 1731,…
+$ `PELAYAN PUBLIK TOTAL\r\nVAKSIN DIBERIKAN`   &lt;dbl&gt; 2740200, 7725, 8485, 6901…
+$ `GOTONG ROYONG\r\nDOSIS 1`                   &lt;dbl&gt; 35263, 44, 84, 103, 58, 7…
+$ `GOTONG ROYONG\r\nDOSIS 2`                   &lt;dbl&gt; 11624, 13, 31, 24, 18, 25…
+$ `GOTONG ROYONG TOTAL\r\nVAKSIN DIBERIKAN`    &lt;dbl&gt; 46887, 57, 115, 127, 76, …
+$ `TENAGA KESEHATAN\r\nDOSIS 1`                &lt;dbl&gt; 73322, 101, 91, 208, 70, …
+$ `TENAGA KESEHATAN\r\nDOSIS 2`                &lt;dbl&gt; 65402, 93, 80, 186, 63, 3…
+$ `TENAGA KESEHATAN TOTAL\r\nVAKSIN DIBERIKAN` &lt;dbl&gt; 138724, 194, 171, 394, 13…</code></pre>
+</div>
+</div>
+<p>Theres isnt duplicates columns so lets select the relevant columns to our exercise.</p>
+<p>What to do for pre-processing (Aspatial Data):</p>
+<ul>
+<li><p>select relevant columns only</p></li>
+<li><p>Rename those columns names</p></li>
+</ul>
+<p>Columns of interest</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Original ver</th>
+<th>Translated ver</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>WILAYAH KOTA</td>
+<td>City</td>
+</tr>
+<tr class="even">
+<td>KECAMATAN</td>
+<td>Sub-district</td>
+</tr>
+<tr class="odd">
+<td>KELURAHAN</td>
+<td>Ward / Villages / Communities</td>
+</tr>
+<tr class="even">
+<td>TOTAL VAKSIN DIBERIKAN</td>
+<td>Total Vaccine Given</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="importing-aspatial" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="importing-aspatial"><span class="header-section-number">3.2</span> Importing Aspatial</h2>
+<section id="from-july-2021-to-dec-2021" class="level3" data-number="3.2.1">
+<h3 data-number="3.2.1" class="anchored" data-anchor-id="from-july-2021-to-dec-2021"><span class="header-section-number">3.2.1</span> From July 2021 to Dec 2021</h3>
 <div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">1st Jul 2021</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">1st Aug 2021</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false">1st Sept 2021</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false">1st Oct 2021</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-5" role="tab" aria-controls="tabset-2-5" aria-selected="false">1st Nov 2021</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-6" role="tab" aria-controls="tabset-2-6" aria-selected="false">1st Dec 2021</a></li></ul>
 <div class="tab-content">
 <div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>jkt_jul2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Juli 2021).xlsx"</span>)</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co">#jkt_july2021 |&gt; select(4)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>jkt_jul2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Juli 2021).xlsx"</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co">#select &amp; filter</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>jkt_jul2021 <span class="ot">&lt;-</span> jkt_jul2021 <span class="sc">|&gt;</span> </span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">9</span>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="co">#rename</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_jul2021)[<span class="dv">1</span>] <span class="ot">=</span><span class="st">"City"</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_jul2021)[<span class="dv">2</span>] <span class="ot">=</span><span class="st">"Sub_District"</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_jul2021)[<span class="dv">3</span>] <span class="ot">=</span><span class="st">"Ward"</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_jul2021)[<span class="dv">4</span>] <span class="ot">=</span><span class="st">"Total_vaccine_given_jul2021"</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>jkt_jul2021</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 268 × 4
+   City            Sub_District     Ward            Total_vaccine_given_jul2021
+   &lt;chr&gt;           &lt;chr&gt;            &lt;chr&gt;                                 &lt;dbl&gt;
+ 1 &lt;NA&gt;            &lt;NA&gt;             TOTAL                               3877757
+ 2 JAKARTA UTARA   PADEMANGAN       ANCOL                                 10401
+ 3 JAKARTA BARAT   TAMBORA          ANGKE                                 12520
+ 4 JAKARTA TIMUR   KRAMAT JATI      BALE KAMBANG                           8945
+ 5 JAKARTA TIMUR   JATINEGARA       BALI MESTER                            4454
+ 6 JAKARTA TIMUR   CIPAYUNG         BAMBU APUS                            11342
+ 7 JAKARTA SELATAN MAMPANG PRAPATAN BANGKA                                 9125
+ 8 JAKARTA TIMUR   PASAR REBO       BARU                                  13656
+ 9 JAKARTA TIMUR   KRAMAT JATI      BATU AMPAR                            16274
+10 JAKARTA PUSAT   TANAH ABANG      BENDUNGAN HILIR                       11065
+# … with 258 more rows</code></pre>
+</div>
 </div>
 </div>
 <div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>jkt_aug2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (1 Agustus 2021).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>jkt_aug2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (1 Agustus 2021).xlsx"</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co">#select &amp; filter</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>jkt_aug2021 <span class="ot">&lt;-</span> jkt_aug2021 <span class="sc">|&gt;</span> </span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">9</span>)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="co">#rename</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_aug2021)[<span class="dv">1</span>] <span class="ot">=</span><span class="st">"City"</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_aug2021)[<span class="dv">2</span>] <span class="ot">=</span><span class="st">"Sub_District"</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_aug2021)[<span class="dv">3</span>] <span class="ot">=</span><span class="st">"Ward"</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_aug2021)[<span class="dv">4</span>] <span class="ot">=</span><span class="st">"Total_vaccine_given_aug2021"</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>jkt_aug2021</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 268 × 4
+   City            Sub_District     Ward            Total_vaccine_given_aug2021
+   &lt;chr&gt;           &lt;chr&gt;            &lt;chr&gt;                                 &lt;dbl&gt;
+ 1 &lt;NA&gt;            &lt;NA&gt;             TOTAL                               6228535
+ 2 JAKARTA UTARA   PADEMANGAN       ANCOL                                 16060
+ 3 JAKARTA BARAT   TAMBORA          ANGKE                                 20559
+ 4 JAKARTA TIMUR   KRAMAT JATI      BALE KAMBANG                          14560
+ 5 JAKARTA TIMUR   JATINEGARA       BALI MESTER                            6801
+ 6 JAKARTA TIMUR   CIPAYUNG         BAMBU APUS                            17811
+ 7 JAKARTA SELATAN MAMPANG PRAPATAN BANGKA                                15423
+ 8 JAKARTA TIMUR   PASAR REBO       BARU                                  20037
+ 9 JAKARTA TIMUR   KRAMAT JATI      BATU AMPAR                            26892
+10 JAKARTA PUSAT   TANAH ABANG      BENDUNGAN HILIR                       16261
+# … with 258 more rows</code></pre>
+</div>
 </div>
 </div>
 <div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>jkt_sept2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 September 2021).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>jkt_sept2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 September 2021).xlsx"</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="co">#select &amp; filter</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>jkt_sept2021 <span class="ot">&lt;-</span> jkt_sept2021 <span class="sc">|&gt;</span> </span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">9</span>)</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="co">#rename</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_sept2021)[<span class="dv">1</span>] <span class="ot">=</span><span class="st">"City"</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_sept2021)[<span class="dv">2</span>] <span class="ot">=</span><span class="st">"Sub_District"</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_sept2021)[<span class="dv">3</span>] <span class="ot">=</span><span class="st">"Ward"</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_sept2021)[<span class="dv">4</span>] <span class="ot">=</span><span class="st">"Total_vaccine_given_sept2021"</span></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>jkt_sept2021</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 268 × 4
+   City            Sub_District     Ward            Total_vaccine_given_sept2021
+   &lt;chr&gt;           &lt;chr&gt;            &lt;chr&gt;                                  &lt;dbl&gt;
+ 1 &lt;NA&gt;            &lt;NA&gt;             TOTAL                                9159398
+ 2 JAKARTA UTARA   PADEMANGAN       ANCOL                                  24039
+ 3 JAKARTA BARAT   TAMBORA          ANGKE                                  29767
+ 4 JAKARTA TIMUR   KRAMAT JATI      BALE KAMBANG                           24587
+ 5 JAKARTA TIMUR   JATINEGARA       BALI MESTER                             9840
+ 6 JAKARTA TIMUR   CIPAYUNG         BAMBU APUS                             27526
+ 7 JAKARTA SELATAN MAMPANG PRAPATAN BANGKA                                 21424
+ 8 JAKARTA TIMUR   PASAR REBO       BARU                                   27701
+ 9 JAKARTA TIMUR   KRAMAT JATI      BATU AMPAR                             43746
+10 JAKARTA PUSAT   TANAH ABANG      BENDUNGAN HILIR                        22259
+# … with 258 more rows</code></pre>
+</div>
 </div>
 </div>
 <div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>jkt_oct2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Oktober 2021).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>jkt_oct2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Oktober 2021).xlsx"</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="co">#select &amp; filter</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>jkt_oct2021 <span class="ot">&lt;-</span> jkt_oct2021 <span class="sc">|&gt;</span> </span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">9</span>)</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="co">#rename</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_oct2021)[<span class="dv">1</span>] <span class="ot">=</span><span class="st">"City"</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_oct2021)[<span class="dv">2</span>] <span class="ot">=</span><span class="st">"Sub_District"</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_oct2021)[<span class="dv">3</span>] <span class="ot">=</span><span class="st">"Ward"</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_oct2021)[<span class="dv">4</span>] <span class="ot">=</span><span class="st">"Total_vaccine_given_oct2021"</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>jkt_oct2021</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 268 × 4
+   City            Sub_District     Ward            Total_vaccine_given_oct2021
+   &lt;chr&gt;           &lt;chr&gt;            &lt;chr&gt;                                 &lt;dbl&gt;
+ 1 &lt;NA&gt;            &lt;NA&gt;             TOTAL                              11900966
+ 2 JAKARTA UTARA   PADEMANGAN       ANCOL                                 30705
+ 3 JAKARTA BARAT   TAMBORA          ANGKE                                 38293
+ 4 JAKARTA TIMUR   KRAMAT JATI      BALE KAMBANG                          34839
+ 5 JAKARTA TIMUR   JATINEGARA       BALI MESTER                           12921
+ 6 JAKARTA TIMUR   CIPAYUNG         BAMBU APUS                            35630
+ 7 JAKARTA SELATAN MAMPANG PRAPATAN BANGKA                                27996
+ 8 JAKARTA TIMUR   PASAR REBO       BARU                                  34571
+ 9 JAKARTA TIMUR   KRAMAT JATI      BATU AMPAR                            58620
+10 JAKARTA PUSAT   TANAH ABANG      BENDUNGAN HILIR                       29069
+# … with 258 more rows</code></pre>
+</div>
 </div>
 </div>
 <div id="tabset-2-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-5-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>jkt_nov2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 November 2021).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>jkt_nov2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 November 2021).xlsx"</span>)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="co">#select &amp; filter</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>jkt_nov2021 <span class="ot">&lt;-</span> jkt_nov2021 <span class="sc">|&gt;</span> </span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">9</span>)</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="co">#rename</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_nov2021)[<span class="dv">1</span>] <span class="ot">=</span><span class="st">"City"</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_nov2021)[<span class="dv">2</span>] <span class="ot">=</span><span class="st">"Sub_District"</span></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_nov2021)[<span class="dv">3</span>] <span class="ot">=</span><span class="st">"Ward"</span></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_nov2021)[<span class="dv">4</span>] <span class="ot">=</span><span class="st">"Total_vaccine_given_nov2021"</span></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>jkt_nov2021</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 268 × 4
+   City            Sub_District     Ward            Total_vaccine_given_nov2021
+   &lt;chr&gt;           &lt;chr&gt;            &lt;chr&gt;                                 &lt;dbl&gt;
+ 1 &lt;NA&gt;            &lt;NA&gt;             TOTAL                              12800819
+ 2 JAKARTA UTARA   PADEMANGAN       ANCOL                                 32500
+ 3 JAKARTA BARAT   TAMBORA          ANGKE                                 41038
+ 4 JAKARTA TIMUR   KRAMAT JATI      BALE KAMBANG                          37978
+ 5 JAKARTA TIMUR   JATINEGARA       BALI MESTER                           13924
+ 6 JAKARTA TIMUR   CIPAYUNG         BAMBU APUS                            38581
+ 7 JAKARTA SELATAN MAMPANG PRAPATAN BANGKA                                30421
+ 8 JAKARTA TIMUR   PASAR REBO       BARU                                  36513
+ 9 JAKARTA TIMUR   KRAMAT JATI      BATU AMPAR                            63699
+10 JAKARTA PUSAT   TANAH ABANG      BENDUNGAN HILIR                       31202
+# … with 258 more rows</code></pre>
+</div>
 </div>
 </div>
 <div id="tabset-2-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-6-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>jkt_dec2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Desember 2021).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>jkt_dec2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Desember 2021).xlsx"</span>)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="co">#select &amp; filter</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>jkt_dec2021 <span class="ot">&lt;-</span> jkt_dec2021 <span class="sc">|&gt;</span> </span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">9</span>)</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="co">#rename</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_dec2021)[<span class="dv">1</span>] <span class="ot">=</span><span class="st">"City"</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_dec2021)[<span class="dv">2</span>] <span class="ot">=</span><span class="st">"Sub_District"</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_dec2021)[<span class="dv">3</span>] <span class="ot">=</span><span class="st">"Ward"</span></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_dec2021)[<span class="dv">4</span>] <span class="ot">=</span><span class="st">"Total_vaccine_given_dec2021"</span></span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>jkt_dec2021</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 268 × 4
+   City            Sub_District     Ward            Total_vaccine_given_dec2021
+   &lt;chr&gt;           &lt;chr&gt;            &lt;chr&gt;                                 &lt;dbl&gt;
+ 1 &lt;NA&gt;            &lt;NA&gt;             TOTAL                              13407877
+ 2 JAKARTA UTARA   PADEMANGAN       ANCOL                                 33920
+ 3 JAKARTA BARAT   TAMBORA          ANGKE                                 42846
+ 4 JAKARTA TIMUR   KRAMAT JATI      BALE KAMBANG                          40418
+ 5 JAKARTA TIMUR   JATINEGARA       BALI MESTER                           14616
+ 6 JAKARTA TIMUR   CIPAYUNG         BAMBU APUS                            40419
+ 7 JAKARTA SELATAN MAMPANG PRAPATAN BANGKA                                31951
+ 8 JAKARTA TIMUR   PASAR REBO       BARU                                  37939
+ 9 JAKARTA TIMUR   KRAMAT JATI      BATU AMPAR                            67662
+10 JAKARTA PUSAT   TANAH ABANG      BENDUNGAN HILIR                       32467
+# … with 258 more rows</code></pre>
+</div>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="from-jan-2022-to-june-2022" class="level3" data-number="3.1.2">
-<h3 data-number="3.1.2" class="anchored" data-anchor-id="from-jan-2022-to-june-2022"><span class="header-section-number">3.1.2</span> From Jan 2022 to June 2022</h3>
+<section id="from-jan-2022-to-june-2022" class="level3" data-number="3.2.2">
+<h3 data-number="3.2.2" class="anchored" data-anchor-id="from-jan-2022-to-june-2022"><span class="header-section-number">3.2.2</span> From Jan 2022 to June 2022</h3>
 <div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">1st Jan 2022</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">1st Feb 2022</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false">1st Mar 2022</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-4" role="tab" aria-controls="tabset-3-4" aria-selected="false">1st Apr 2022</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-5" role="tab" aria-controls="tabset-3-5" aria-selected="false">1st May 2022</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-6" role="tab" aria-controls="tabset-3-6" aria-selected="false">1st June 2022</a></li></ul>
 <div class="tab-content">
 <div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>jkt_jan2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Januari 2022).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>jkt_jan2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Januari 2022).xlsx"</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="co">#select &amp; filter</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>jkt_jan2022 <span class="ot">&lt;-</span> jkt_jan2022 <span class="sc">|&gt;</span> </span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">9</span>)</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a><span class="co">#rename</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_jan2022)[<span class="dv">1</span>] <span class="ot">=</span><span class="st">"City"</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_jan2022)[<span class="dv">2</span>] <span class="ot">=</span><span class="st">"Sub_District"</span></span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_jan2022)[<span class="dv">3</span>] <span class="ot">=</span><span class="st">"Ward"</span></span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_jan2022)[<span class="dv">4</span>] <span class="ot">=</span><span class="st">"Total_vaccine_given_jan2022"</span></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>jkt_jan2022</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 268 × 4
+   City            Sub_District     Ward            Total_vaccine_given_jan2022
+   &lt;chr&gt;           &lt;chr&gt;            &lt;chr&gt;                                 &lt;dbl&gt;
+ 1 &lt;NA&gt;            &lt;NA&gt;             TOTAL                              13696305
+ 2 JAKARTA UTARA   PADEMANGAN       ANCOL                                 34909
+ 3 JAKARTA BARAT   TAMBORA          ANGKE                                 43800
+ 4 JAKARTA TIMUR   KRAMAT JATI      BALE KAMBANG                          41705
+ 5 JAKARTA TIMUR   JATINEGARA       BALI MESTER                           14981
+ 6 JAKARTA TIMUR   CIPAYUNG         BAMBU APUS                            41331
+ 7 JAKARTA SELATAN MAMPANG PRAPATAN BANGKA                                32550
+ 8 JAKARTA TIMUR   PASAR REBO       BARU                                  38559
+ 9 JAKARTA TIMUR   KRAMAT JATI      BATU AMPAR                            69820
+10 JAKARTA PUSAT   TANAH ABANG      BENDUNGAN HILIR                       33053
+# … with 258 more rows</code></pre>
+</div>
 </div>
 </div>
 <div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>jkt_feb2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Februari 2022).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>jkt_feb2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Februari 2022).xlsx"</span>)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="co">#select &amp; filter</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>jkt_feb2022 <span class="ot">&lt;-</span> jkt_feb2022 <span class="sc">|&gt;</span> </span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">9</span>)</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a><span class="co">#rename</span></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_feb2022)[<span class="dv">1</span>] <span class="ot">=</span><span class="st">"City"</span></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_feb2022)[<span class="dv">2</span>] <span class="ot">=</span><span class="st">"Sub_District"</span></span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_feb2022)[<span class="dv">3</span>] <span class="ot">=</span><span class="st">"Ward"</span></span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_feb2022)[<span class="dv">4</span>] <span class="ot">=</span><span class="st">"Total_vaccine_given_feb2022"</span></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>jkt_feb2022</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 268 × 4
+   City            Sub_District     Ward            Total_vaccine_given_feb2022
+   &lt;chr&gt;           &lt;chr&gt;            &lt;chr&gt;                                 &lt;dbl&gt;
+ 1 &lt;NA&gt;            &lt;NA&gt;             TOTAL                              13925806
+ 2 JAKARTA UTARA   PADEMANGAN       ANCOL                                 35808
+ 3 JAKARTA BARAT   TAMBORA          ANGKE                                 44470
+ 4 JAKARTA TIMUR   KRAMAT JATI      BALE KAMBANG                          42592
+ 5 JAKARTA TIMUR   JATINEGARA       BALI MESTER                           15257
+ 6 JAKARTA TIMUR   CIPAYUNG         BAMBU APUS                            42192
+ 7 JAKARTA SELATAN MAMPANG PRAPATAN BANGKA                                33112
+ 8 JAKARTA TIMUR   PASAR REBO       BARU                                  39084
+ 9 JAKARTA TIMUR   KRAMAT JATI      BATU AMPAR                            71394
+10 JAKARTA PUSAT   TANAH ABANG      BENDUNGAN HILIR                       33562
+# … with 258 more rows</code></pre>
+</div>
 </div>
 </div>
 <div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>jkt_mar2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (02 Maret 2022).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>jkt_mar2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (02 Maret 2022).xlsx"</span>)</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="co">#select &amp; filter</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>jkt_mar2022 <span class="ot">&lt;-</span> jkt_mar2022 <span class="sc">|&gt;</span> </span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">9</span>)</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a><span class="co">#rename</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_mar2022)[<span class="dv">1</span>] <span class="ot">=</span><span class="st">"City"</span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_mar2022)[<span class="dv">2</span>] <span class="ot">=</span><span class="st">"Sub_District"</span></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_mar2022)[<span class="dv">3</span>] <span class="ot">=</span><span class="st">"Ward"</span></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_mar2022)[<span class="dv">4</span>] <span class="ot">=</span><span class="st">"Total_vaccine_given_mar2022"</span></span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>jkt_mar2022</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 268 × 4
+   City            Sub_District     Ward            Total_vaccine_given_mar2022
+   &lt;chr&gt;           &lt;chr&gt;            &lt;chr&gt;                                 &lt;dbl&gt;
+ 1 &lt;NA&gt;            &lt;NA&gt;             TOTAL                              14022104
+ 2 JAKARTA UTARA   PADEMANGAN       ANCOL                                 36055
+ 3 JAKARTA BARAT   TAMBORA          ANGKE                                 44814
+ 4 JAKARTA TIMUR   KRAMAT JATI      BALE KAMBANG                          42961
+ 5 JAKARTA TIMUR   JATINEGARA       BALI MESTER                           15353
+ 6 JAKARTA TIMUR   CIPAYUNG         BAMBU APUS                            42423
+ 7 JAKARTA SELATAN MAMPANG PRAPATAN BANGKA                                33301
+ 8 JAKARTA TIMUR   PASAR REBO       BARU                                  39311
+ 9 JAKARTA TIMUR   KRAMAT JATI      BATU AMPAR                            71935
+10 JAKARTA PUSAT   TANAH ABANG      BENDUNGAN HILIR                       33780
+# … with 258 more rows</code></pre>
+</div>
 </div>
 </div>
 <div id="tabset-3-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-4-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>jkt_apr2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 April 2022).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>jkt_apr2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 April 2022).xlsx"</span>)</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="co">#select &amp; filter</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>jkt_apr2022 <span class="ot">&lt;-</span> jkt_apr2022 <span class="sc">|&gt;</span> </span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">9</span>)</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a><span class="co">#rename</span></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_apr2022)[<span class="dv">1</span>] <span class="ot">=</span><span class="st">"City"</span></span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_apr2022)[<span class="dv">2</span>] <span class="ot">=</span><span class="st">"Sub_District"</span></span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_apr2022)[<span class="dv">3</span>] <span class="ot">=</span><span class="st">"Ward"</span></span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_apr2022)[<span class="dv">4</span>] <span class="ot">=</span><span class="st">"Total_vaccine_given_apr2022"</span></span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>jkt_apr2022</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 268 × 4
+   City            Sub_District     Ward            Total_vaccine_given_apr2022
+   &lt;chr&gt;           &lt;chr&gt;            &lt;chr&gt;                                 &lt;dbl&gt;
+ 1 &lt;NA&gt;            &lt;NA&gt;             TOTAL                               1886300
+ 2 JAKARTA UTARA   PADEMANGAN       ANCOL                                  4266
+ 3 JAKARTA BARAT   TAMBORA          ANGKE                                  6227
+ 4 JAKARTA TIMUR   KRAMAT JATI      BALE KAMBANG                           4237
+ 5 JAKARTA TIMUR   JATINEGARA       BALI MESTER                            2202
+ 6 JAKARTA TIMUR   CIPAYUNG         BAMBU APUS                             5381
+ 7 JAKARTA SELATAN MAMPANG PRAPATAN BANGKA                                 3936
+ 8 JAKARTA TIMUR   PASAR REBO       BARU                                   7056
+ 9 JAKARTA TIMUR   KRAMAT JATI      BATU AMPAR                             8249
+10 JAKARTA PUSAT   TANAH ABANG      BENDUNGAN HILIR                        5626
+# … with 258 more rows</code></pre>
+</div>
 </div>
 </div>
 <div id="tabset-3-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-5-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>jkt_may2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Mei 2022).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>jkt_may2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Mei 2022).xlsx"</span>)</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="co">#select &amp; filter</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>jkt_may2022 <span class="ot">&lt;-</span> jkt_may2022 <span class="sc">|&gt;</span> </span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">9</span>)</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/</span></span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a><span class="co">#rename</span></span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_may2022)[<span class="dv">1</span>] <span class="ot">=</span><span class="st">"City"</span></span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_may2022)[<span class="dv">2</span>] <span class="ot">=</span><span class="st">"Sub_District"</span></span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_may2022)[<span class="dv">3</span>] <span class="ot">=</span><span class="st">"Ward"</span></span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_may2022)[<span class="dv">4</span>] <span class="ot">=</span><span class="st">"Total_vaccine_given_may2022"</span></span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>jkt_may2022</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 268 × 4
+   City            Sub_District     Ward            Total_vaccine_given_may2022
+   &lt;chr&gt;           &lt;chr&gt;            &lt;chr&gt;                                 &lt;dbl&gt;
+ 1 &lt;NA&gt;            &lt;NA&gt;             TOTAL                               2723453
+ 2 JAKARTA UTARA   PADEMANGAN       ANCOL                                  6578
+ 3 JAKARTA BARAT   TAMBORA          ANGKE                                  8926
+ 4 JAKARTA TIMUR   KRAMAT JATI      BALE KAMBANG                           6499
+ 5 JAKARTA TIMUR   JATINEGARA       BALI MESTER                            3227
+ 6 JAKARTA TIMUR   CIPAYUNG         BAMBU APUS                             8176
+ 7 JAKARTA SELATAN MAMPANG PRAPATAN BANGKA                                 5495
+ 8 JAKARTA TIMUR   PASAR REBO       BARU                                   9341
+ 9 JAKARTA TIMUR   KRAMAT JATI      BATU AMPAR                            12119
+10 JAKARTA PUSAT   TANAH ABANG      BENDUNGAN HILIR                        7657
+# … with 258 more rows</code></pre>
+</div>
 </div>
 </div>
 <div id="tabset-3-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-6-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>jkt_jun2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Juni 2022).xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>jkt_jun2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Juni 2022).xlsx"</span>)</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a><span class="co">#select &amp; filter</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>jkt_jun2022 <span class="ot">&lt;-</span> jkt_jun2022 <span class="sc">|&gt;</span> </span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">9</span>)</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/</span></span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a><span class="co">#rename</span></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_jun2022)[<span class="dv">1</span>] <span class="ot">=</span><span class="st">"City"</span></span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_jun2022)[<span class="dv">2</span>] <span class="ot">=</span><span class="st">"Sub_District"</span></span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_jun2022)[<span class="dv">3</span>] <span class="ot">=</span><span class="st">"Ward"</span></span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jkt_jun2022)[<span class="dv">4</span>] <span class="ot">=</span><span class="st">"Total_vaccine_given_jun2022"</span></span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>jkt_jun2022</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 268 × 4
+   City            Sub_District     Ward            Total_vaccine_given_jun2022
+   &lt;chr&gt;           &lt;chr&gt;            &lt;chr&gt;                                 &lt;dbl&gt;
+ 1 &lt;NA&gt;            &lt;NA&gt;             TOTAL                               2894577
+ 2 JAKARTA UTARA   PADEMANGAN       ANCOL                                  7041
+ 3 JAKARTA BARAT   TAMBORA          ANGKE                                  9520
+ 4 JAKARTA TIMUR   KRAMAT JATI      BALE KAMBANG                           7055
+ 5 JAKARTA TIMUR   JATINEGARA       BALI MESTER                            3428
+ 6 JAKARTA TIMUR   CIPAYUNG         BAMBU APUS                             8724
+ 7 JAKARTA SELATAN MAMPANG PRAPATAN BANGKA                                 5848
+ 8 JAKARTA TIMUR   PASAR REBO       BARU                                   9808
+ 9 JAKARTA TIMUR   KRAMAT JATI      BATU AMPAR                            13022
+10 JAKARTA PUSAT   TANAH ABANG      BENDUNGAN HILIR                        8118
+# … with 258 more rows</code></pre>
+</div>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="glimpse-1" class="level3" data-number="3.1.3">
-<h3 data-number="3.1.3" class="anchored" data-anchor-id="glimpse-1"><span class="header-section-number">3.1.3</span> Glimpse</h3>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co">#glimpse(jkt_july2021)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 </section>
-</section>
-<section id="perform-relational-join" class="level2" data-number="3.2">
-<h2 data-number="3.2" class="anchored" data-anchor-id="perform-relational-join"><span class="header-section-number">3.2</span> Perform relational join</h2>
+<section id="perform-relational-join" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="perform-relational-join"><span class="header-section-number">3.3</span> Perform relational join</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># jkt_jul2021 &lt;- left_join(jkt,jkt_jul2021)%&gt;%</span></span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   select(1:4, 7, 15)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># jkt_jul2021 &lt;- left_join(jkt,jkt_jul2021)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># basemap &lt;- tm_shape(jkt_jul2021) +</span></span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   tm_polygons() +</span></span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   tm_text("KECAMATAN", size=0.5)</span></span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="co"># subdistrict &lt;- qtm(jkt_jul2021, "TOTAL VAKSIN DIBERIKAN")</span></span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="co"># tmap_arrange(basemap, subdistrict, asp=1, ncol=2)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># jkt_jul2021 &lt;- left_join(jkt,jkt_jul2021)</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="co"># glimpse(jkt_jul2021)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># basemap &lt;- tm_shape(jkt_jul2021) +</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   tm_polygons() +</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   tm_text("KECAMATAN", size=0.5)</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a><span class="co"># subdistrict &lt;- qtm(jkt_jul2021, "TOTAL VAKSIN DIBERIKAN")</span></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a><span class="co"># tmap_arrange(basemap, subdistrict, asp=1, ncol=2)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
