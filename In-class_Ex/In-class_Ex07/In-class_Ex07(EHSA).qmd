@@ -1,0 +1,60 @@
+---
+title: "In-class_Ex07 (EHSA)"
+date: "20 Feb 2023"
+date-modified: "`r Sys.Date()`"
+number-sections: true
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: visual
+---
+## Prep packages
+```{r}
+#pacman::p_load(sf, tmap, sfdep, tidyverse, plotly)
+```
+
+## geospatial 
+```{r}
+# hunan <- st_read(dsn = "data/geospatial", 
+#                  layer = "Hunan")
+```
+
+
+## aspatial
+```{r}
+# hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+```
+
+
+## left-join
+```{r}
+# ensure there are same number of observations
+# hunan_GDPPC <- left_join(hunan,hunan2012) %>%
+#   select(1:4, 7, 15)
+```
+
+
+
+# hot spot and cold spot
+
+## create a time series cube
+```{r}
+# GDPPC_st <- space(GDPPC, hunan, 
+#                   .loc_col = "County", 
+#                   .time_col = "Year")
+```
+
+
+```{r}
+# GDPPC_NB <- GDPPC_st |>
+#   activate("geometry") |>
+#   mutate(
+#     nb = include_self(st_contiguity(geometry)), 
+#     wt = st_weights(nb)
+#   )|>
+#   set_nbs("nb") |>
+#   set_wts("wt")
+```
+

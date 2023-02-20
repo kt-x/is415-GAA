@@ -14,6 +14,7 @@ editor: visual
 # Overview
 
 ## Install and load packages
+
 ```{r}
 pacman::p_load(sf, sfdep, tmap, tidyverse)
 ```
@@ -21,18 +22,18 @@ pacman::p_load(sf, sfdep, tmap, tidyverse)
 # DATA
 
 ## Import Geospatial Data
+
 ```{r}
 hunan <- st_read(dsn = "data/geospatial", 
                  layer = "Hunan")
 ```
 
-
 ## Import Aspatial Data
+
 ```{r}
 hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
 hunan2012
 ```
-
 
 ## Combine both df using left-join
 
@@ -45,8 +46,8 @@ hunan_GDPPC <- left_join(hunan, hunan2012) |>
 
 NOTE: during joining,must have a common field (unique identifier) then another thing to take note is to make sure both columns have same number of attributes(?)
 
-
 ## Plotting Chrorpleth map
+
 ```{r}
 tmap_mode("plot")
 tm_shape(hunan_GDPPC)+
@@ -66,26 +67,26 @@ tm_shape(hunan_GDPPC)+
   tm_grid(alpha =0.2) 
 ```
 
-
 # Identify neighbours
 
 ## Contibuity neighbours method
+
 .before = 1 is to put the newly created column at the first column onwards.
+
 ```{r}
 cn_queen <- hunan_GDPPC |>
   mutate(nb = st_contiguity(geometry), .before = 1)
 ```
 
-
-
 ## Neighbour list by Rook's method
+
 queen = false is to know that the default queen is false then its rook.
+
 ```{r}
 cn_rook <- hunan_GDPPC |>
   mutate(nb = st_contiguity(geometry), queen = FALSE, .before = 1)
 
 ```
-
 
 ```{r}
 wm_q = hunan_GDPPC |>
@@ -94,9 +95,8 @@ wm_q = hunan_GDPPC |>
          .before = 1)
 ```
 
-
-
 ## Contiguity rook method
+
 ```{r}
 wm_r = hunan_GDPPC |>
   mutate(nb = st_contiguity(geometry), 
@@ -104,4 +104,3 @@ wm_r = hunan_GDPPC |>
          wt = st_weights(nb), 
          .before = 1)
 ```
-
