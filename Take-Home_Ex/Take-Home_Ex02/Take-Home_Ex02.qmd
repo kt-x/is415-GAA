@@ -60,12 +60,18 @@ For this exercise, we'll be using the following packages:
 
 -   knitr:
 
+-   kableExtra:
+
+-   dplyr:
+
 -   readxl: The readxl package makes it easy to get data out of Excel and into R
+
+-   plyr:
 
 We will be using p_load function of pacman package to install and load required packages.
 
 ```{r}
-pacman::p_load(sf, sfdep, tmap, maptools, tidyverse, knitr, readxl)
+pacman::p_load(sf, sfdep, tmap, maptools, tidyverse, knitr, readxl, kableExtra, dplyr, plyr)
 ```
 
 # Data wrangling: Geospatial data
@@ -105,20 +111,36 @@ Since theres no invalids geometrics, we move to missing values
 
 ### Missing values
 
+::: panel-tabset
+
+#### 1. Check of missing values
 ```{r}
 jkt[rowSums(is.na(jkt))!=0,]
 ```
 
-From the output, Columns with missing values (KAB_KOTA (City), KECAMATAN (District) and DESA_KELUR (Village)) as well as other fields since its from the same 2 rows (243 & 244), we can just remove these.
+From the output, Columns with missing values (KAB_KOTA (City), KECAMATAN (District) and DESA_KELUR (Sub-District)) as well as other fields since its from the same 2 rows (243 & 244), we can just remove these.
+
+#### 2. Remove missing values
 
 ```{r}
 jkt <- na.omit(jkt,c("DESA_KELUR"))
 ```
 
+
+#### 3. Check again for missing value
+```{r}
+jkt[rowSums(is.na(jkt))!=0,]
+```
+:::
+
+
 ### Validate & Transform jkt CRS
 
 Moving on, we gotta to validate the CRS of jarkarta
 
+::: panel-tabset
+
+#### 1. Check the current crs
 ```{r}
 # retrieves the crs
 st_crs(jkt)
@@ -126,15 +148,20 @@ st_crs(jkt)
 
 So the assigned coordinates system is WGS 84 (aka World Geodetic System 1984) therefore, we got to change it to crs of Indonesia, DGN95 using the code of 23845.
 
+#### 2. Transform crs 
 ```{r}
 jkt <- st_transform(jkt, 23845)
 ```
 
+#### 3. Check crs again
 ```{r}
 st_crs(jkt)
 ```
 
 It changed.
+
+:::
+
 
 ## Visualise data
 
@@ -204,7 +231,8 @@ Before we import, lets see one of the data first.
 
 ```{r}
 #July 2021
-jkt_jul2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Juli 2021).xlsx")
+jkt_jul2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Juli 2021) vac.xlsx")
+
 glimpse(jkt_jul2021)
 ```
 Theres isnt duplicates columns so lets select the relevant columns to our exercise.
@@ -215,271 +243,451 @@ What to do for pre-processing (Aspatial Data):
 
 -   Rename those columns names
 
-Columns of interest
-
-| Original ver           | Translated ver                |
-|------------------------|-------------------------------|
-| WILAYAH KOTA           | City                          |
-| KECAMATAN              | Sub-district                  |
-| KELURAHAN              | Ward / Villages / Communities |
-| TOTAL VAKSIN DIBERIKAN | Total Vaccine Given           |
 
 
-## Importing Aspatial
+| Original ver           | Translated ver              |
+|------------------------|-----------------------------|
+| WILAYAH KOTA           | City                        |
+| KECAMATAN              | District                    |
+| KELURAHAN              | Sub_District                |
+| SASARAN                | Target                      |
+| BELUM VAKSIN           | Yet to be Vaccinated        |
 
 
-### From July 2021 to Dec 2021
+
+## A function to take in the Aspatial files in the specific path
+
+```{r}
+# takes in an aspatial data filepath and returns a processed output
+aspatial_preprocess <- function(filepath){
+  # the .name_repair="minimal" is to indicate not to replace duplicate column names with 'NAME...n' like we saw above!
+  # reference: https://readxl.tidyverse.org/articles/articles/column-names.html
+  result_file <- read_xlsx(filepath, .name_repair="minimal")
+  
+  # Remove Duplicate Columns
+  # essentially, it's saying "take the columns that aren't duplicated, and if there are duplicates, take the last duplicate"
+  # we use fromLast = TRUE to ensure that we keep the last duplicated column
+  # reference: https://www.marsja.se/how-to-remove-duplicates-in-r-rows-columns-dplyr/
+  # reference: https://stackoverflow.com/questions/16905425/find-duplicate-values-in-r
+  result_file <- result_file[, !duplicated(colnames(result_file), fromLast = TRUE)] 
+  
+  # Create the Date Column
+  # the format of our files is: Standar Kelurahan Data Corona (DD Month YYYY Pukul Ti.me)
+  # while the start is technically "(", "(" is part of a regular expression and leads to a warning message, so we'll use "Corona" instead. The [[1]] refers to the first element in the list.
+  # we're loading it as DD-Month-YYYY format
+  # the end is 1 space before "Pukul", which means we have to -2 spaces (one for P, one for space)
+  # as such, the most relevant functions are substr (returns a substring) and either str_locate (returns location of substring as an integer matrix) or gregexpr (returns a list of locations of substring)
+  # reference https://stackoverflow.com/questions/14249562/find-the-location-of-a-character-in-string
+  startpoint <- gregexpr(pattern="Kelurahan", filepath)[[1]] + 11
+  endpoint <- gregexpr(pattern="vac", filepath)[[1]] - 3
+  result_file$Date <- substr(filepath, startpoint, endpoint)
+  
+  # Retain the Relevant Columns
+  result_file <- result_file %>% 
+    select("Date", 
+           "KODE KELURAHAN", 
+           "WILAYAH KOTA", 
+           "KECAMATAN", 
+           "KELURAHAN", 
+           "SASARAN",
+           "BELUM VAKSIN")
+  
+  return(result_file)
+}
+```
+
+Lets Test out to see if theres a date column. 
+```{r}
+test_jul2021 = aspatial_preprocess("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Juli 2021) vac.xlsx")
+```
+
+Great, its there. Now lets do for all the Aspatial files
+
+## Feeding Files into our aspatial_preprocess function
+```{r}
+# in the folder 'data/aspatial', find files with the extension '.xlsx' and add it to our fileslist 
+# the full.names=TRUE prepends the directory path to the file names, giving a relative file path - otherwise, only the file names (not the paths) would be returned 
+# reference: https://stat.ethz.ch/R-manual/R-devel/library/base/html/list.files.html
+fileslist <-list.files(path = "data/aspatial", pattern = "*.xlsx", full.names=TRUE)
+
+# afterwards, for every element in fileslist, apply aspatial_process function
+dflist <- lapply(seq_along(fileslist), function(x) aspatial_preprocess(fileslist[x]))
+```
+
+we’ll need to convert the dflist into an actual dataframe with ldply()
+```{r}
+vaccine_jkt <- ldply(dflist, data.frame)
+```
+
+Let’s check what vaccine_jkt looks like, and make sure the columns are correct.
+```{r}
+glimpse(vaccine_jkt)
+```
+
+
+## Format Date Column of the Aspatial data
+
+The dates now are in substring format, we got to convert into datetime format, with the additional consideration that the month are in Bahasa Indonesian. 
+```{r}
+# parses the 'Date' column into Month(Full Name)-YYYY datetime objects
+# reference: https://stackoverflow.com/questions/53380650/b-y-date-conversion-gives-na
+
+# locale="ind" means that the locale has been set as Indonesia
+Sys.setlocale(locale="ind")
+```
+
+```{r}
+vaccine_jkt$Date <- c(vaccine_jkt$Date) %>% 
+  as.Date(vaccine_jkt$Date, format ="%d %B %Y")
+
+glimpse(vaccine_jkt)
+```
+
+##  Renaming Columns with Translation
+```{r}
+# renames the columns in the style New_Name = OLD_NAME
+vaccine_jkt <- vaccine_jkt %>% 
+  dplyr::rename(
+    Date=Date,
+    Code=KODE.KELURAHAN, 
+    City=WILAYAH.KOTA, 
+    District=KECAMATAN, 
+    Sub_District=KELURAHAN,
+    Target=SASARAN, 
+    Yet_to_be_vaccinated=BELUM.VAKSIN
+    )
+```
+
+
+## Further Data Processing
+
+Now that we have our confirmed dataframe, let’s execute any pre-processing we might have missed. Firstly, let’s check for missing values:
+```{r}
+# returns rows that contain NA values
+vaccine_jkt[rowSums(is.na(vaccine_jkt))!=0,]
+```
+
+OH so these are the rows of each starting aspatial data files that has the total values. Anyways, we got to remove these then
+```{r}
+# removes rows that have an NA value in ID
+vaccine_jkt <- na.omit(vaccine_jkt,c("code"))
+```
+
+Lets check again
+```{r}
+# returns rows that contain NA values
+vaccine_jkt[rowSums(is.na(vaccine_jkt))!=0,]
+```
+
+
+Great. its removed.
+
+# New column - Actual vaccination rate
+use the target - the yet to vaccinated column and put into new column Actual_Vaccination_Rate
+```{r}
+#reference taken from: https://stackoverflow.com/questions/23888037/subtracting-two-columns-to-give-a-new-column-in-r
+
+vaccine_jkt$Vaccinated <- (vaccine_jkt$Target - vaccine_jkt$Yet_to_be_vaccinated)
+
+glimpse(vaccine_jkt)
+```
+
+# Geospatial Data Integration
+
+##  Preliminary joining + EDA
+Now that we have both the geospatial and aspatial data frames, we’ll need to join them. A quick look at their headers tell us what their common fields are:
+
+```{r}
+# checks for column names of the dataframes
+colnames(jkt)
+```
+
+```{r}
+# checks for column names of the dataframes
+colnames(vaccine_jkt)
+```
+
+It seems that the City, Distict and Sub_District should match up. Let’s try doing that first:
+
+```{r}
+# joins cases_jakarta to bd_jakarta based on Province, Sub_District and City
+combined_jkt <- left_join(jkt, vaccine_jkt,
+                              by=c(
+                                "District"="District", 
+                                "Sub_District"="Sub_District",
+                                "City"="City")
+                              )
+```
+
+
+Now, let’s visualise our current combined_jkt in terms of vaccination rates:
+
+```{r}
+# maps the monthly vaccination rates
+
+
+vaccinated = tm_shape(combined_jkt)+
+  tm_fill("Vaccinated") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title="Vaccination Rate July2021")
+vaccinated
+```
+
+## Identifying Mismatched Sub-District Records
+
+```{r}
+# checks for unique values of Sub_District in cases_jakarta that aren't already present in bd_jakarta and vice versa
+vaccine_subdistrict <- c(vaccine_jkt$Sub_District)
+jkt_subdistrict <- c(jkt$Sub_District)
+
+unique(vaccine_subdistrict[!(vaccine_subdistrict %in% jkt_subdistrict)])
+```
+
+```{r}
+unique(jkt_subdistrict[!(jkt_subdistrict %in% vaccine_subdistrict)])
+```
+
+Input the common data between the unique values of both df. We should have 9 mismatches. Because the aspatial data includes some of the islands in the dataset too.
+```{r}
+# initialise a dataframe of our vaccine vs jkt subdistrict spelling
+spelling <- data.frame(
+  Aspatial_Cases=c("BALE KAMBANG", "HALIM PERDANA KUSUMAH", "JATI PULO", "KAMPUNG TENGAH", "KRAMAT JATI", "KERENDANG", "PAL MERIAM", "PINANG RANTI", "RAWA JATI"),
+  Geospatial_BD=c("BALEKAMBANG", "HALIM PERDANA KUSUMA", "JATIPULO", "TENGAH", "KRAMATJATI", "KRENDANG", "PALMERIAM", "PINANGRANTI", "RAWAJATI")
+  )
+
+# with dataframe a input, outputs a kable
+library(knitr)
+library(kableExtra)
+kable(spelling, caption="Mismatched Records") %>%
+  kable_material("hover", latex_options="scale_down")
+```
+
+## Correcting Mismatched Sub-District Records
+Now that we know which sub-district records are mismatched, we need to rectify the mismatches by renaming them: (9 mismatches)
+```{r}
+# where jkt is a mismatched value, replace with the correct value
+jkt$Sub_District[jkt$Sub_District == 'BALEKAMBANG'] <- 'BALE KAMBANG'
+
+jkt$Sub_District[jkt$Sub_District == 'HALIM PERDANA KUSUMA'] <- 'HALIM PERDANA KUSUMAH'
+
+jkt$Sub_District[jkt$Sub_District == 'JATIPULO'] <- 'JATI PULO'
+
+jkt$Sub_District[jkt$Sub_District == 'TENGAH'] <- 'KAMPUNG TENGAH'
+
+jkt$Sub_District[jkt$Sub_District == 'KRAMATJATI'] <- 'KRAMAT JATI'
+
+jkt$Sub_District[jkt$Sub_District == 'KRENDANG'] <- 'KERENDANG'
+
+jkt$Sub_District[jkt$Sub_District == 'PALMERIAM'] <- 'PAL MERIAM'
+
+jkt$Sub_District[jkt$Sub_District == 'PINANGRANTI'] <- 'PINANG RANTI'
+
+jkt$Sub_District[jkt$Sub_District == 'RAWAJATI'] <- 'RAWA JATI'
+```
+
+
+## Remove the islands from aspatial data
+
+```{r}
+vaccine_jkt = filter(vaccine_jkt, !(Sub_District %in% c("PULAU HARAPAN", "PULAU KELAPA", "PULAU PANGGANG", "PULAU PARI", "PULAU TIDUNG", "PULAU UNTUNG JAWA")))
+```
+
+
+## Joining + EDA
+Now, we have a standardised common identifier among our geospatial and aspatial dataframes. Let’s join them once more:
+```{r}
+# joins vaccine_jkt to jkt based on Sub_District
+combined_jkt<- left_join(jkt, vaccine_jkt,
+                              by=c("Sub_District"="Sub_District")
+                              )
+```
+
+Now, let’s visualise our current combined_jkt in terms of vaccination rates again:
+```{r}
+# maps the monthly vaccination rates
+
+
+vaccinated = tm_shape(combined_jkt)+
+  tm_fill("Vaccinated") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title="Vaccination Rate July2021")
+vaccinated
+```
+
+## Calculations - (change the para explatnation)
+
+Before we move into into EDA and thematic mapping, we need to calculate the cumulative vaccination cases rate (i.e. cases per 10000 population) as per assignment requirements.
+
+### CUMULATIVE CONFIRMED VACCINATION RATE
+
+The cumulative vaccination rate can be calculated by taking the vaccinated  
+
+summing up the number of cases (based on the name of the sub-district and the date), and then dividing by the total population - but do note that the total population represented in our dataframe represents 10,000 denominations (in other words, this is number of cases for every 10,000 people). This can easily be achieved with pivot_wider().
+```{r}
+# grouping based on the sub-district and date
+# the cumulative_case_rate is based on the sum of cases over the total population
+vaccination_rate <- vaccine_jkt %>%
+  inner_join(jkt, by=c("Sub_District" = "Sub_District")) %>%
+  group_by(Sub_District, Date) %>%
+  dplyr::summarise(`vaccination_rate` = ((sum(Vaccinated)/(Total_Population))*100)) %>%
+  
+  #afterwards, pivots the table based on the Dates, using the cumulative case rate as the values
+  ungroup() %>% pivot_wider(names_from = Date,
+              values_from = vaccination_rate)
+```
+
+```{r}
+print(as_tibble(vaccination_rate))
+```
+
+##  Converting dataframes to sf objects
+Before we move on into the mapping, we should convert these dataframes into sf objects.
+```{r}
+combined_jkt <- st_as_sf(combined_jkt)
+
+# need to join our previous dataframes with the geospatial data to ensure that geometry column is present
+vaccination_rate <- vaccination_rate%>% left_join(jkt, by=c("Sub_District"="Sub_District"))
+vaccination_rate <- st_as_sf(vaccination_rate)
+```
+
+
+
+
+# Mapping: Monthly Cumulative Cases Rate
+
+## Jenks Choropleth Map
+Now I will be trying to see the suitability of using Jenks Choropleth Map. It ‘seeks to minimize the average deviation from the class mean while maximizing the deviation from the means of the other groups’ (source) and tends to identify real, natural classes within the data. However, jenks will not work as well if the data has a low variance, so let’s check the variance:
+
+
+```{r}
+# commented out most of the variances due to the increasing variance over time
+var(vaccination_rate$`2021-07-01`)
+```
+
+```{r}
+# var(vaccination_rate$`2021-07-01`)
+# var(vaccination_rate$`2021-08-01`)
+# var(vaccination_rate$`2021-09-01`)
+# var(vaccination_rate$`2021-10-01`)
+# var(vaccination_rate$`2021-11-01`)
+# var(vaccination_rate$`2021-12-01`)
+# var(vaccination_rate$`2022-01-01`)
+# var(vaccination_rate$`2022-02-01`)
+# var(vaccination_rate$`2022-03-01`)
+# var(vaccination_rate$`2022-04-01`)
+# var(vaccination_rate$`2022-05-01`)
+ var(vaccination_rate$`2022-06-01`)
+```
+<to be paraphrase>
+Since the variance is increasing over time and seems significant, we can continue with jenks classification. After some testing, having 6 classes seems to be the optimum: too many classes and it becomes hard for the human eye to differentiate between the gradients, while too few classes makes it hard for any differentiation to be seen.
+
+```{r}
+# using the jenks method, with 6 classes
+tmap_mode("plot")
+tm_shape(vaccination_rate)+
+  tm_fill("2021-07-01", 
+          n= 6,
+          style = "jenks", 
+          title = "Vaccination Rate") +
+  tm_layout(main.title = "Vaccination Rate July 2021",
+            main.title.position = "center",
+            main.title.size = 1,
+            legend.height = 0.5, 
+            legend.width = 0.4,
+            frame = TRUE) +
+  tm_borders(alpha = 0.5)
+```
+
+We should plot it for all the months - so let’s have a helper function for plotting this!
+
+```{r}
+# input: the dataframe and the variable name - in this case, the month 
+# with style="jenks" for the jenks classification method
+jenks_plot <- function(df, varname) {
+  tm_shape(vaccination_rate) +
+    tm_polygons() +
+  tm_shape(df) +
+    tm_fill(varname, 
+          n= 6,
+          style = "jenks", 
+          title = "Vaccination Rate") +
+    tm_layout(main.title = varname,
+          main.title.position = "center",
+          main.title.size = 1.2,
+          legend.height = 0.35, 
+          legend.width = 0.25,
+          frame = TRUE) +
+    tm_borders(alpha = 0.5)
+}
+```
+
+
+## Choropleth Mapping 
+Now the visualisation the jenks plots for all months:\
+
 ::: panel-tabset
-#### 1st Jul 2021
 
+### Yr 2021
+Jul & Aug 2021
 ```{r}
-jkt_jul2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Juli 2021).xlsx")
-
-#select & filter
-jkt_jul2021 <- jkt_jul2021 |> 
-  select(2:4, 9)
-
-#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/
-#rename
-colnames(jkt_jul2021)[1] ="City"
-colnames(jkt_jul2021)[2] ="Sub_District"
-colnames(jkt_jul2021)[3] ="Ward"
-colnames(jkt_jul2021)[4] ="Total_vaccine_given_jul2021"
-
-jkt_jul2021
+# split it up into multiple arranges to make it easier to see
+library(tmap)
+tmap_mode("plot")
+jul2021 = jenks_plot(vaccination_rate, "2021-07-01")
+aug2021 = jenks_plot(vaccination_rate, "2021-08-01")
+tmap_arrange(jul2021, aug2021, asp=1, ncol=2)
+```
+Sept & Oct 2021
+```{r}
+library(tmap)
+tmap_mode("plot")
+sept2021 = jenks_plot(vaccination_rate, "2021-09-01")
+oct2021 = jenks_plot(vaccination_rate, "2021-09-01")
+tmap_arrange(sept2021, oct2021, asp=1, ncol=2)
 ```
 
-#### 1st Aug 2021
-
+Nov & Dec 2021
 ```{r}
-jkt_aug2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (1 Agustus 2021).xlsx")
-
-#select & filter
-jkt_aug2021 <- jkt_aug2021 |> 
-  select(2:4, 9)
-
-#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/
-#rename
-colnames(jkt_aug2021)[1] ="City"
-colnames(jkt_aug2021)[2] ="Sub_District"
-colnames(jkt_aug2021)[3] ="Ward"
-colnames(jkt_aug2021)[4] ="Total_vaccine_given_aug2021"
-
-jkt_aug2021
+library(tmap)
+tmap_mode("plot")
+nov2021 = jenks_plot(vaccination_rate, "2021-09-01")
+dec2021 = jenks_plot(vaccination_rate, "2021-09-01")
+tmap_arrange(nov2021, dec2021, asp=1, ncol=2)
+```
+### Yr 2022
+Jan & Feb 2022
+```{r}
+library(tmap)
+tmap_mode("plot")
+jan2021 = jenks_plot(vaccination_rate, "2022-01-01")
+feb2021 = jenks_plot(vaccination_rate, "2022-02-01")
+tmap_arrange(jan2021, feb2021, asp=1, ncol=2)
 ```
 
-#### 1st Sept 2021
 
+Mar & Apr 2022
 ```{r}
-jkt_sept2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 September 2021).xlsx")
-
-#select & filter
-jkt_sept2021 <- jkt_sept2021 |> 
-  select(2:4, 9)
-
-#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/
-#rename
-colnames(jkt_sept2021)[1] ="City"
-colnames(jkt_sept2021)[2] ="Sub_District"
-colnames(jkt_sept2021)[3] ="Ward"
-colnames(jkt_sept2021)[4] ="Total_vaccine_given_sept2021"
-
-jkt_sept2021
+# library(tmap)
+# tmap_mode("plot")
+# mar2021 = jenks_plot(vaccination_rate, "2022-03-01")
+# apr2021 = jenks_plot(vaccination_rate, "2022-04-01")
+# tmap_arrange(mar2021, apr2021, asp=1, ncol=2)
 ```
 
-#### 1st Oct 2021
 
+May & Jun 2021
 ```{r}
-jkt_oct2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Oktober 2021).xlsx")
-
-#select & filter
-jkt_oct2021 <- jkt_oct2021 |> 
-  select(2:4, 9)
-
-#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/
-#rename
-colnames(jkt_oct2021)[1] ="City"
-colnames(jkt_oct2021)[2] ="Sub_District"
-colnames(jkt_oct2021)[3] ="Ward"
-colnames(jkt_oct2021)[4] ="Total_vaccine_given_oct2021"
-
-jkt_oct2021
-```
-
-#### 1st Nov 2021
-
-```{r}
-jkt_nov2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 November 2021).xlsx")
-
-#select & filter
-jkt_nov2021 <- jkt_nov2021 |> 
-  select(2:4, 9)
-
-#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/
-#rename
-colnames(jkt_nov2021)[1] ="City"
-colnames(jkt_nov2021)[2] ="Sub_District"
-colnames(jkt_nov2021)[3] ="Ward"
-colnames(jkt_nov2021)[4] ="Total_vaccine_given_nov2021"
-
-jkt_nov2021
-```
-
-#### 1st Dec 2021
-
-```{r}
-jkt_dec2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Desember 2021).xlsx")
-
-#select & filter
-jkt_dec2021 <- jkt_dec2021 |> 
-  select(2:4, 9)
-
-#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/
-#rename
-colnames(jkt_dec2021)[1] ="City"
-colnames(jkt_dec2021)[2] ="Sub_District"
-colnames(jkt_dec2021)[3] ="Ward"
-colnames(jkt_dec2021)[4] ="Total_vaccine_given_dec2021"
-
-jkt_dec2021
+library(tmap)
+tmap_mode("plot")
+may2021 = jenks_plot(vaccination_rate, "2022-05-01")
+jun2021 = jenks_plot(vaccination_rate, "2022-06-01")
+tmap_arrange(may2021, jun2021, asp=1, ncol=2)
 ```
 :::
 
-### From Jan 2022 to June 2022
-
-::: panel-tabset
-#### 1st Jan 2022
-
-```{r}
-jkt_jan2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Januari 2022).xlsx")
-
-#select & filter
-jkt_jan2022 <- jkt_jan2022 |> 
-  select(2:4, 9)
-
-#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/
-#rename
-colnames(jkt_jan2022)[1] ="City"
-colnames(jkt_jan2022)[2] ="Sub_District"
-colnames(jkt_jan2022)[3] ="Ward"
-colnames(jkt_jan2022)[4] ="Total_vaccine_given_jan2022"
-
-jkt_jan2022
-```
-
-#### 1st Feb 2022
-
-```{r}
-jkt_feb2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Februari 2022).xlsx")
-
-#select & filter
-jkt_feb2022 <- jkt_feb2022 |> 
-  select(2:4, 9)
-
-#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/
-#rename
-colnames(jkt_feb2022)[1] ="City"
-colnames(jkt_feb2022)[2] ="Sub_District"
-colnames(jkt_feb2022)[3] ="Ward"
-colnames(jkt_feb2022)[4] ="Total_vaccine_given_feb2022"
-
-jkt_feb2022
-```
-
-#### 1st Mar 2022
-
-```{r}
-jkt_mar2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (02 Maret 2022).xlsx")
-
-#select & filter
-jkt_mar2022 <- jkt_mar2022 |> 
-  select(2:4, 9)
-
-#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/
-#rename
-colnames(jkt_mar2022)[1] ="City"
-colnames(jkt_mar2022)[2] ="Sub_District"
-colnames(jkt_mar2022)[3] ="Ward"
-colnames(jkt_mar2022)[4] ="Total_vaccine_given_mar2022"
-
-jkt_mar2022
-```
-
-#### 1st Apr 2022
-
-```{r}
-jkt_apr2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 April 2022).xlsx")
-
-#select & filter
-jkt_apr2022 <- jkt_apr2022 |> 
-  select(2:4, 9)
-
-#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/
-#rename
-colnames(jkt_apr2022)[1] ="City"
-colnames(jkt_apr2022)[2] ="Sub_District"
-colnames(jkt_apr2022)[3] ="Ward"
-colnames(jkt_apr2022)[4] ="Total_vaccine_given_apr2022"
-
-jkt_apr2022
-```
-
-#### 1st May 2022
-
-```{r}
-jkt_may2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Mei 2022).xlsx")
-
-#select & filter
-jkt_may2022 <- jkt_may2022 |> 
-  select(2:4, 9)
-
-#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/
-#rename
-colnames(jkt_may2022)[1] ="City"
-colnames(jkt_may2022)[2] ="Sub_District"
-colnames(jkt_may2022)[3] ="Ward"
-colnames(jkt_may2022)[4] ="Total_vaccine_given_may2022"
-
-jkt_may2022
-```
-
-#### 1st June 2022
-
-```{r}
-jkt_jun2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Juni 2022).xlsx")
-
-#select & filter
-jkt_jun2022 <- jkt_jun2022 |> 
-  select(2:4, 9)
-
-#Reference to https://sparkbyexamples.com/r-programming/rename-column-in-r/
-#rename
-colnames(jkt_jun2022)[1] ="City"
-colnames(jkt_jun2022)[2] ="Sub_District"
-colnames(jkt_jun2022)[3] ="Ward"
-colnames(jkt_jun2022)[4] ="Total_vaccine_given_jun2022"
-
-jkt_jun2022
-```
-:::
-
-## Perform relational join
-
-```{r}
-# jkt_jul2021 <- left_join(jkt,jkt_jul2021)
-```
 
 
-```{r}
-# jkt_jul2021 <- left_join(jkt,jkt_jul2021)
-# glimpse(jkt_jul2021)
-```
 
-```{r}
-# basemap <- tm_shape(jkt_jul2021) +
-#   tm_polygons() +
-#   tm_text("KECAMATAN", size=0.5)
-# 
-# subdistrict <- qtm(jkt_jul2021, "TOTAL VAKSIN DIBERIKAN")
-# tmap_arrange(basemap, subdistrict, asp=1, ncol=2)
-```
+
+
+
