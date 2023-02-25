@@ -763,53 +763,461 @@ The month where the case rate was ramping up in severity across the country (and
 
 We can roughly track the journey of the COVID-19 'clusters' across the map: Central Cluster: Originated in SENAYAN, circulating within central Jakarta before taking root in GAMBIR. Southern Cluster: Became prominent in December 2020 onwards, where multiple sub-districts were medium-ly affected. While it pales in comparison to the central cluster, it still has a relatively significant presence. Northeast Cluster: while the 'center' of the cluster (with the most darkest shade) changed frequently in the initial stages, by December 2020 there a pair of confirmed 'center' districts that stayed constant throughout 2021. Close proximity of the northeast cluster with the central cluster (specifically, GAMBIR) Additionally, across the map, it seems that a darker colour will likely have similarly dark colours near it, which could be a sign of spreading to neighbouring districts - we'll confirm this in 6.4
 
-# Localised geospatial statistics
 
-In this section, localised spatial statistical analysis methods will be utilised to analyse the monthly vaccination rate. The following spatial statistics will be utilised for the analysis:
 
-Local Moran’s I: cluster and outlier analysis
-Getis-Ord Gi* : hot spot and cold spot area analysis
 
+
+
+
+
+
+
+
+# Computing Contiguity Spatial Weights
 
 Reference for this section of Choropleth Mapping was taken from the senior sample submissions for the code for this section, with credit to [Detecting Spatio-Temporal Patterns of COVID-19 in Central Mexico by Xiao Rong Wong](https://rpubs.com/xiaorongw/IS415_Take-home_Ex02).
 
 And reference to In-class Ex7
 
-## Global Measures of Spatial Association
+::: panel-tabset
+
+### Deriving contiguity weights: Queen’s method
+```{r}
+nb_queen <- vaccination_rate %>%
+  mutate(nb = st_contiguity(geometry),
+         .before = 1)
+summary(nb_queen$nb)
+```
+The summary report above shows that there are 261 area units in Jarkarta. The most connected area unit has 11 neighbours. There are 5 are units with 2 neighbours.
 
 ```{r}
-nb_queen <- hunan_GDPPC %>% 
+# print(tibble(nb_queen))
+nb_queen
+```
+
+
+### Deriving contiguity weights: Rook’s method
+```{r}
+nb_rook <- vaccination_rate %>%
+  mutate(nb = st_contiguity(geometry, queen = FALSE),
+         .before = 1)
+summary(nb_rook$nb)
+```
+
+
+### Identifying higher order neighbors
+```{r}
+nb2_queen <-  vaccination_rate %>% 
   mutate(nb = st_contiguity(geometry),
+         nb2 = st_nb_lag_cumul(nb, 2),
          .before = 1)
 ```
 
-
-
-
-
-
-<paraphrase this>
-For this method, neighbours at the municipality level in Central Mexico will be determined based on municipalities with contiguous boundaries. There are two methods in determining contiguity:
-
-Rook contiguity considers areas to be adjacent if areas have at least two common boundary points (a segment).
-Queen contiguity considers areas to be adjacent if as long as the areas share a common boundary point.
-The spatial weight matrices using these two methods will be computed.
-
-### Step 1: Deriving contiguity weights: Queen’s method
 ```{r}
-wm_q <- vaccination_rate %>%
+nb2_queen
+```
+:::
+
+
+
+
+
+
+
+# Hot Spot and Cold Spot Area Analysis (HCSA)
+<paraphrase>
+HCSA uses spatial weights to identify locations of statistically significant hot spots and cold spots in an spatially weighted attribute that are in proximity to one another based on a calculated distance. The analysis groups features when similar high (hot) or low (cold) values are found in a cluster. The polygon features usually represent administration boundaries or a custom grid structure.
+
+## Computing local Gi* statistics
+
+```{r}
+wm_idw <- vaccination_rate %>%
   mutate(nb = st_contiguity(geometry),
-         wt = st_weights(nb,
-                         style = "W"),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
          .before = 1)
-summary(wm_q)
 ```
 
-
-
+::: panel-tabset
+### Yr2021
+#### July 2021
 ```{r}
-wm_q[[1]]
+#| code-fold: true
+#| code-summary: "Show the code"
+HCSA_jul2021 <- wm_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    wm_idw$`2021-07-01`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+tmap_mode("plot")
+map1 <- tm_shape(HCSA_jul2021) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(main.title = "Gi* of Vaccination Rate",
+            main.title.size = 0.8)
+
+map2 <- tm_shape(HCSA_jul2021) +
+  tm_fill("p_value",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "p-value of Gi*",
+            main.title.size = 0.8)
+
+tmap_arrange(map1, map2, ncol = 2)
 ```
+
+#### Aug 2021
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+HCSA_aug2021 <- wm_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    wm_idw$`2021-08-01`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+tmap_mode("plot")
+map3 <- tm_shape(HCSA_aug2021) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(main.title = "Gi* of Vaccination Rate",
+            main.title.size = 0.8)
+
+map4 <- tm_shape(HCSA_aug2021) +
+  tm_fill("p_value",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "p-value of Gi*",
+            main.title.size = 0.8)
+
+tmap_arrange(map3, map4, ncol = 2)
+```
+
+#### Sept 2021
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+HCSA_sept2021 <- wm_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    wm_idw$`2021-09-01`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+tmap_mode("plot")
+map5 <- tm_shape(HCSA_sept2021) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(main.title = "Gi* of Vaccination Rate",
+            main.title.size = 0.8)
+
+map6 <- tm_shape(HCSA_sept2021) +
+  tm_fill("p_value",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "p-value of Gi*",
+            main.title.size = 0.8)
+
+tmap_arrange(map5, map6, ncol = 2)
+```
+
+#### Oct 2021
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+HCSA_oct2021 <- wm_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    wm_idw$`2021-10-01`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+tmap_mode("plot")
+map7 <- tm_shape(HCSA_oct2021) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(main.title = "Gi* of Vaccination Rate",
+            main.title.size = 0.8)
+
+map8 <- tm_shape(HCSA_oct2021) +
+  tm_fill("p_value",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "p-value of Gi*",
+            main.title.size = 0.8)
+
+tmap_arrange(map7, map8, ncol = 2)
+```
+
+#### Nov 2021
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+HCSA_nov2021 <- wm_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    wm_idw$`2021-11-01`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+tmap_mode("plot")
+map9 <- tm_shape(HCSA_nov2021) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(main.title = "Gi* of Vaccination Rate",
+            main.title.size = 0.8)
+
+map10 <- tm_shape(HCSA_nov2021) +
+  tm_fill("p_value",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "p-value of Gi*",
+            main.title.size = 0.8)
+
+tmap_arrange(map9, map10, ncol = 2)
+```
+
+#### Dec 2021
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+HCSA_dec2021 <- wm_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    wm_idw$`2021-12-01`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+tmap_mode("plot")
+map11 <- tm_shape(HCSA_dec2021) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(main.title = "Gi* of Vaccination Rate",
+            main.title.size = 0.8)
+
+map12 <- tm_shape(HCSA_dec2021) +
+  tm_fill("p_value",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "p-value of Gi*",
+            main.title.size = 0.8)
+
+tmap_arrange(map11, map12, ncol = 2)
+```
+
+### Yr2022
+#### Jan 2022
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+HCSA_jan2022 <- wm_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    wm_idw$`2022-01-01`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+tmap_mode("plot")
+map13 <- tm_shape(HCSA_jan2022) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(main.title = "Gi* of Vaccination Rate",
+            main.title.size = 0.8)
+
+map14 <- tm_shape(HCSA_jan2022) +
+  tm_fill("p_value",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "p-value of Gi*",
+            main.title.size = 0.8)
+
+tmap_arrange(map13, map14, ncol = 2)
+```
+
+#### Feb 2022
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+HCSA_feb2022 <- wm_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    wm_idw$`2022-02-01`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+tmap_mode("plot")
+map15 <- tm_shape(HCSA_feb2022) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(main.title = "Gi* of Vaccination Rate",
+            main.title.size = 0.8)
+
+map16 <- tm_shape(HCSA_feb2022) +
+  tm_fill("p_value",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "p-value of Gi*",
+            main.title.size = 0.8)
+
+tmap_arrange(map15, map16, ncol = 2)
+```
+
+#### Mar 2022
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+HCSA_mar2022 <- wm_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    wm_idw$`2022-03-02`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+tmap_mode("plot")
+map17 <- tm_shape(HCSA_mar2022) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(main.title = "Gi* of Vaccination Rate",
+            main.title.size = 0.8)
+
+map18 <- tm_shape(HCSA_mar2022) +
+  tm_fill("p_value",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "p-value of Gi*",
+            main.title.size = 0.8)
+
+tmap_arrange(map17, map18, ncol = 2)
+```
+
+#### Apr 2022
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+HCSA_apr2022 <- wm_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    wm_idw$`2022-04-01`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+tmap_mode("plot")
+map19 <- tm_shape(HCSA_apr2022) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(main.title = "Gi* of Vaccination Rate",
+            main.title.size = 0.8)
+
+map20 <- tm_shape(HCSA_apr2022) +
+  tm_fill("p_value",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "p-value of Gi*",
+            main.title.size = 0.8)
+
+tmap_arrange(map19, map20, ncol = 2)
+
+```
+
+#### May & June 2022
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+HCSA_may2022 <- wm_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    wm_idw$`2022-05-01`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+tmap_mode("plot")
+map21 <- tm_shape(HCSA_may2022) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(main.title = "Gi* of Vaccination Rate",
+            main.title.size = 0.8)
+
+map22 <- tm_shape(HCSA_may2022) +
+  tm_fill("p_value",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "p-value of Gi*",
+            main.title.size = 0.8)
+
+tmap_arrange(map21, map22, ncol = 2)
+```
+
+
+#### June 2022
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+HCSA_jun2022 <- wm_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    wm_idw$`2022-06-01`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+tmap_mode("plot")
+map23 <- tm_shape(HCSA_jun2022) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(main.title = "Gi* of Vaccination Rate (Jun2022)",
+            main.title.size = 0.8)
+
+map24 <- tm_shape(HCSA_jun2022) +
+  tm_fill("p_value",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "p-value of Gi* (Jun2022)",
+            main.title.size = 0.8)
+
+tmap_arrange(map23, map24, ncol = 2)
+```
+
+
+:::
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
