@@ -97,7 +97,7 @@ glimpse(jkt)
 
 We got to first ensure 2 things: validity of geomeetries and if there are missing values that could affect the later section of calculations and visualisations.
 
-Reference was taken from the senior sample submissions for the code for this section, with credit to [Take-Home Exercise 1: Analysing and Visualising Spatio-temporal Patterns of COVID-19 in DKI Jakarta, Indonesia by MEGAN SIM TZE YEN.](https://is415-msty.netlify.app/posts/2021-09-10-take-home-exercise-1/)
+Reference for this section of Choropleth Mapping was taken from the senior sample submissions for the code for this section, with credit to [Take-Home Exercise 1: Analysing and Visualising Spatio-temporal Patterns of COVID-19 in DKI Jakarta, Indonesia by MEGAN SIM TZE YEN.](https://is415-msty.netlify.app/posts/2021-09-10-take-home-exercise-1/)
 
 ### Validity of geometry
 
@@ -112,8 +112,8 @@ Since theres no invalids geometrics, we move to missing values
 ### Missing values
 
 ::: panel-tabset
-
 #### 1. Check of missing values
+
 ```{r}
 jkt[rowSums(is.na(jkt))!=0,]
 ```
@@ -126,21 +126,20 @@ From the output, Columns with missing values (KAB_KOTA (City), KECAMATAN (Distri
 jkt <- na.omit(jkt,c("DESA_KELUR"))
 ```
 
-
 #### 3. Check again for missing value
+
 ```{r}
 jkt[rowSums(is.na(jkt))!=0,]
 ```
 :::
-
 
 ### Validate & Transform jkt CRS
 
 Moving on, we gotta to validate the CRS of jarkarta
 
 ::: panel-tabset
-
 #### 1. Check the current crs
+
 ```{r}
 # retrieves the crs
 st_crs(jkt)
@@ -148,20 +147,20 @@ st_crs(jkt)
 
 So the assigned coordinates system is WGS 84 (aka World Geodetic System 1984) therefore, we got to change it to crs of Indonesia, DGN95 using the code of 23845.
 
-#### 2. Transform crs 
+#### 2. Transform crs
+
 ```{r}
 jkt <- st_transform(jkt, 23845)
 ```
 
 #### 3. Check crs again
+
 ```{r}
 st_crs(jkt)
 ```
 
 It changed.
-
 :::
-
 
 ## Visualise data
 
@@ -225,6 +224,7 @@ tm_shape(jkt) +
 # Data wrangling with Aspatial Data
 
 ## Inspect Aspatial Data
+
 For the Choropleth mapping, the time frame to plot the map is from July 2021 to June 2022, i will be using the first day of the month of each month.
 
 Before we import, lets see one of the data first.
@@ -235,6 +235,7 @@ jkt_jul2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 J
 
 glimpse(jkt_jul2021)
 ```
+
 Theres isnt duplicates columns so lets select the relevant columns to our exercise.
 
 What to do for pre-processing (Aspatial Data):
@@ -243,17 +244,13 @@ What to do for pre-processing (Aspatial Data):
 
 -   Rename those columns names
 
-
-
-| Original ver           | Translated ver              |
-|------------------------|-----------------------------|
-| WILAYAH KOTA           | City                        |
-| KECAMATAN              | District                    |
-| KELURAHAN              | Sub_District                |
-| SASARAN                | Target                      |
-| BELUM VAKSIN           | Yet to be Vaccinated        |
-
-
+| Original ver | Translated ver       |
+|--------------|----------------------|
+| WILAYAH KOTA | City                 |
+| KECAMATAN    | District             |
+| KELURAHAN    | Sub_District         |
+| SASARAN      | Target               |
+| BELUM VAKSIN | Yet to be Vaccinated |
 
 ## A function to take in the Aspatial files in the specific path
 
@@ -296,7 +293,8 @@ aspatial_preprocess <- function(filepath){
 }
 ```
 
-Lets Test out to see if theres a date column. 
+Lets Test out to see if theres a date column.
+
 ```{r}
 test_jul2021 = aspatial_preprocess("data/aspatial/Data Vaksinasi Berbasis Kelurahan (01 Juli 2021) vac.xlsx")
 ```
@@ -304,6 +302,7 @@ test_jul2021 = aspatial_preprocess("data/aspatial/Data Vaksinasi Berbasis Kelura
 Great, its there. Now lets do for all the Aspatial files
 
 ## Feeding Files into our aspatial_preprocess function
+
 ```{r}
 # in the folder 'data/aspatial', find files with the extension '.xlsx' and add it to our fileslist 
 # the full.names=TRUE prepends the directory path to the file names, giving a relative file path - otherwise, only the file names (not the paths) would be returned 
@@ -314,20 +313,22 @@ fileslist <-list.files(path = "data/aspatial", pattern = "*.xlsx", full.names=TR
 dflist <- lapply(seq_along(fileslist), function(x) aspatial_preprocess(fileslist[x]))
 ```
 
-we’ll need to convert the dflist into an actual dataframe with ldply()
+we'll need to convert the dflist into an actual dataframe with ldply()
+
 ```{r}
 vaccine_jkt <- ldply(dflist, data.frame)
 ```
 
-Let’s check what vaccine_jkt looks like, and make sure the columns are correct.
+Let's check what vaccine_jkt looks like, and make sure the columns are correct.
+
 ```{r}
 glimpse(vaccine_jkt)
 ```
 
-
 ## Format Date Column of the Aspatial data
 
-The dates now are in substring format, we got to convert into datetime format, with the additional consideration that the month are in Bahasa Indonesian. 
+The dates now are in substring format, we got to convert into datetime format, with the additional consideration that the month are in Bahasa Indonesian.
+
 ```{r}
 # parses the 'Date' column into Month(Full Name)-YYYY datetime objects
 # reference: https://stackoverflow.com/questions/53380650/b-y-date-conversion-gives-na
@@ -343,7 +344,8 @@ vaccine_jkt$Date <- c(vaccine_jkt$Date) %>%
 glimpse(vaccine_jkt)
 ```
 
-##  Renaming Columns with Translation
+## Renaming Columns with Translation
+
 ```{r}
 # renames the columns in the style New_Name = OLD_NAME
 vaccine_jkt <- vaccine_jkt %>% 
@@ -358,32 +360,35 @@ vaccine_jkt <- vaccine_jkt %>%
     )
 ```
 
-
 ## Further Data Processing
 
-Now that we have our confirmed dataframe, let’s execute any pre-processing we might have missed. Firstly, let’s check for missing values:
+Now that we have our confirmed dataframe, let's execute any pre-processing we might have missed. Firstly, let's check for missing values:
+
 ```{r}
 # returns rows that contain NA values
 vaccine_jkt[rowSums(is.na(vaccine_jkt))!=0,]
 ```
 
 OH so these are the rows of each starting aspatial data files that has the total values. Anyways, we got to remove these then
+
 ```{r}
 # removes rows that have an NA value in ID
 vaccine_jkt <- na.omit(vaccine_jkt,c("code"))
 ```
 
 Lets check again
+
 ```{r}
 # returns rows that contain NA values
 vaccine_jkt[rowSums(is.na(vaccine_jkt))!=0,]
 ```
 
-
 Great. its removed.
 
-# New column - Actual vaccination rate
+## New column - Actual vaccination count
+
 use the target - the yet to vaccinated column and put into new column Actual_Vaccination_Rate
+
 ```{r}
 #reference taken from: https://stackoverflow.com/questions/23888037/subtracting-two-columns-to-give-a-new-column-in-r
 
@@ -394,8 +399,9 @@ glimpse(vaccine_jkt)
 
 # Geospatial Data Integration
 
-##  Preliminary joining + EDA
-Now that we have both the geospatial and aspatial data frames, we’ll need to join them. A quick look at their headers tell us what their common fields are:
+## Preliminary joining + EDA
+
+Now that we have both the geospatial and aspatial data frames, we'll need to join them. A quick look at their headers tell us what their common fields are:
 
 ```{r}
 # checks for column names of the dataframes
@@ -407,7 +413,7 @@ colnames(jkt)
 colnames(vaccine_jkt)
 ```
 
-It seems that the City, Distict and Sub_District should match up. Let’s try doing that first:
+It seems that the City, Distict and Sub_District should match up. Let's try doing that first:
 
 ```{r}
 # joins cases_jakarta to bd_jakarta based on Province, Sub_District and City
@@ -419,8 +425,7 @@ combined_jkt <- left_join(jkt, vaccine_jkt,
                               )
 ```
 
-
-Now, let’s visualise our current combined_jkt in terms of vaccination rates:
+Now, let's visualise our current combined_jkt in terms of vaccination rates:
 
 ```{r}
 # maps the monthly vaccination rates
@@ -448,6 +453,7 @@ unique(jkt_subdistrict[!(jkt_subdistrict %in% vaccine_subdistrict)])
 ```
 
 Input the common data between the unique values of both df. We should have 9 mismatches. Because the aspatial data includes some of the islands in the dataset too.
+
 ```{r}
 # initialise a dataframe of our vaccine vs jkt subdistrict spelling
 spelling <- data.frame(
@@ -463,7 +469,9 @@ kable(spelling, caption="Mismatched Records") %>%
 ```
 
 ## Correcting Mismatched Sub-District Records
+
 Now that we know which sub-district records are mismatched, we need to rectify the mismatches by renaming them: (9 mismatches)
+
 ```{r}
 # where jkt is a mismatched value, replace with the correct value
 jkt$Sub_District[jkt$Sub_District == 'BALEKAMBANG'] <- 'BALE KAMBANG'
@@ -485,16 +493,16 @@ jkt$Sub_District[jkt$Sub_District == 'PINANGRANTI'] <- 'PINANG RANTI'
 jkt$Sub_District[jkt$Sub_District == 'RAWAJATI'] <- 'RAWA JATI'
 ```
 
-
 ## Remove the islands from aspatial data
 
 ```{r}
 vaccine_jkt = filter(vaccine_jkt, !(Sub_District %in% c("PULAU HARAPAN", "PULAU KELAPA", "PULAU PANGGANG", "PULAU PARI", "PULAU TIDUNG", "PULAU UNTUNG JAWA")))
 ```
 
-
 ## Joining + EDA
-Now, we have a standardised common identifier among our geospatial and aspatial dataframes. Let’s join them once more:
+
+Now, we have a standardised common identifier among our geospatial and aspatial dataframes. Let's join them once more:
+
 ```{r}
 # joins vaccine_jkt to jkt based on Sub_District
 combined_jkt<- left_join(jkt, vaccine_jkt,
@@ -502,7 +510,8 @@ combined_jkt<- left_join(jkt, vaccine_jkt,
                               )
 ```
 
-Now, let’s visualise our current combined_jkt in terms of vaccination rates again:
+Now, let's visualise our current combined_jkt in terms of vaccination rates again:
+
 ```{r}
 # maps the monthly vaccination rates
 
@@ -520,9 +529,10 @@ Before we move into into EDA and thematic mapping, we need to calculate the cumu
 
 ### CUMULATIVE CONFIRMED VACCINATION RATE
 
-The cumulative vaccination rate can be calculated by taking the vaccinated  
+The cumulative vaccination rate can be calculated by taking the vaccinated
 
 summing up the number of cases (based on the name of the sub-district and the date), and then dividing by the total population - but do note that the total population represented in our dataframe represents 10,000 denominations (in other words, this is number of cases for every 10,000 people). This can easily be achieved with pivot_wider().
+
 ```{r}
 # grouping based on the sub-district and date
 # the cumulative_case_rate is based on the sum of cases over the total population
@@ -540,8 +550,10 @@ vaccination_rate <- vaccine_jkt %>%
 print(as_tibble(vaccination_rate))
 ```
 
-##  Converting dataframes to sf objects
+## Converting dataframes to sf objects
+
 Before we move on into the mapping, we should convert these dataframes into sf objects.
+
 ```{r}
 combined_jkt <- st_as_sf(combined_jkt)
 
@@ -550,14 +562,11 @@ vaccination_rate <- vaccination_rate%>% left_join(jkt, by=c("Sub_District"="Sub_
 vaccination_rate <- st_as_sf(vaccination_rate)
 ```
 
-
-
-
 # Mapping: Monthly Cumulative Cases Rate
 
 ## Jenks Choropleth Map
-Now I will be trying to see the suitability of using Jenks Choropleth Map. It ‘seeks to minimize the average deviation from the class mean while maximizing the deviation from the means of the other groups’ (source) and tends to identify real, natural classes within the data. However, jenks will not work as well if the data has a low variance, so let’s check the variance:
 
+Now I will be trying to see the suitability of using Jenks Choropleth Map. It 'seeks to minimize the average deviation from the class mean while maximizing the deviation from the means of the other groups' (source) and tends to identify real, natural classes within the data. However, jenks will not work as well if the data has a low variance, so let's check the variance:
 
 ```{r}
 # commented out most of the variances due to the increasing variance over time
@@ -573,13 +582,13 @@ var(vaccination_rate$`2021-07-01`)
 # var(vaccination_rate$`2021-12-01`)
 # var(vaccination_rate$`2022-01-01`)
 # var(vaccination_rate$`2022-02-01`)
-# var(vaccination_rate$`2022-03-01`)
+# var(vaccination_rate$`2022-03-02`)
 # var(vaccination_rate$`2022-04-01`)
 # var(vaccination_rate$`2022-05-01`)
  var(vaccination_rate$`2022-06-01`)
 ```
-<to be paraphrase>
-Since the variance is increasing over time and seems significant, we can continue with jenks classification. After some testing, having 6 classes seems to be the optimum: too many classes and it becomes hard for the human eye to differentiate between the gradients, while too few classes makes it hard for any differentiation to be seen.
+
+<to be paraphrase> Since the variance is increasing over time and seems significant, we can continue with jenks classification. After some testing, having 6 classes seems to be the optimum: too many classes and it becomes hard for the human eye to differentiate between the gradients, while too few classes makes it hard for any differentiation to be seen.
 
 ```{r}
 # using the jenks method, with 6 classes
@@ -598,7 +607,7 @@ tm_shape(vaccination_rate)+
   tm_borders(alpha = 0.5)
 ```
 
-We should plot it for all the months - so let’s have a helper function for plotting this!
+We should plot it for all the months - so let's have a helper function for plotting this!
 
 ```{r}
 # input: the dataframe and the variable name - in this case, the month 
@@ -621,14 +630,15 @@ jenks_plot <- function(df, varname) {
 }
 ```
 
+## Choropleth Mapping
 
-## Choropleth Mapping 
-Now the visualisation the jenks plots for all months:\
+Now the visualisation the jenks plots for all months:
 
 ::: panel-tabset
-
 ### Yr 2021
+
 Jul & Aug 2021
+
 ```{r}
 # split it up into multiple arranges to make it easier to see
 library(tmap)
@@ -637,25 +647,31 @@ jul2021 = jenks_plot(vaccination_rate, "2021-07-01")
 aug2021 = jenks_plot(vaccination_rate, "2021-08-01")
 tmap_arrange(jul2021, aug2021, asp=1, ncol=2)
 ```
+
 Sept & Oct 2021
+
 ```{r}
 library(tmap)
 tmap_mode("plot")
 sept2021 = jenks_plot(vaccination_rate, "2021-09-01")
-oct2021 = jenks_plot(vaccination_rate, "2021-09-01")
+oct2021 = jenks_plot(vaccination_rate, "2021-10-01")
 tmap_arrange(sept2021, oct2021, asp=1, ncol=2)
 ```
 
 Nov & Dec 2021
+
 ```{r}
 library(tmap)
 tmap_mode("plot")
-nov2021 = jenks_plot(vaccination_rate, "2021-09-01")
-dec2021 = jenks_plot(vaccination_rate, "2021-09-01")
+nov2021 = jenks_plot(vaccination_rate, "2021-11-01")
+dec2021 = jenks_plot(vaccination_rate, "2021-12-01")
 tmap_arrange(nov2021, dec2021, asp=1, ncol=2)
 ```
+
 ### Yr 2022
+
 Jan & Feb 2022
+
 ```{r}
 library(tmap)
 tmap_mode("plot")
@@ -664,18 +680,18 @@ feb2021 = jenks_plot(vaccination_rate, "2022-02-01")
 tmap_arrange(jan2021, feb2021, asp=1, ncol=2)
 ```
 
-
 Mar & Apr 2022
+
 ```{r}
-# library(tmap)
-# tmap_mode("plot")
-# mar2021 = jenks_plot(vaccination_rate, "2022-03-01")
-# apr2021 = jenks_plot(vaccination_rate, "2022-04-01")
-# tmap_arrange(mar2021, apr2021, asp=1, ncol=2)
+library(tmap)
+tmap_mode("plot")
+mar2021 = jenks_plot(vaccination_rate, "2022-03-02")
+apr2021 = jenks_plot(vaccination_rate, "2022-04-01")
+tmap_arrange(mar2021, apr2021, asp=1, ncol=2)
 ```
 
-
 May & Jun 2021
+
 ```{r}
 library(tmap)
 tmap_mode("plot")
@@ -684,6 +700,121 @@ jun2021 = jenks_plot(vaccination_rate, "2022-06-01")
 tmap_arrange(may2021, jun2021, asp=1, ncol=2)
 ```
 :::
+
+### View highest vaccination rate
+
+Check for darkest sub-district in early stages
+
+::: panel-tabset
+### Yr 2021
+
+```{r}
+vaccination_rate$Village[which.max(vaccination_rate$`2021-07-01`)]
+```
+
+```{r}
+vaccination_rate$Village[which.max(vaccination_rate$`2021-08-01`)]
+```
+
+```{r}
+vaccination_rate$Village[which.max(vaccination_rate$`2021-09-01`)]
+```
+
+```{r}
+vaccination_rate$Village[which.max(vaccination_rate$`2021-10-01`)]
+```
+
+```{r}
+vaccination_rate$Village[which.max(vaccination_rate$`2021-11-01`)]
+```
+
+```{r}
+vaccination_rate$Village[which.max(vaccination_rate$`2021-12-01`)]
+```
+
+### Yr 2022
+
+To check for darkest sub-district in the later stages
+
+```{r}
+vaccination_rate$Village[which.max(vaccination_rate$`2022-01-01`)]
+```
+
+```{r}
+vaccination_rate$Village[which.max(vaccination_rate$`2022-06-01`)]
+```
+:::
+
+Observations from Jenks Choropleth Map (not more than 200 words)
+
+Note: The ranges will slowly grow larger over time with greater influx of cases. Some observations made from these maps:
+
+-   (July 2021 to Aug 2021) - there is a visible increase of vaccination rate like 2 times increase, referencing to the legend
+
+-   As shown above, the highest darkest shade is in KELAPA GADING TIMUR where it is likely that more people are willing to take the vaccination.
+
+-   (Aug 2021 to Sept-Oct 2021)
+
+Between June 2020 \~ August 2020, there is a noticeable shift for the 'center' with the highest case rate - GAMBIR, which would then remain as the sub-district with the highest cases_rate until the end of our data (July 2021)
+
+There is a noticeable darkening of gradient across majority of the map as we transition from the first quarter (March 2020 \~ May 2020) to the next quarter, with special mentions going to July 2020 and October 2020. While, as mentioned, the ranges for each map are not consistent, it is undeniable that more areas are being affected with increasing severity in the later stages as compared to the earlier stages.
+
+The month where the case rate was ramping up in severity across the country (and thus had a significant amount of darker areas) would be 2021 February.
+
+We can roughly track the journey of the COVID-19 'clusters' across the map: Central Cluster: Originated in SENAYAN, circulating within central Jakarta before taking root in GAMBIR. Southern Cluster: Became prominent in December 2020 onwards, where multiple sub-districts were medium-ly affected. While it pales in comparison to the central cluster, it still has a relatively significant presence. Northeast Cluster: while the 'center' of the cluster (with the most darkest shade) changed frequently in the initial stages, by December 2020 there a pair of confirmed 'center' districts that stayed constant throughout 2021. Close proximity of the northeast cluster with the central cluster (specifically, GAMBIR) Additionally, across the map, it seems that a darker colour will likely have similarly dark colours near it, which could be a sign of spreading to neighbouring districts - we'll confirm this in 6.4
+
+# Localised geospatial statistics
+
+In this section, localised spatial statistical analysis methods will be utilised to analyse the monthly vaccination rate. The following spatial statistics will be utilised for the analysis:
+
+Local Moran’s I: cluster and outlier analysis
+Getis-Ord Gi* : hot spot and cold spot area analysis
+
+
+Reference for this section of Choropleth Mapping was taken from the senior sample submissions for the code for this section, with credit to [Detecting Spatio-Temporal Patterns of COVID-19 in Central Mexico by Xiao Rong Wong](https://rpubs.com/xiaorongw/IS415_Take-home_Ex02).
+
+And reference to In-class Ex7
+
+## Global Measures of Spatial Association
+
+```{r}
+nb_queen <- hunan_GDPPC %>% 
+  mutate(nb = st_contiguity(geometry),
+         .before = 1)
+```
+
+
+
+
+
+
+<paraphrase this>
+For this method, neighbours at the municipality level in Central Mexico will be determined based on municipalities with contiguous boundaries. There are two methods in determining contiguity:
+
+Rook contiguity considers areas to be adjacent if areas have at least two common boundary points (a segment).
+Queen contiguity considers areas to be adjacent if as long as the areas share a common boundary point.
+The spatial weight matrices using these two methods will be computed.
+
+### Step 1: Deriving contiguity weights: Queen’s method
+```{r}
+wm_q <- vaccination_rate %>%
+  mutate(nb = st_contiguity(geometry),
+         wt = st_weights(nb,
+                         style = "W"),
+         .before = 1)
+summary(wm_q)
+```
+
+
+
+```{r}
+wm_q[[1]]
+```
+
+
+
+
+
 
 
 
