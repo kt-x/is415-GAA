@@ -33,6 +33,28 @@ Choropleth Mapping and Analysis
 
 -   Describe the spatial patterns revealed by the choropleth maps (not more than 200 words).
 
+Local Gi* Analysis
+
+With reference to the vaccination rate maps prepared in ESDA:
+
+Compute local Gi* values of the monthly vaccination rate,
+
+-   Display the Gi* maps of the monthly vaccination rate. The maps should only display the significant (i.e. p-value < 0.05)
+
+-   With reference to the analysis results, draw statistical conclusions (not more than 250 words).
+
+Emerging Hot Spot Analysis(EHSA)
+
+With reference to the local Gi* values of the vaccination rate maps prepared in the previous section:
+
+-   Perform Mann-Kendall Test by using the spatio-temporal local Gi* values,
+
+-   Select three sub-districts and describe the temporal trends revealed (not more than 250 words), and
+
+-   Prepared a EHSA map of the Gi* values of vaccination rate. The maps should only display the significant (i.e. p-value < 0.05).
+
+-   With reference to the EHSA map prepared, describe the spatial patterns revelaed. (not more than 250 words).
+
 ## Data used
 
 | Type       | Name                                     | Format | Description                   | Source                                   |
@@ -42,7 +64,7 @@ Choropleth Mapping and Analysis
 
 : Table 1: Data used
 
-For the Aspatial Data, I decided to use the dataset available on 1st Sept 2022 for this exercise.
+For the Aspatial Data, We will be using dataset available on 1st day of the set time period (from july 2021 to jun 2022)
 
 ## Packages used
 
@@ -50,7 +72,7 @@ For this exercise, we'll be using the following packages:
 
 -   sf: Manage and process vector-based geospatial data in R
 
--   sfdep:
+-   sfdep: Creates an sf and tidyverse friendly interface to the package as well as introduces new functionality that is not present in spdep.
 
 -   maptools: Convert Spatial objects into ppp format of spatstat
 
@@ -58,15 +80,15 @@ For this exercise, we'll be using the following packages:
 
 -   tidyverse: a collection of functions, data, and documentation that extends the capabilities of base R.
 
--   knitr:
+-   knitr: A General-Purpose Package for Dynamic Report Generation in R
 
--   kableExtra:
+-   kableExtra: an extension of kable, used for table customisation
 
--   dplyr:
+-   dplyr: for wrangling and transforming data
 
 -   readxl: The readxl package makes it easy to get data out of Excel and into R
 
--   plyr:
+-   plyr: used for splitting data, applying functions and combining results
 
 We will be using p_load function of pacman package to install and load required packages.
 
@@ -170,7 +192,7 @@ plot(st_geometry(jkt))
 
 From the plot, jkt has both the mainland and outer islands but since outer islands are not within the objectives and tasks, so we can remove those.
 
-Using google translate/google len, 3 location-based relevant fields are KAB_KOTA (City), KECAMATAN (District) and DESA_KELUR (Village). Let's to the macro lens to city level since district would be too much of unique values.
+Using google translate, 3 location-based relevant fields are KAB_KOTA (City), KECAMATAN (District) and DESA_KELUR (Village). Let's to the macro lens to city level since district would be too much of unique values.
 
 ```{r}
 unique(jkt$"KAB_KOTA")
@@ -217,6 +239,8 @@ jkt <- jkt %>%
 ## EDA
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 tm_shape(jkt) + 
   tm_polygons("City")
 ```
@@ -523,15 +547,13 @@ vaccinated = tm_shape(combined_jkt)+
 vaccinated
 ```
 
-## Calculations - (change the para explatnation)
+## Calculations
 
-Before we move into into EDA and thematic mapping, we need to calculate the cumulative vaccination cases rate (i.e. cases per 10000 population) as per assignment requirements.
+Before we move into into EDA and thematic mapping, we need to calculate the cumulative vaccination cases rate (i.e. cases per 10000 population).
 
 ### CUMULATIVE CONFIRMED VACCINATION RATE
 
-The cumulative vaccination rate can be calculated by taking the vaccinated
-
-summing up the number of cases (based on the name of the sub-district and the date), and then dividing by the total population - but do note that the total population represented in our dataframe represents 10,000 denominations (in other words, this is number of cases for every 10,000 people). This can easily be achieved with pivot_wider().
+The cumulative vaccination rate can be calculated by taking the vaccinated (based on the name of the sub-district and the date), then dividing by the total population represented in our dataframe represents 10,000 denominations (in other words, this is number of cases for every 10,000 people). This can easily be achieved with pivot_wider().
 
 ```{r}
 # grouping based on the sub-district and date
@@ -539,7 +561,7 @@ summing up the number of cases (based on the name of the sub-district and the da
 vaccination_rate <- vaccine_jkt %>%
   inner_join(jkt, by=c("Sub_District" = "Sub_District")) %>%
   group_by(Sub_District, Date) %>%
-  dplyr::summarise(`vaccination_rate` = ((sum(Vaccinated)/(Total_Population))*100)) %>%
+  dplyr::summarise(`vaccination_rate` = ((sum(Vaccinated)/(Total_Population))*10000)) %>%
   
   #afterwards, pivots the table based on the Dates, using the cumulative case rate as the values
   ungroup() %>% pivot_wider(names_from = Date,
@@ -569,7 +591,6 @@ vaccination_rate <- st_as_sf(vaccination_rate)
 Now I will be trying to see the suitability of using Jenks Choropleth Map. It 'seeks to minimize the average deviation from the class mean while maximizing the deviation from the means of the other groups' (source) and tends to identify real, natural classes within the data. However, jenks will not work as well if the data has a low variance, so let's check the variance:
 
 ```{r}
-# commented out most of the variances due to the increasing variance over time
 var(vaccination_rate$`2021-07-01`)
 ```
 
@@ -588,7 +609,7 @@ var(vaccination_rate$`2021-07-01`)
  var(vaccination_rate$`2022-06-01`)
 ```
 
-<to be paraphrase> Since the variance is increasing over time and seems significant, we can continue with jenks classification. After some testing, having 6 classes seems to be the optimum: too many classes and it becomes hard for the human eye to differentiate between the gradients, while too few classes makes it hard for any differentiation to be seen.
+We can continue using the Jenks categorization since the variance is increasing overtime and appears to be significant. Following some testing, six classes appear to be the optimal: too few classes make it difficult to perceive any differentiation between the gradients, while too many classes make it difficult for us to distinguish between them.
 
 ```{r}
 # using the jenks method, with 6 classes
@@ -640,6 +661,8 @@ Now the visualisation the jenks plots for all months:
 Jul & Aug 2021
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 # split it up into multiple arranges to make it easier to see
 library(tmap)
 tmap_mode("plot")
@@ -651,6 +674,8 @@ tmap_arrange(jul2021, aug2021, asp=1, ncol=2)
 Sept & Oct 2021
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 library(tmap)
 tmap_mode("plot")
 sept2021 = jenks_plot(vaccination_rate, "2021-09-01")
@@ -661,6 +686,8 @@ tmap_arrange(sept2021, oct2021, asp=1, ncol=2)
 Nov & Dec 2021
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 library(tmap)
 tmap_mode("plot")
 nov2021 = jenks_plot(vaccination_rate, "2021-11-01")
@@ -673,6 +700,8 @@ tmap_arrange(nov2021, dec2021, asp=1, ncol=2)
 Jan & Feb 2022
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 library(tmap)
 tmap_mode("plot")
 jan2021 = jenks_plot(vaccination_rate, "2022-01-01")
@@ -683,6 +712,8 @@ tmap_arrange(jan2021, feb2021, asp=1, ncol=2)
 Mar & Apr 2022
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 library(tmap)
 tmap_mode("plot")
 mar2021 = jenks_plot(vaccination_rate, "2022-03-02")
@@ -690,9 +721,11 @@ apr2021 = jenks_plot(vaccination_rate, "2022-04-01")
 tmap_arrange(mar2021, apr2021, asp=1, ncol=2)
 ```
 
-May & Jun 2021
+May & Jun 2022
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 library(tmap)
 tmap_mode("plot")
 may2021 = jenks_plot(vaccination_rate, "2022-05-01")
@@ -745,39 +778,23 @@ vaccination_rate$Village[which.max(vaccination_rate$`2022-06-01`)]
 ```
 :::
 
-Observations from Jenks Choropleth Map (not more than 200 words)
+### Observations from Jenks Choropleth Map 
 
 Note: The ranges will slowly grow larger over time with greater influx of cases. Some observations made from these maps:
 
--   (July 2021 to Aug 2021) - there is a visible increase of vaccination rate like 2 times increase, referencing to the legend
+-   (July 2021 to Aug 2021) - there is a visible increase of vaccination rate like 2 times increase, referencing to the legend. As shown above, the highest darkest shade is in KELAPA GADING TIMUR where it is likely that more people are willing to take the vaccination.
 
--   As shown above, the highest darkest shade is in KELAPA GADING TIMUR where it is likely that more people are willing to take the vaccination.
+-   (Nov 2021 to Dec 2021) - the increase of vaccination rate starts to slow down slightly but still increasing. There is a noticeable darkening of gradient across majority of the map as we transition from Oct 2021 to Nov 2021, the increase is noticably significant. 
 
--   (Aug 2021 to Sept-Oct 2021)
+-   (Jan 2022 to Mar 2022) - from march 2022, the rate of vaccination rate increase even lesser which is probably due to large populations already vaccinated and hence only the minority still going for vaccination.
 
-Between June 2020 \~ August 2020, there is a noticeable shift for the 'center' with the highest case rate - GAMBIR, which would then remain as the sub-district with the highest cases_rate until the end of our data (July 2021)
-
-There is a noticeable darkening of gradient across majority of the map as we transition from the first quarter (March 2020 \~ May 2020) to the next quarter, with special mentions going to July 2020 and October 2020. While, as mentioned, the ranges for each map are not consistent, it is undeniable that more areas are being affected with increasing severity in the later stages as compared to the earlier stages.
-
-The month where the case rate was ramping up in severity across the country (and thus had a significant amount of darker areas) would be 2021 February.
-
-We can roughly track the journey of the COVID-19 'clusters' across the map: Central Cluster: Originated in SENAYAN, circulating within central Jakarta before taking root in GAMBIR. Southern Cluster: Became prominent in December 2020 onwards, where multiple sub-districts were medium-ly affected. While it pales in comparison to the central cluster, it still has a relatively significant presence. Northeast Cluster: while the 'center' of the cluster (with the most darkest shade) changed frequently in the initial stages, by December 2020 there a pair of confirmed 'center' districts that stayed constant throughout 2021. Close proximity of the northeast cluster with the central cluster (specifically, GAMBIR) Additionally, across the map, it seems that a darker colour will likely have similarly dark colours near it, which could be a sign of spreading to neighbouring districts - we'll confirm this in 6.4
-
-
-
-
-
-
-
-
-
-
+-   There are signs of cluster around the South region area where certain areas still remain light shade gradient, which might due to the missing sub-district vaccination data.
 
 # Computing Contiguity Spatial Weights
 
 Reference for this section of Choropleth Mapping was taken from the senior sample submissions for the code for this section, with credit to [Detecting Spatio-Temporal Patterns of COVID-19 in Central Mexico by Xiao Rong Wong](https://rpubs.com/xiaorongw/IS415_Take-home_Ex02).
 
-And reference to In-class Ex7
+Reference to In-class Exercise 7
 
 ::: panel-tabset
 
@@ -1195,15 +1212,37 @@ tmap_arrange(map23, map24, ncol = 2)
 
 :::
 
+OBSERVATIONS
+-   
 
 
+# Spatio-temporal cube
+
+## Creating a Time Series Cube
+
+```{r}
+# vac_jul2021_st <- spacetime(vaccine_jkt, jkt,
+#                       .loc_col = "Sub-District",
+#                       .time_col = "2021-07-01")
+# is_spacetime_cube(vac_jul2021_st)
+```
 
 
+## Computing Gi*
 
+### Deriving the spatial weights
 
-
-
-
+```{r}
+# vac_nb <- vac_jul2021_st %>%
+#   activate("geometry") %>%
+#   mutate(nb = include_self(st_contiguity(geometry)),
+#          wt = st_inverse_distance(nb, geometry,
+#                                   scale = 1,
+#                                   alpha = 1),
+#          .before = 1) %>%
+#   set_nbs("nb") %>%
+#   set_wts("wt")
+```
 
 
 
