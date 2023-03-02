@@ -1193,6 +1193,9 @@ vac_rate
 
 ## Creating a Time Series Cube
 
+- Encountered an error ! Number of rows does not equal `n time-periods x n locations`
+[1] FALSE, have tried to re-create another df but unsure how to go abt with it hence only have the code out.
+
 ```{r}
 time_st <- spacetime(vac_rate, jkt,
                       .loc_col = "Sub-District",
