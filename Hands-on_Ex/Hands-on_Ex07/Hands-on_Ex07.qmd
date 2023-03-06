@@ -11,7 +11,8 @@ execute:
 editor: visual
 ---
 
-# Prep packages 
+# Prep packages
+
 ```{r}
 pacman::p_load(sf, spdep, tmap, tidyverse)
 ```
@@ -19,25 +20,27 @@ pacman::p_load(sf, spdep, tmap, tidyverse)
 # Get data into env
 
 ## Geospatial
+
 ```{r}
 hunan <- st_read(dsn = "data/geospatial", 
                  layer = "Hunan")
 ```
 
-## Aspatial 
+## Aspatial
+
 ```{r}
 hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
 ```
 
-
 ## Relational Join
+
 ```{r}
 hunan <- left_join(hunan,hunan2012) %>%
   select(1:4, 7, 15)
 ```
 
-
 ## Visualising Regional Development Indicator
+
 ```{r}
 equal <- tm_shape(hunan) +
   tm_fill("GDPPC",
@@ -59,7 +62,6 @@ tmap_arrange(equal,
              ncol=2)
 ```
 
-
 # Global Spatial Autocorrelation
 
 ## Computing Contiguity Spatial Weights
@@ -71,6 +73,7 @@ summary(wm_q)
 ```
 
 ## Row-standardised weights matrix
+
 ```{r}
 rswm_q <- nb2listw(wm_q, 
                    style="W", 
@@ -78,9 +81,10 @@ rswm_q <- nb2listw(wm_q,
 rswm_q
 ```
 
-## Global Spatial Autocorrelation: Moran’s I
+## Global Spatial Autocorrelation: Moran's I
 
-### Maron’s I test
+### Maron's I test
+
 ```{r}
 moran.test(hunan$GDPPC, 
            listw=rswm_q, 
@@ -88,7 +92,8 @@ moran.test(hunan$GDPPC,
            na.action=na.omit)
 ```
 
-### Computing Monte Carlo Moran’s I
+### Computing Monte Carlo Moran's I
+
 ```{r}
 set.seed(1234)
 bperm= moran.mc(hunan$GDPPC, 
@@ -99,8 +104,8 @@ bperm= moran.mc(hunan$GDPPC,
 bperm
 ```
 
+#### Visualising Monte Carlo Moran's I
 
-#### Visualising Monte Carlo Moran’s I
 ```{r}
 mean(bperm$res[1:999])
 ```
@@ -122,15 +127,16 @@ abline(v=0,
        col="red") 
 ```
 
+## Global Spatial Autocorrelation: Geary's
 
-## Global Spatial Autocorrelation: Geary’s
+### Geary's C test
 
-### Geary’s C test
 ```{r}
 geary.test(hunan$GDPPC, listw=rswm_q)
 ```
 
-#### Computing Monte Carlo Geary’s C
+#### Computing Monte Carlo Geary's C
+
 ```{r}
 set.seed(1234)
 bperm=geary.mc(hunan$GDPPC, 
@@ -139,7 +145,8 @@ bperm=geary.mc(hunan$GDPPC,
 bperm
 ```
 
-#### Visualising the Monte Carlo Geary’s C
+#### Visualising the Monte Carlo Geary's C
+
 ```{r}
 mean(bperm$res[1:999])
 ```
@@ -157,10 +164,9 @@ hist(bperm$res, freq=TRUE, breaks=20, xlab="Simulated Geary c")
 abline(v=1, col="red") 
 ```
 
-
 # Spatial Correlogram
 
-## Compute Moran’s I correlogram
+## Compute Moran's I correlogram
 
 ```{r}
 MI_corr <- sp.correlogram(wm_q, 
@@ -175,7 +181,8 @@ plot(MI_corr)
 print(MI_corr)
 ```
 
-## Compute Geary’s C correlogram and plot
+## Compute Geary's C correlogram and plot
+
 ```{r}
 GC_corr <- sp.correlogram(wm_q, 
                           hunan$GDPPC, 
@@ -191,7 +198,7 @@ print(GC_corr)
 
 # Cluster and Outlier Analysis (Chapter 10.6)
 
-## Computing local Moran’s I
+## Computing local Moran's I
 
 ```{r}
 fips <- order(hunan$County)
@@ -206,14 +213,15 @@ printCoefmat(data.frame(
   check.names=FALSE)
 ```
 
+### Mapping the local Moran's I
 
-### Mapping the local Moran’s I
 ```{r}
 hunan.localMI <- cbind(hunan,localMI) %>%
   rename(Pr.Ii = Pr.z....E.Ii..)
 ```
 
-### Mapping local Moran’s I values
+### Mapping local Moran's I values
+
 ```{r}
 tm_shape(hunan.localMI) +
   tm_fill(col = "Ii", 
@@ -223,7 +231,8 @@ tm_shape(hunan.localMI) +
   tm_borders(alpha = 0.5)
 ```
 
-### Mapping local Moran’s I p-values
+### Mapping local Moran's I p-values
+
 ```{r}
 tm_shape(hunan.localMI) +
   tm_fill(col = "Pr.Ii", 
@@ -233,7 +242,8 @@ tm_shape(hunan.localMI) +
   tm_borders(alpha = 0.5)
 ```
 
-### Mapping both local Moran’s I values and p-values
+### Mapping both local Moran's I values and p-values
+
 ```{r}
 localMI.map <- tm_shape(hunan.localMI) +
   tm_fill(col = "Ii", 
@@ -254,6 +264,7 @@ tmap_arrange(localMI.map, pvalue.map, asp=1, ncol=2)
 # Creating a LISA Cluster Map
 
 ## Plotting Moran scatterplot
+
 ```{r}
 nci <- moran.plot(hunan$GDPPC, rswm_q,
                   labels=as.character(hunan$County), 
@@ -261,8 +272,8 @@ nci <- moran.plot(hunan$GDPPC, rswm_q,
                   ylab="Spatially Lag GDPPC 2012")
 ```
 
-
 ### Plotting Moran scatterplot with standardised variable
+
 ```{r}
 hunan$Z.GDPPC <- scale(hunan$GDPPC) %>% 
   as.vector 
@@ -276,6 +287,7 @@ nci2 <- moran.plot(hunan$Z.GDPPC, rswm_q,
 ```
 
 ## Preparing LISA map classes
+
 ```{r}
 quadrant <- vector(mode="numeric",length=nrow(localMI))
 ```
@@ -293,14 +305,12 @@ LM_I <- localMI[,1] - mean(localMI[,1])
 signif <- 0.05       
 ```
 
-
 ```{r}
 quadrant[DV <0 & LM_I>0] <- 1
 quadrant[DV >0 & LM_I<0] <- 2
 quadrant[DV <0 & LM_I<0] <- 3  
 quadrant[DV >0 & LM_I>0] <- 4      
 ```
-
 
 ```{r}
 quadrant[localMI[,5]>signif] <- 0
@@ -320,6 +330,7 @@ quadrant[localMI[,5]>signif] <- 0
 ```
 
 ## Plotting LISA map
+
 ```{r}
 hunan.localMI$quadrant <- quadrant
 colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
@@ -357,7 +368,7 @@ tmap_arrange(gdppc, LISAmap,
 
 # Hot Spot and Cold Spot Area Analysis
 
-##  Getis and Ord’s G-Statistics
+## Getis and Ord's G-Statistics
 
 ### Deriving distance-based weight matrix
 
@@ -376,6 +387,7 @@ coords <- cbind(longitude, latitude)
 ```
 
 ### Determine the cut-off distance
+
 ```{r}
 #coords <- coordinates(hunan)
 k1 <- knn2nb(knearneigh(coords))
@@ -384,11 +396,11 @@ summary(k1dists)
 ```
 
 ### Computing fixed distance weight matrix
+
 ```{r}
 wm_d62 <- dnearneigh(coords, 0, 62, longlat = TRUE)
 wm_d62
 ```
-
 
 ```{r}
 wm62_lw <- nb2listw(wm_d62, style = 'B')
@@ -396,6 +408,7 @@ summary(wm62_lw)
 ```
 
 ## Computing adaptive distance weight matrix
+
 ```{r}
 knn <- knn2nb(knearneigh(coords, k=8))
 knn
@@ -406,15 +419,15 @@ knn_lw <- nb2listw(knn, style = 'B')
 summary(knn_lw)
 ```
 
-#  Computing Gi statistics
+# Computing Gi statistics
 
 ## Gi statistics using fixed distance
+
 ```{r}
 fips <- order(hunan$County)
 gi.fixed <- localG(hunan$GDPPC, wm62_lw)
 gi.fixed
 ```
-
 
 ```{r}
 hunan.gi <- cbind(hunan, as.matrix(gi.fixed)) %>%
@@ -422,6 +435,7 @@ hunan.gi <- cbind(hunan, as.matrix(gi.fixed)) %>%
 ```
 
 ## Mapping Gi values with fixed distance weights
+
 ```{r}
 gdppc <- qtm(hunan, "GDPPC")
 
@@ -436,6 +450,7 @@ tmap_arrange(gdppc, Gimap, asp=1, ncol=2)
 ```
 
 ## Gi statistics using adaptive distance
+
 ```{r}
 fips <- order(hunan$County)
 gi.adaptive <- localG(hunan$GDPPC, knn_lw)
@@ -443,8 +458,8 @@ hunan.gi <- cbind(hunan, as.matrix(gi.adaptive)) %>%
   rename(gstat_adaptive = as.matrix.gi.adaptive.)
 ```
 
+## Mapping Gi values with adaptive distance weights
 
-##  Mapping Gi values with adaptive distance weights
 ```{r}
 gdppc<- qtm(hunan, "GDPPC")
 
@@ -460,7 +475,3 @@ tmap_arrange(gdppc,
              asp=1, 
              ncol=2)
 ```
-
-
-
-

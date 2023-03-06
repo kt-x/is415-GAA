@@ -1,0 +1,40 @@
+---
+title: "In-class_Ex09"
+date: "6 Mar 2023"
+date-modified: "`r Sys.Date()`"
+number-sections: true
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: visual
+---
+
+```{r}
+pacman::p_load(olsrr, corrplot, ggpubr, sf, spdep, GWmodel, tmap, tidyverse, gtsummary, readr, dplyr)
+```
+
+
+
+## Multiple Linear Regression Method
+
+### Visualising the relationships of the independent variables
+```{r}
+corrplot(cor(condo_resale[, 5:23]), diag = FALSE, order = "AOE",
+         tl.pos = "td", tl.cex = 0.5, method = "number", type = "upper")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
