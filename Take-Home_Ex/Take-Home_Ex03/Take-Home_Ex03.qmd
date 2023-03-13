@@ -20,7 +20,7 @@ Conventional, housing resale prices predictive models were built by using [**Ord
 ## Data Used
 
 | Type                      | Name                              | Format  | Source                                                                                   |
-|-------------------|--------------------|-----------------|-----------------|
+|-------------|-------------|-------------|----------------------------------|
 | Aspatial                  | HDB Flat Resale Prices            | csv     | [data.gov](https://data.gov.sg/dataset/resale-flat-prices)                               |
 | Geospatial                | Master Plan 2014 Subzone Boundary | shp     | [data.gov](https://data.gov.sg/dataset/master-plan-2014-subzone-boundary-web)            |
 | Locational (w geo-coord)  | Eldercare services                | shp     | [data.gov](https://data.gov.sg/dataset/eldercare-services)                               |
@@ -29,7 +29,7 @@ Conventional, housing resale prices predictive models were built by using [**Ord
 | Locational (w geo-coord)  | Supermarkets                      | geojson | [data.gov](https://data.gov.sg/dataset/supermarkets)                                     |
 | Locational (w geo-coord)  | Bus Stops                         | shp     | [Datamall.lta.gov.sg](https://datamall.lta.gov.sg/content/datamall/en/static-data.html)  |
 | Locational (w geo-coord)  | MRT                               | shp     | [Datamall.lta.gov.sg](https://datamall.lta.gov.sg/content/datamall/en/static-data.html)  |
-| Locational (no geo-coord) | Childcare                         | csv     | [dataportal.asia](https://dataportal.asia/dataset/192512222_list-of-childcare-centres)   |
+| Locational (w geo-coord) | Childcare                         | csv     | [dataportal.asia](https://dataportal.asia/dataset/203030733_child-care-services)   |
 | Locational (no geo-coord) | Kindergartens                     | csv     | [dataportal.asia](https://dataportal.asia/dataset/192512222_list-of-kindergartens)       |
 | Locational (no geo-coord) | Primary school                    | csv     | [data.gov](https://data.gov.sg/dataset/school-directory-and-information)                 |
 | Locational (no geo-coord) | CBD                               |         | Google search                                                                            |
@@ -112,40 +112,45 @@ glimpse(resale)
 
 The study should focus on either three-room, four-room or five-room flat and transaction period should be from 1st January 2021 to 31st December 2022. The test data should be January and February 2023 resale prices.
 
-For this project, I will be going with 4 room flats. 
+For this project, I will be going with 4 room flats.
 
 ::: panel-tabset
-
-Code
+#### Code
 
 ```{r}
 rs_subset <-  filter(resale,flat_type == "4 ROOM") %>%
                     filter(month >= "2021-01" & month <= "2022-12")
 ```
 
-Glimpse
+#### Glimpse
+
 ```{r}
 glimpse(rs_subset)
 ```
-Unique month
+
+#### Unique month
+
 ```{r}
 unique(rs_subset$month)
 ```
 
-Unique flat_type
+#### Unique flat_type
+
 ```{r}
 unique(rs_subset$flat_type)
 ```
 :::
 
 ## Transform resale data
+
 After checking the correctly filtered out data, next is transforming the data,
 
 ### New columns
 
 ::: panel-tabset
 
-Code
+#### Code
+
 ```{r}
 rs_transform <- rs_subset %>%
   mutate(rs_subset, address = paste(block,street_name)) %>%
@@ -153,7 +158,8 @@ rs_transform <- rs_subset %>%
   mutate(rs_subset, remaining_lease_mth = as.integer(str_sub(remaining_lease, 9, 11)))
 ```
 
-Head
+#### Head
+
 ```{r}
 head(rs_transform)
 ```
@@ -168,7 +174,8 @@ head(rs_transform)
 
 ::: panel-tabset
 
-Code
+#### Code
+
 ```{r}
 rs_transform$remaining_lease_mth[is.na(rs_transform$remaining_lease_mth)] <- 0
 rs_transform$remaining_lease_yr <- rs_transform$remaining_lease_yr * 12
@@ -178,18 +185,21 @@ rs_transform <- rs_transform %>%
          lease_commence_date, remaining_lease_mths, resale_price)
 ```
 
-Head
+#### Head
+
 ```{r}
 head(rs_transform)
 ```
-
 :::
 
 ## Retrieve Postal Codes and Coordinates of Addresses
+
 This section aims to get the postal codes and coordinates which is needed for the locational factors without geographical coordinates.
 
-###  Create a list storing unique addresses
+### Create a list storing unique addresses
+
 -   Use unique() function to extract the unique addresses then use sort() function to sort the unique vector.
+
 ```{r}
 add_list <- sort(unique(rs_transform$address))
 ```
@@ -255,70 +265,93 @@ get_coords <- function(add_list){
 ```
 
 ### Call get_coords function to retrieve resale coordinates
+
 ```{r}
 coords <- get_coords(add_list)
 ```
 
 ### Inspect results
+
 ```{r}
 coords[(is.na(coords$postal) | is.na(coords$latitude) | is.na(coords$longitude) | coords$postal=="NIL"), ]
 ```
 
+It seems like there is 1 address that does not contain geographic coordinates. After further investigation, I will be input in 
+
+```{r}
+coords$postal[coords$postal=="NIL"] <- "680215"
+```
+
+```{r}
+coords[(is.na(coords$postal) | is.na(coords$latitude) | is.na(coords$longitude) | coords$postal=="NIL"), ]
+```
+
+great, no more NIL postal codes.
 
 ### Combine resale and coordinates data
+Now, we need to combine the data
 
 ::: panel-tabset
 
-Code
+#### Code
+
 ```{r}
 rs_coords <- left_join(rs_transform, coords, by = c('address' = 'address'))
 ```
 
-Head
+#### Head
+
 ```{r}
 head(rs_coords)
 ```
-
 :::
 
-###  Handle invalid addresses
+### Handle invalid addresses
+By replacing sub string in invalid addresses in the address and extract rows with addresses containing SAINT GEORGE’S
 
 ::: panel-tabset
 
-Code
+#### Code
+
 ```{r}
 rs_coords$address <- sub("ST. GEORGE'S", "SAINT GEORGE'S", rs_coords$address)
 rs_invalid <- rs_coords[grepl("SAINT GEORGE'S", rs_coords$address), ]
 ```
 
-Glimpse
+#### Glimpse
+
 ```{r}
 glimpse(rs_invalid)
 ```
 :::
 
-#### Create unique list of addresses again 
+There are 32 rows that contains SAINT GEORGE’S as street name but has a substring replaced in the address.
+
+#### Create unique list of addresses again
+
 ```{r}
 add_list <- sort(unique(rs_invalid$address))
 ```
 
-#### Call get_coords to retrieve resale coordinates again 
+#### Call get_coords to retrieve resale coordinates again
+
 ```{r}
 rs_invalid_coords <- get_coords(add_list)
 ```
 
-####  Inspect results again
+#### Inspect results again
+
 ```{r}
 rs_invalid_coords[(is.na(rs_invalid_coords$postal) | is.na(rs_invalid_coords$latitude) | is.na(rs_invalid_coords$longitude)), ]
 ```
 
 Yep, the results shows no invalid coordinates now.
 
-#### Combine rs_invalid_coords with rs_coords data 
+#### Combine rs_invalid_coords with rs_coords data
 
 ::: panel-tabset
+##### Code
 
-Code
 ```{r}
 rs_coords_final <- rs_coords %>%
   left_join(rs_invalid_coords, by = c("address")) %>%
@@ -328,31 +361,270 @@ rs_coords_final <- rs_coords %>%
   select(-c(postal.x, latitude.x, longitude.x, postal.y, latitude.y, longitude.y))
 ```
 
-Head
+##### Head
+
 ```{r}
 head(rs_coords_final)
 ```
 :::
 
 ## Write file to rds
+
 ```{r}
 rs_coords_rds <- write_rds(rs_coords_final, "data/aspatial/rds/rs_coords.rds")
 ```
 
 ## Read rs_coords RDS file
-::: panel-tabset
 
-Code
+::: panel-tabset
+#### Code
+
 ```{r}
 rs_coords <- read_rds("data/aspatial/rds/rs_coords.rds")
 ```
 
-Glimpse
+#### Glimpse
+
 ```{r}
 glimpse(rs_coords)
 ```
 :::
 
-
 ### Assign and Transform CRS and Check
+
+::: panel-tabset
+#### Code
+```{r}
+rs_coords_sf <- st_as_sf(rs_coords,
+                    coords = c("longitude", 
+                               "latitude"),
+                    crs=4326) %>%
+  st_transform(crs = 3414)
+```
+
+#### st_crs
+```{r}
+st_crs(rs_coords_sf)
+```
+:::
+
+### Check for invalid geometries
+```{r}
+length(which(st_is_valid(rs_coords_sf) == FALSE))
+```
+
+No invalid geometries
+
+### Plot hdb resale points
+```{r}
+tmap_mode("view")
+tm_shape(rs_coords_sf)+
+  tm_dots(col="blue", size = 0.02)
+  tm_view(set.zoom.limits = c(6,8))
+tmap_mode("plot")
+```
+
+# Locational with geographical coordinates
+
+## Read and check CRS of Locational factors
+
+::: panel-tabset
+
+#### elder_sf
+```{r}
+elder_sf <- st_read(dsn = "data/geospatial/eldercare-services", layer = "ELDERCARE")
+```
+
+##### st_crs
+```{r}
+st_crs(elder_sf)
+```
+
+#### parks_sf
+```{r}
+parks_sf <- st_read("data/geospatial/park-facilities/park-facilities-geojson.geojson") 
+```
+
+##### st_crs
+```{r}
+st_crs(parks_sf)
+```
+
+#### hawker_sf
+```{r}
+hawker_sf <- st_read("data/geospatial/hawker-centres/hawker-centres-geojson.geojson") 
+```
+
+##### st_crs
+```{r}
+st_crs(hawker_sf)
+```
+
+#### supermkt_sf
+```{r}
+supermkt_sf <- st_read("data/geospatial/supermarkets/supermarkets-geojson.geojson")
+```
+
+##### st_crs
+```{r}
+st_crs(supermkt_sf)
+```
+
+#### childcare_sf
+```{r}
+childcare_sf <- st_read("data/geospatial/childcare/childcare.geojson")
+```
+
+##### st_crs
+```{r}
+st_crs(childcare_sf)
+```
+
+#### kind_sf
+```{r}
+kind_sf <- st_read("data/geospatial/kindergartens/preschools-location.geojson")
+```
+
+##### st_crs
+```{r}
+st_crs(kind_sf)
+```
+
+#### mrt_sf
+```{r}
+mrtlrt_sf <- st_read(dsn = "data/geospatial/TrainStation", layer="Train_Station_Exit_Layer")
+```
+
+##### st_crs
+```{r}
+st_crs(mrtlrt_sf)
+```
+
+
+#### bus_sf
+```{r}
+bus_sf <- st_read(dsn = "data/geospatial/BusStopLocation", layer="BusStop")
+```
+
+##### st_crs
+```{r}
+st_crs(bus_sf)
+```
+
+:::
+
+### Assign EPSG code to sf dataframes and check again
+
+::: panel-tabset
+
+#### Code
+
+```{r}
+elder_sf <- st_set_crs(elder_sf, 3414)
+mrtlrt_sf <- st_set_crs(mrtlrt_sf, 3414)
+bus_sf <- st_set_crs(bus_sf, 3414)
+
+hawker_sf <- hawker_sf %>%
+  st_transform(crs = 3414)
+parks_sf <- parks_sf %>%
+  st_transform(crs = 3414)
+supermkt_sf <- supermkt_sf %>%
+  st_transform(crs = 3414)
+childcare_sf <- childcare_sf %>%
+  st_transform(crs = 3414)
+kind_sf <- kind_sf %>%
+  st_transform(crs = 3414)
+```
+
+#### st_crs
+```{r}
+st_crs(elder_sf)
+st_crs(mrtlrt_sf)
+st_crs(bus_sf)
+st_crs(hawker_sf)
+st_crs(parks_sf)
+st_crs(supermkt_sf)
+st_crs(childcare_sf)
+st_crs(kind_sf)
+```
+:::
+
+## Check for invalid geometries
+```{r}
+length(which(st_is_valid(elder_sf) == FALSE))
+length(which(st_is_valid(mrtlrt_sf) == FALSE))
+length(which(st_is_valid(hawker_sf) == FALSE))
+length(which(st_is_valid(parks_sf) == FALSE))
+length(which(st_is_valid(supermkt_sf) == FALSE))
+length(which(st_is_valid(childcare_sf) == FALSE))
+length(which(st_is_valid(kind_sf) == FALSE))
+length(which(st_is_valid(bus_sf) == FALSE))
+```
+
+NO invalid geometries.
+
+## Calculate Proximity
+```{r}
+get_prox <- function(origin_df, dest_df, col_name){
+  
+  # creates a matrix of distances
+  dist_matrix <- st_distance(origin_df, dest_df)           
+  
+  # find the nearest location_factor and create new data frame
+  near <- origin_df %>% 
+    mutate(PROX = apply(dist_matrix, 1, function(x) min(x)) / 1000) 
+  
+  # rename column name according to input parameter
+  names(near)[names(near) == 'PROX'] <- col_name
+
+  # Return df
+  return(near)
+}
+```
+
+#### CALL GET_PROX FUNCTION
+
+```{r}
+# rs_coords_sf <- get_prox(rs_coords_sf, elder_sf, "PROX_ELDERLYCARE")
+# rs_coords_sf <- get_prox(rs_coords_sf, mrtlrt_sf, "PROX_MRT")
+# rs_coords_sf <- get_prox(rs_coords_sf, hawker_sf, "PROX_HAWKER") 
+# rs_coords_sf <- get_prox(rs_coords_sf, parks_sf, "PROX_PARK") 
+# rs_coords_sf <- get_prox(rs_coords_sf, supermkt_sf, "PROX_SUPERMARKET")
+```
+
+## Create get_within function to calculate no. of factors within dist
+
+```{r}
+# get_within <- function(origin_df, dest_df, threshold_dist, col_name){
+#   
+#   # creates a matrix of distances
+#   dist_matrix <- st_distance(origin_df, dest_df)   
+#   
+#   # count the number of location_factors within threshold_dist and create new data frame
+#   wdist <- origin_df %>% 
+#     mutate(WITHIN_DT = apply(dist_matrix, 1, function(x) sum(x <= threshold_dist)))
+#   
+#   # rename column name according to input parameter
+#   names(wdist)[names(wdist) == 'WITHIN_DT'] <- col_name
+# 
+#   # Return df
+#   return(wdist)
+# }
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
