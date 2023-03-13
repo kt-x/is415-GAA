@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.280">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2023-03-09">
+
+<title>is415-GAA - Take-Home_Ex03</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">is415-GAA</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-hands-on-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Hands-on Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html">
+ <span class="dropdown-text">Hands-on Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html">
+ <span class="dropdown-text">Hands-on Exercise 2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html">
+ <span class="dropdown-text">Hands-on Exercise 3</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex06/Hands-on_Ex06.html">
+ <span class="dropdown-text">Hands-on Exercise 6</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html">
+ <span class="dropdown-text">Hands-on Exercise 7</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex08/Hands-on_Ex08.html">
+ <span class="dropdown-text">Hands-on Exercise 8</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex09/Hands-on_Ex09.html">
+ <span class="dropdown-text">Hands-on Exercise 9</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-in-class-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">In-class Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex02/In-class_Ex02.html">
+ <span class="dropdown-text">In-class Exercise 2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex03/In-class_Ex03.html">
+ <span class="dropdown-text">In-class Exercise 3</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex04/In-class_Ex04.html">
+ <span class="dropdown-text">In-class Exercise 4</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex05/In-class_Ex05.html">
+ <span class="dropdown-text">In-class Exercise 5</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex06/In-class_Ex06.html">
+ <span class="dropdown-text">In-class Exercise 6</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex07/In-class_Ex07.html">
+ <span class="dropdown-text">In-class Exercise 7</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex08/In-class_Ex08.html">
+ <span class="dropdown-text">In-class Exercise 8</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex09/In-class_Ex09.html">
+ <span class="dropdown-text">In-class Exercise 9</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-take-home-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Take-Home Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-take-home-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html">
+ <span class="dropdown-text">Take-Home Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Take-Home_Ex/Take-Home_Ex02/Take-Home_Ex02.html">
+ <span class="dropdown-text">Take-Home Exercise 2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Take-Home_Ex/Take-Home_Ex03/Take-Home_Ex03.html">
+ <span class="dropdown-text">Take-Home Exercise 3</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="toc-section-number">1</span>  Overview</a>
+  <ul class="collapse">
+  <li><a href="#data-used" id="toc-data-used" class="nav-link" data-scroll-target="#data-used"><span class="toc-section-number">1.1</span>  Data Used</a></li>
+  <li><a href="#packages" id="toc-packages" class="nav-link" data-scroll-target="#packages"><span class="toc-section-number">1.2</span>  Packages</a></li>
+  <li><a href="#import-packages" id="toc-import-packages" class="nav-link" data-scroll-target="#import-packages"><span class="toc-section-number">1.3</span>  Import Packages</a></li>
+  </ul></li>
+  <li><a href="#aspatial-data-wrangling" id="toc-aspatial-data-wrangling" class="nav-link" data-scroll-target="#aspatial-data-wrangling"><span class="toc-section-number">2</span>  Aspatial Data Wrangling</a>
+  <ul class="collapse">
+  <li><a href="#filter-the-data" id="toc-filter-the-data" class="nav-link" data-scroll-target="#filter-the-data"><span class="toc-section-number">2.1</span>  Filter the data</a></li>
+  <li><a href="#transform-resale-data" id="toc-transform-resale-data" class="nav-link" data-scroll-target="#transform-resale-data"><span class="toc-section-number">2.2</span>  Transform resale data</a>
+  <ul class="collapse">
+  <li><a href="#new-columns" id="toc-new-columns" class="nav-link" data-scroll-target="#new-columns"><span class="toc-section-number">2.2.1</span>  New columns</a></li>
+  <li><a href="#add-up-the-remaining-lease-in-months" id="toc-add-up-the-remaining-lease-in-months" class="nav-link" data-scroll-target="#add-up-the-remaining-lease-in-months"><span class="toc-section-number">2.2.2</span>  Add up the remaining lease in months</a></li>
+  </ul></li>
+  <li><a href="#retrieve-postal-codes-and-coordinates-of-addresses" id="toc-retrieve-postal-codes-and-coordinates-of-addresses" class="nav-link" data-scroll-target="#retrieve-postal-codes-and-coordinates-of-addresses"><span class="toc-section-number">2.3</span>  Retrieve Postal Codes and Coordinates of Addresses</a>
+  <ul class="collapse">
+  <li><a href="#create-a-list-storing-unique-addresses" id="toc-create-a-list-storing-unique-addresses" class="nav-link" data-scroll-target="#create-a-list-storing-unique-addresses"><span class="toc-section-number">2.3.1</span>  Create a list storing unique addresses</a></li>
+  </ul></li>
+  <li><a href="#create-function-to-retrieve-coordinates-from-onemap.sg-api" id="toc-create-function-to-retrieve-coordinates-from-onemap.sg-api" class="nav-link" data-scroll-target="#create-function-to-retrieve-coordinates-from-onemap.sg-api"><span class="toc-section-number">2.4</span>  Create function to retrieve coordinates from OneMap.Sg API</a>
+  <ul class="collapse">
+  <li><a href="#call-get_coords-function-to-retrieve-resale-coordinates" id="toc-call-get_coords-function-to-retrieve-resale-coordinates" class="nav-link" data-scroll-target="#call-get_coords-function-to-retrieve-resale-coordinates"><span class="toc-section-number">2.4.1</span>  Call get_coords function to retrieve resale coordinates</a></li>
+  <li><a href="#inspect-results" id="toc-inspect-results" class="nav-link" data-scroll-target="#inspect-results"><span class="toc-section-number">2.4.2</span>  Inspect results</a></li>
+  <li><a href="#combine-resale-and-coordinates-data" id="toc-combine-resale-and-coordinates-data" class="nav-link" data-scroll-target="#combine-resale-and-coordinates-data"><span class="toc-section-number">2.4.3</span>  Combine resale and coordinates data</a></li>
+  <li><a href="#handle-invalid-addresses" id="toc-handle-invalid-addresses" class="nav-link" data-scroll-target="#handle-invalid-addresses"><span class="toc-section-number">2.4.4</span>  Handle invalid addresses</a></li>
+  </ul></li>
+  <li><a href="#write-file-to-rds" id="toc-write-file-to-rds" class="nav-link" data-scroll-target="#write-file-to-rds"><span class="toc-section-number">2.5</span>  Write file to rds</a></li>
+  <li><a href="#read-rs_coords-rds-file" id="toc-read-rs_coords-rds-file" class="nav-link" data-scroll-target="#read-rs_coords-rds-file"><span class="toc-section-number">2.6</span>  Read rs_coords RDS file</a>
+  <ul class="collapse">
+  <li><a href="#assign-and-transform-crs-and-check" id="toc-assign-and-transform-crs-and-check" class="nav-link" data-scroll-target="#assign-and-transform-crs-and-check"><span class="toc-section-number">2.6.1</span>  Assign and Transform CRS and Check</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Take-Home_Ex03</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">March 9, 2023</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">March 13, 2023</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+</header>
+
+<section id="overview" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Overview</h1>
+<p>The price of housing is affected by many factors such as the general economy of a country or inflation rate. These factors can be further divided to structural and locational factors. Structural factors are variables related to the property themselves such as the size, fitting, and tenure of the property. Locational factors are variables related to the neighbourhood of the properties such as proximity to childcare centre, public transport service and shopping centre.</p>
+<p>Conventional, housing resale prices predictive models were built by using <a href="https://en.wikipedia.org/wiki/Ordinary_least_squares"><strong>Ordinary Least Square (OLS)</strong></a> method. However, this method failed to take into consideration that spatial autocorrelation and spatial heterogeneity exist in geographic data sets such as housing transactions. With the existence of spatial autocorrelation, the OLS estimation of predictive housing resale pricing models could lead to biased, inconsistent, or inefficient results (Anselin 1998). In view of this limitation, <strong>Geographical Weighted Models</strong> were introduced for calibrating predictive model for housing resale prices.</p>
+<section id="data-used" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="data-used"><span class="header-section-number">1.1</span> Data Used</h2>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Name</th>
+<th>Format</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Aspatial</td>
+<td>HDB Flat Resale Prices</td>
+<td>csv</td>
+<td><a href="https://data.gov.sg/dataset/resale-flat-prices">data.gov</a></td>
+</tr>
+<tr class="even">
+<td>Geospatial</td>
+<td>Master Plan 2014 Subzone Boundary</td>
+<td>shp</td>
+<td><a href="https://data.gov.sg/dataset/master-plan-2014-subzone-boundary-web">data.gov</a></td>
+</tr>
+<tr class="odd">
+<td>Locational (w geo-coord)</td>
+<td>Eldercare services</td>
+<td>shp</td>
+<td><a href="https://data.gov.sg/dataset/eldercare-services">data.gov</a></td>
+</tr>
+<tr class="even">
+<td>Locational (w geo-coord)</td>
+<td>Park facilities</td>
+<td>geojson</td>
+<td><a href="https://data.gov.sg/dataset/park-facilities">data.gov</a></td>
+</tr>
+<tr class="odd">
+<td>Locational (w geo-coord)</td>
+<td>Hawker centres</td>
+<td>geojson</td>
+<td><a href="https://data.gov.sg/dataset/hawker-centres">data.gov</a></td>
+</tr>
+<tr class="even">
+<td>Locational (w geo-coord)</td>
+<td>Supermarkets</td>
+<td>geojson</td>
+<td><a href="https://data.gov.sg/dataset/supermarkets">data.gov</a></td>
+</tr>
+<tr class="odd">
+<td>Locational (w geo-coord)</td>
+<td>Bus Stops</td>
+<td>shp</td>
+<td><a href="https://datamall.lta.gov.sg/content/datamall/en/static-data.html">Datamall.lta.gov.sg</a></td>
+</tr>
+<tr class="even">
+<td>Locational (w geo-coord)</td>
+<td>MRT</td>
+<td>shp</td>
+<td><a href="https://datamall.lta.gov.sg/content/datamall/en/static-data.html">Datamall.lta.gov.sg</a></td>
+</tr>
+<tr class="odd">
+<td>Locational (no geo-coord)</td>
+<td>Childcare</td>
+<td>csv</td>
+<td><a href="https://dataportal.asia/dataset/192512222_list-of-childcare-centres">dataportal.asia</a></td>
+</tr>
+<tr class="even">
+<td>Locational (no geo-coord)</td>
+<td>Kindergartens</td>
+<td>csv</td>
+<td><a href="https://dataportal.asia/dataset/192512222_list-of-kindergartens">dataportal.asia</a></td>
+</tr>
+<tr class="odd">
+<td>Locational (no geo-coord)</td>
+<td>Primary school</td>
+<td>csv</td>
+<td><a href="https://data.gov.sg/dataset/school-directory-and-information">data.gov</a></td>
+</tr>
+<tr class="even">
+<td>Locational (no geo-coord)</td>
+<td>CBD</td>
+<td></td>
+<td>Google search</td>
+</tr>
+<tr class="odd">
+<td>Locational (no geo-coord)</td>
+<td>Shopping Malls</td>
+<td>list</td>
+<td><a href="https://en.wikipedia.org/wiki/List_of_shopping_malls_in_Singapore">Wikipedia</a></td>
+</tr>
+<tr class="even">
+<td>Locational (no geo-coord)</td>
+<td>Good primary school</td>
+<td>list</td>
+<td><a href="https://www.salary.sg/2021/best-primary-schools-2021-by-popularity">Local Salary Forum</a></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="packages" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="packages"><span class="header-section-number">1.2</span> Packages</h2>
+<p>[References taken from <a href="https://aisyahajit2018-is415.netlify.app/posts/2021-11-07-take-home-exercise-3/">Take-home Exercise 3</a> by NOR AISYAH BINTE AJIT.]</p>
+<p>[References taken from <a href="https://is415-msty.netlify.app/posts/2021-10-25-take-home-exercise-3/">Take-Home Exercise 3: Hedonic Pricing Models for Resale Prices of Public Housing in Singapore</a> by MEGAN SIM TZE YEN.]</p>
+<ul>
+<li><p><strong>sf</strong>: used for importing, managing, and processing geospatial data</p></li>
+<li><p><strong>tidyverse</strong>: a collection of packages for data science tasks</p></li>
+<li><p><strong>tmap</strong>: used for creating thematic maps, such as choropleth and bubble maps</p></li>
+<li><p><strong>sfdep</strong>: used to create spatial weights matrix objects, global and local spatial autocorrelation statistics and related calculations (e.g.&nbsp;spatially lag attributes)</p></li>
+<li><p><strong>httr</strong>: used to make API calls, such as a GET request</p></li>
+<li><p><strong>jsonlite</strong>: a JSON parser that can convert from JSON to the appropraite R data types</p></li>
+<li><p><strong>rvest: A new package that makes it easy to scrape (or harvest) data from html web pages, inspired by libraries like beautiful soup.</strong></p>
+<ul>
+<li>In this analysis, it will be used to scrape data for <strong>Shopping malls</strong> and <strong>Good primary schools</strong></li>
+</ul></li>
+</ul>
+<p><strong>Tidyverse packages:</strong></p>
+<ul>
+<li><p><strong>readr</strong> for importing delimited files (.csv)</p></li>
+<li><p><strong>readxl</strong> for importing Excel worksheets (.xlsx) - note that it has to be loaded explicitly as it is not a core tidyverse package</p></li>
+<li><p><strong>tidyr</strong> for manipulating and tidying data</p></li>
+<li><p><strong>dplyr</strong> for wrangling and transforming data</p></li>
+<li><p><strong>ggplot2</strong> for visualising data</p></li>
+</ul>
+<p><strong>Building + visualising hedonic pricing models:</strong></p>
+<ul>
+<li><p><strong>olsrr</strong>: used for building least squares regression models</p></li>
+<li><p><strong>coorplot</strong> + <strong>ggpubr</strong>: both are used for multivariate data visualisation &amp; analysis</p></li>
+<li><p><strong>GWmodel</strong>: provides a collection of localised spatial statistical methods, such as summary statistics, principal components analysis, discriminant analysis and various forms of GW regression</p></li>
+</ul>
+<p><strong>Visualisations:</strong></p>
+<ul>
+<li><p><strong>devtools:</strong> used for installing any R packages which is not available in RCRAN. In this exercise, I will be installing using devtools to install the package xaringanExtra which is still under development stage.</p></li>
+<li><p><strong>kableExtra</strong>: an extension of kable, used for table customisation</p></li>
+<li><p><strong>plotly</strong>: used for creating interactive web graphics, and can be used in conjunction with ggplot2 with the <code>ggplotly()</code> function</p></li>
+<li><p><strong>ggthemes</strong>: an extension of ggplot2, with more advanced themes for plotting</p></li>
+</ul>
+</section>
+<section id="import-packages" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="import-packages"><span class="header-section-number">1.3</span> Import Packages</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, tidyverse, tmap, httr, rvest, sfdep, readxl, jsonlite, olsrr, corrplot, ggpubr, GWmodel, kableExtra, plotly, ggthemes, broom, devtools)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"gadenbuie/xaringanExtra"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(xaringanExtra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="aspatial-data-wrangling" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Aspatial Data Wrangling</h1>
+<p>[References taken from <a href="https://aisyahajit2018-is415.netlify.app/posts/2021-11-07-take-home-exercise-3/">Take-home Exercise 3</a> by NOR AISYAH BINTE AJIT.]</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>resale <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/aspatial/resale-flat-prices.csv"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(resale)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 148,277
+Columns: 11
+$ month               &lt;chr&gt; "2017-01", "2017-01", "2017-01", "2017-01", "2017-…
+$ town                &lt;chr&gt; "ANG MO KIO", "ANG MO KIO", "ANG MO KIO", "ANG MO …
+$ flat_type           &lt;chr&gt; "2 ROOM", "3 ROOM", "3 ROOM", "3 ROOM", "3 ROOM", …
+$ block               &lt;chr&gt; "406", "108", "602", "465", "601", "150", "447", "…
+$ street_name         &lt;chr&gt; "ANG MO KIO AVE 10", "ANG MO KIO AVE 4", "ANG MO K…
+$ storey_range        &lt;chr&gt; "10 TO 12", "01 TO 03", "01 TO 03", "04 TO 06", "0…
+$ floor_area_sqm      &lt;dbl&gt; 44, 67, 67, 68, 67, 68, 68, 67, 68, 67, 68, 67, 67…
+$ flat_model          &lt;chr&gt; "Improved", "New Generation", "New Generation", "N…
+$ lease_commence_date &lt;dbl&gt; 1979, 1978, 1980, 1980, 1980, 1981, 1979, 1976, 19…
+$ remaining_lease     &lt;chr&gt; "61 years 04 months", "60 years 07 months", "62 ye…
+$ resale_price        &lt;dbl&gt; 232000, 250000, 262000, 265000, 265000, 275000, 28…</code></pre>
+</div>
+</div>
+<section id="filter-the-data" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="filter-the-data"><span class="header-section-number">2.1</span> Filter the data</h2>
+<p>The study should focus on either three-room, four-room or five-room flat and transaction period should be from 1st January 2021 to 31st December 2022. The test data should be January and February 2023 resale prices.</p>
+<p>For this project, I will be going with 4 room flats.</p>
+<div class="panel-tabset">
+<p>Code</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>rs_subset <span class="ot">&lt;-</span>  <span class="fu">filter</span>(resale,flat_type <span class="sc">==</span> <span class="st">"4 ROOM"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">filter</span>(month <span class="sc">&gt;=</span> <span class="st">"2021-01"</span> <span class="sc">&amp;</span> month <span class="sc">&lt;=</span> <span class="st">"2022-12"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Glimpse</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(rs_subset)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 23,656
+Columns: 11
+$ month               &lt;chr&gt; "2021-01", "2021-01", "2021-01", "2021-01", "2021-…
+$ town                &lt;chr&gt; "ANG MO KIO", "ANG MO KIO", "ANG MO KIO", "ANG MO …
+$ flat_type           &lt;chr&gt; "4 ROOM", "4 ROOM", "4 ROOM", "4 ROOM", "4 ROOM", …
+$ block               &lt;chr&gt; "547", "414", "509", "467", "571", "134", "204", "…
+$ street_name         &lt;chr&gt; "ANG MO KIO AVE 10", "ANG MO KIO AVE 10", "ANG MO …
+$ storey_range        &lt;chr&gt; "04 TO 06", "01 TO 03", "01 TO 03", "07 TO 09", "0…
+$ floor_area_sqm      &lt;dbl&gt; 92, 92, 91, 92, 92, 98, 92, 92, 92, 92, 92, 109, 9…
+$ flat_model          &lt;chr&gt; "New Generation", "New Generation", "New Generatio…
+$ lease_commence_date &lt;dbl&gt; 1981, 1979, 1980, 1979, 1979, 1978, 1977, 1978, 19…
+$ remaining_lease     &lt;chr&gt; "59 years", "57 years 09 months", "58 years 06 mon…
+$ resale_price        &lt;dbl&gt; 370000, 375000, 380000, 385000, 410000, 410000, 41…</code></pre>
+</div>
+</div>
+<p>Unique month</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(rs_subset<span class="sc">$</span>month)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "2021-01" "2021-02" "2021-03" "2021-04" "2021-05" "2021-06" "2021-07"
+ [8] "2021-08" "2021-09" "2021-10" "2021-11" "2021-12" "2022-01" "2022-02"
+[15] "2022-03" "2022-04" "2022-05" "2022-06" "2022-07" "2022-08" "2022-09"
+[22] "2022-10" "2022-11" "2022-12"</code></pre>
+</div>
+</div>
+<p>Unique flat_type</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(rs_subset<span class="sc">$</span>flat_type)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "4 ROOM"</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="transform-resale-data" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="transform-resale-data"><span class="header-section-number">2.2</span> Transform resale data</h2>
+<p>After checking the correctly filtered out data, next is transforming the data,</p>
+<section id="new-columns" class="level3" data-number="2.2.1">
+<h3 data-number="2.2.1" class="anchored" data-anchor-id="new-columns"><span class="header-section-number">2.2.1</span> New columns</h3>
+<div class="panel-tabset">
+<p>Code</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>rs_transform <span class="ot">&lt;-</span> rs_subset <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(rs_subset, <span class="at">address =</span> <span class="fu">paste</span>(block,street_name)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(rs_subset, <span class="at">remaining_lease_yr =</span> <span class="fu">as.integer</span>(<span class="fu">str_sub</span>(remaining_lease, <span class="dv">0</span>, <span class="dv">2</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(rs_subset, <span class="at">remaining_lease_mth =</span> <span class="fu">as.integer</span>(<span class="fu">str_sub</span>(remaining_lease, <span class="dv">9</span>, <span class="dv">11</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Head</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(rs_transform)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 14
+  month   town     flat_…¹ block stree…² store…³ floor…⁴ flat_…⁵ lease…⁶ remai…⁷
+  &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;  
+1 2021-01 ANG MO … 4 ROOM  547   ANG MO… 04 TO …      92 New Ge…    1981 59 yea…
+2 2021-01 ANG MO … 4 ROOM  414   ANG MO… 01 TO …      92 New Ge…    1979 57 yea…
+3 2021-01 ANG MO … 4 ROOM  509   ANG MO… 01 TO …      91 New Ge…    1980 58 yea…
+4 2021-01 ANG MO … 4 ROOM  467   ANG MO… 07 TO …      92 New Ge…    1979 57 yea…
+5 2021-01 ANG MO … 4 ROOM  571   ANG MO… 07 TO …      92 New Ge…    1979 57 yea…
+6 2021-01 ANG MO … 4 ROOM  134   ANG MO… 07 TO …      98 New Ge…    1978 56 yea…
+# … with 4 more variables: resale_price &lt;dbl&gt;, address &lt;chr&gt;,
+#   remaining_lease_yr &lt;int&gt;, remaining_lease_mth &lt;int&gt;, and abbreviated
+#   variable names ¹​flat_type, ²​street_name, ³​storey_range, ⁴​floor_area_sqm,
+#   ⁵​flat_model, ⁶​lease_commence_date, ⁷​remaining_lease</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="add-up-the-remaining-lease-in-months" class="level3" data-number="2.2.2">
+<h3 data-number="2.2.2" class="anchored" data-anchor-id="add-up-the-remaining-lease-in-months"><span class="header-section-number">2.2.2</span> Add up the remaining lease in months</h3>
+<ul>
+<li>Replace NA values in remaining_lease_mth with the value 0 using is.na() function</li>
+<li>Multiply remaining_lease_yr by 12 to convert it to months unit</li>
+<li>Create remaining_lease_mths column using mutate function of dplyr package which contains the summation of the remaining_lease_yr and remaining_lease_mths using rowSums() function of base R package</li>
+<li>Select required columns for analysis</li>
+</ul>
+<div class="panel-tabset">
+<p>Code</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>rs_transform<span class="sc">$</span>remaining_lease_mth[<span class="fu">is.na</span>(rs_transform<span class="sc">$</span>remaining_lease_mth)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>rs_transform<span class="sc">$</span>remaining_lease_yr <span class="ot">&lt;-</span> rs_transform<span class="sc">$</span>remaining_lease_yr <span class="sc">*</span> <span class="dv">12</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>rs_transform <span class="ot">&lt;-</span> rs_transform <span class="sc">%&gt;%</span> </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(rs_transform, <span class="at">remaining_lease_mths =</span> <span class="fu">rowSums</span>(rs_transform[, <span class="fu">c</span>(<span class="st">"remaining_lease_yr"</span>, <span class="st">"remaining_lease_mth"</span>)])) <span class="sc">%&gt;%</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(month, town, address, block, street_name, flat_type, storey_range, floor_area_sqm, flat_model, </span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>         lease_commence_date, remaining_lease_mths, resale_price)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Head</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(rs_transform)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 12
+  month   town     address block stree…¹ flat_…² store…³ floor…⁴ flat_…⁵ lease…⁶
+  &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;
+1 2021-01 ANG MO … 547 AN… 547   ANG MO… 4 ROOM  04 TO …      92 New Ge…    1981
+2 2021-01 ANG MO … 414 AN… 414   ANG MO… 4 ROOM  01 TO …      92 New Ge…    1979
+3 2021-01 ANG MO … 509 AN… 509   ANG MO… 4 ROOM  01 TO …      91 New Ge…    1980
+4 2021-01 ANG MO … 467 AN… 467   ANG MO… 4 ROOM  07 TO …      92 New Ge…    1979
+5 2021-01 ANG MO … 571 AN… 571   ANG MO… 4 ROOM  07 TO …      92 New Ge…    1979
+6 2021-01 ANG MO … 134 AN… 134   ANG MO… 4 ROOM  07 TO …      98 New Ge…    1978
+# … with 2 more variables: remaining_lease_mths &lt;dbl&gt;, resale_price &lt;dbl&gt;, and
+#   abbreviated variable names ¹​street_name, ²​flat_type, ³​storey_range,
+#   ⁴​floor_area_sqm, ⁵​flat_model, ⁶​lease_commence_date</code></pre>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="retrieve-postal-codes-and-coordinates-of-addresses" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="retrieve-postal-codes-and-coordinates-of-addresses"><span class="header-section-number">2.3</span> Retrieve Postal Codes and Coordinates of Addresses</h2>
+<p>This section aims to get the postal codes and coordinates which is needed for the locational factors without geographical coordinates.</p>
+<section id="create-a-list-storing-unique-addresses" class="level3" data-number="2.3.1">
+<h3 data-number="2.3.1" class="anchored" data-anchor-id="create-a-list-storing-unique-addresses"><span class="header-section-number">2.3.1</span> Create a list storing unique addresses</h3>
+<ul>
+<li>Use unique() function to extract the unique addresses then use sort() function to sort the unique vector.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>add_list <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">unique</span>(rs_transform<span class="sc">$</span>address))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="create-function-to-retrieve-coordinates-from-onemap.sg-api" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="create-function-to-retrieve-coordinates-from-onemap.sg-api"><span class="header-section-number">2.4</span> Create function to retrieve coordinates from OneMap.Sg API</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>get_coords <span class="ot">&lt;-</span> <span class="cf">function</span>(add_list){</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create a data frame to store all retrieved coordinates</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  postal_coords <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> add_list){</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">#print(i)</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    r <span class="ot">&lt;-</span> <span class="fu">GET</span>(<span class="st">'https://developers.onemap.sg/commonapi/search?'</span>,</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">query=</span><span class="fu">list</span>(<span class="at">searchVal=</span>i,</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>                     <span class="at">returnGeom=</span><span class="st">'Y'</span>,</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>                     <span class="at">getAddrDetails=</span><span class="st">'Y'</span>))</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    data <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="fu">rawToChar</span>(r<span class="sc">$</span>content))</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    found <span class="ot">&lt;-</span> data<span class="sc">$</span>found</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>    res <span class="ot">&lt;-</span> data<span class="sc">$</span>results</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create a new data frame for each address</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>    new_row <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If single result, append </span></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (found <span class="sc">==</span> <span class="dv">1</span>){</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>      postal <span class="ot">&lt;-</span> res<span class="sc">$</span>POSTAL </span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>      lat <span class="ot">&lt;-</span> res<span class="sc">$</span>LATITUDE</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>      lng <span class="ot">&lt;-</span> res<span class="sc">$</span>LONGITUDE</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>      new_row <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">address=</span> i, <span class="at">postal =</span> postal, <span class="at">latitude =</span> lat, <span class="at">longitude =</span> lng)</span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If multiple results, drop NIL and append top 1</span></span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="cf">if</span> (found <span class="sc">&gt;</span> <span class="dv">1</span>){</span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Remove those with NIL as postal</span></span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>      res_sub <span class="ot">&lt;-</span> res[res<span class="sc">$</span>POSTAL <span class="sc">!=</span> <span class="st">"NIL"</span>, ]</span>
+<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Set as NA first if no Postal</span></span>
+<span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">nrow</span>(res_sub) <span class="sc">==</span> <span class="dv">0</span>) {</span>
+<span id="cb19-35"><a href="#cb19-35" aria-hidden="true" tabindex="-1"></a>          new_row <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">address=</span> i, <span class="at">postal =</span> <span class="cn">NA</span>, <span class="at">latitude =</span> <span class="cn">NA</span>, <span class="at">longitude =</span> <span class="cn">NA</span>)</span>
+<span id="cb19-36"><a href="#cb19-36" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb19-37"><a href="#cb19-37" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb19-38"><a href="#cb19-38" aria-hidden="true" tabindex="-1"></a>      <span class="cf">else</span>{</span>
+<span id="cb19-39"><a href="#cb19-39" aria-hidden="true" tabindex="-1"></a>        top1 <span class="ot">&lt;-</span> <span class="fu">head</span>(res_sub, <span class="at">n =</span> <span class="dv">1</span>)</span>
+<span id="cb19-40"><a href="#cb19-40" aria-hidden="true" tabindex="-1"></a>        postal <span class="ot">&lt;-</span> top1<span class="sc">$</span>POSTAL </span>
+<span id="cb19-41"><a href="#cb19-41" aria-hidden="true" tabindex="-1"></a>        lat <span class="ot">&lt;-</span> top1<span class="sc">$</span>LATITUDE</span>
+<span id="cb19-42"><a href="#cb19-42" aria-hidden="true" tabindex="-1"></a>        lng <span class="ot">&lt;-</span> top1<span class="sc">$</span>LONGITUDE</span>
+<span id="cb19-43"><a href="#cb19-43" aria-hidden="true" tabindex="-1"></a>        new_row <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">address=</span> i, <span class="at">postal =</span> postal, <span class="at">latitude =</span> lat, <span class="at">longitude =</span> lng)</span>
+<span id="cb19-44"><a href="#cb19-44" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb19-45"><a href="#cb19-45" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb19-46"><a href="#cb19-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-47"><a href="#cb19-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> {</span>
+<span id="cb19-48"><a href="#cb19-48" aria-hidden="true" tabindex="-1"></a>      new_row <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">address=</span> i, <span class="at">postal =</span> <span class="cn">NA</span>, <span class="at">latitude =</span> <span class="cn">NA</span>, <span class="at">longitude =</span> <span class="cn">NA</span>)</span>
+<span id="cb19-49"><a href="#cb19-49" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb19-50"><a href="#cb19-50" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb19-51"><a href="#cb19-51" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add the row</span></span>
+<span id="cb19-52"><a href="#cb19-52" aria-hidden="true" tabindex="-1"></a>    postal_coords <span class="ot">&lt;-</span> <span class="fu">rbind</span>(postal_coords, new_row)</span>
+<span id="cb19-53"><a href="#cb19-53" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb19-54"><a href="#cb19-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(postal_coords)</span>
+<span id="cb19-55"><a href="#cb19-55" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="call-get_coords-function-to-retrieve-resale-coordinates" class="level3" data-number="2.4.1">
+<h3 data-number="2.4.1" class="anchored" data-anchor-id="call-get_coords-function-to-retrieve-resale-coordinates"><span class="header-section-number">2.4.1</span> Call get_coords function to retrieve resale coordinates</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>coords <span class="ot">&lt;-</span> <span class="fu">get_coords</span>(add_list)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="inspect-results" class="level3" data-number="2.4.2">
+<h3 data-number="2.4.2" class="anchored" data-anchor-id="inspect-results"><span class="header-section-number">2.4.2</span> Inspect results</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>coords[(<span class="fu">is.na</span>(coords<span class="sc">$</span>postal) <span class="sc">|</span> <span class="fu">is.na</span>(coords<span class="sc">$</span>latitude) <span class="sc">|</span> <span class="fu">is.na</span>(coords<span class="sc">$</span>longitude) <span class="sc">|</span> coords<span class="sc">$</span>postal<span class="sc">==</span><span class="st">"NIL"</span>), ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                    address postal         latitude        longitude
+1305 215 CHOA CHU KANG CTRL    NIL 1.38308302434129 103.747076627693</code></pre>
+</div>
+</div>
+</section>
+<section id="combine-resale-and-coordinates-data" class="level3" data-number="2.4.3">
+<h3 data-number="2.4.3" class="anchored" data-anchor-id="combine-resale-and-coordinates-data"><span class="header-section-number">2.4.3</span> Combine resale and coordinates data</h3>
+<div class="panel-tabset">
+<p>Code</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>rs_coords <span class="ot">&lt;-</span> <span class="fu">left_join</span>(rs_transform, coords, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">'address'</span> <span class="ot">=</span> <span class="st">'address'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Head</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(rs_coords)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 15
+  month   town     address block stree…¹ flat_…² store…³ floor…⁴ flat_…⁵ lease…⁶
+  &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;
+1 2021-01 ANG MO … 547 AN… 547   ANG MO… 4 ROOM  04 TO …      92 New Ge…    1981
+2 2021-01 ANG MO … 414 AN… 414   ANG MO… 4 ROOM  01 TO …      92 New Ge…    1979
+3 2021-01 ANG MO … 509 AN… 509   ANG MO… 4 ROOM  01 TO …      91 New Ge…    1980
+4 2021-01 ANG MO … 467 AN… 467   ANG MO… 4 ROOM  07 TO …      92 New Ge…    1979
+5 2021-01 ANG MO … 571 AN… 571   ANG MO… 4 ROOM  07 TO …      92 New Ge…    1979
+6 2021-01 ANG MO … 134 AN… 134   ANG MO… 4 ROOM  07 TO …      98 New Ge…    1978
+# … with 5 more variables: remaining_lease_mths &lt;dbl&gt;, resale_price &lt;dbl&gt;,
+#   postal &lt;chr&gt;, latitude &lt;chr&gt;, longitude &lt;chr&gt;, and abbreviated variable
+#   names ¹​street_name, ²​flat_type, ³​storey_range, ⁴​floor_area_sqm,
+#   ⁵​flat_model, ⁶​lease_commence_date</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="handle-invalid-addresses" class="level3" data-number="2.4.4">
+<h3 data-number="2.4.4" class="anchored" data-anchor-id="handle-invalid-addresses"><span class="header-section-number">2.4.4</span> Handle invalid addresses</h3>
+<div class="panel-tabset">
+<p>Code</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>rs_coords<span class="sc">$</span>address <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="st">"ST. GEORGE'S"</span>, <span class="st">"SAINT GEORGE'S"</span>, rs_coords<span class="sc">$</span>address)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>rs_invalid <span class="ot">&lt;-</span> rs_coords[<span class="fu">grepl</span>(<span class="st">"SAINT GEORGE'S"</span>, rs_coords<span class="sc">$</span>address), ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Glimpse</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(rs_invalid)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 32
+Columns: 15
+$ month                &lt;chr&gt; "2021-01", "2021-03", "2021-03", "2021-05", "2021…
+$ town                 &lt;chr&gt; "KALLANG/WHAMPOA", "KALLANG/WHAMPOA", "KALLANG/WH…
+$ address              &lt;chr&gt; "4B SAINT GEORGE'S LANE", "18 SAINT GEORGE'S RD",…
+$ block                &lt;chr&gt; "4B", "18", "18", "4B", "19", "5", "9", "4B", "5"…
+$ street_name          &lt;chr&gt; "ST. GEORGE'S LANE", "ST. GEORGE'S RD", "ST. GEOR…
+$ flat_type            &lt;chr&gt; "4 ROOM", "4 ROOM", "4 ROOM", "4 ROOM", "4 ROOM",…
+$ storey_range         &lt;chr&gt; "10 TO 12", "04 TO 06", "10 TO 12", "04 TO 06", "…
+$ floor_area_sqm       &lt;dbl&gt; 105, 91, 91, 106, 91, 93, 84, 105, 93, 91, 91, 92…
+$ flat_model           &lt;chr&gt; "Model A", "New Generation", "New Generation", "M…
+$ lease_commence_date  &lt;dbl&gt; 1996, 1984, 1984, 1996, 1984, 1981, 1985, 1996, 1…
+$ remaining_lease_mths &lt;dbl&gt; 899, 754, 754, 895, 749, 707, 753, 893, 702, 746,…
+$ resale_price         &lt;dbl&gt; 585000, 465000, 475000, 590000, 440000, 580000, 4…
+$ postal               &lt;chr&gt; "321004", "320018", "320018", "321004", "320019",…
+$ latitude             &lt;chr&gt; "1.32229102470373", "1.32406159729828", "1.324061…
+$ longitude            &lt;chr&gt; "103.860174104007", "103.862833773877", "103.8628…</code></pre>
+</div>
+</div>
+</div>
+<section id="create-unique-list-of-addresses-again" class="level4" data-number="2.4.4.1">
+<h4 data-number="2.4.4.1" class="anchored" data-anchor-id="create-unique-list-of-addresses-again"><span class="header-section-number">2.4.4.1</span> Create unique list of addresses again</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>add_list <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">unique</span>(rs_invalid<span class="sc">$</span>address))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="call-get_coords-to-retrieve-resale-coordinates-again" class="level4" data-number="2.4.4.2">
+<h4 data-number="2.4.4.2" class="anchored" data-anchor-id="call-get_coords-to-retrieve-resale-coordinates-again"><span class="header-section-number">2.4.4.2</span> Call get_coords to retrieve resale coordinates again</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>rs_invalid_coords <span class="ot">&lt;-</span> <span class="fu">get_coords</span>(add_list)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="inspect-results-again" class="level4" data-number="2.4.4.3">
+<h4 data-number="2.4.4.3" class="anchored" data-anchor-id="inspect-results-again"><span class="header-section-number">2.4.4.3</span> Inspect results again</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>rs_invalid_coords[(<span class="fu">is.na</span>(rs_invalid_coords<span class="sc">$</span>postal) <span class="sc">|</span> <span class="fu">is.na</span>(rs_invalid_coords<span class="sc">$</span>latitude) <span class="sc">|</span> <span class="fu">is.na</span>(rs_invalid_coords<span class="sc">$</span>longitude)), ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] address   postal    latitude  longitude
+&lt;0 rows&gt; (or 0-length row.names)</code></pre>
+</div>
+</div>
+<p>Yep, the results shows no invalid coordinates now.</p>
+</section>
+<section id="combine-rs_invalid_coords-with-rs_coords-data" class="level4" data-number="2.4.4.4">
+<h4 data-number="2.4.4.4" class="anchored" data-anchor-id="combine-rs_invalid_coords-with-rs_coords-data"><span class="header-section-number">2.4.4.4</span> Combine rs_invalid_coords with rs_coords data</h4>
+<div class="panel-tabset">
+<p>Code</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>rs_coords_final <span class="ot">&lt;-</span> rs_coords <span class="sc">%&gt;%</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(rs_invalid_coords, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"address"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">latitude =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(postal.x), postal.y, postal.x)) <span class="sc">%&gt;%</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">latitude =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(latitude.x), latitude.y, latitude.x)) <span class="sc">%&gt;%</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">longitude =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(longitude.x), longitude.y, longitude.x)) <span class="sc">%&gt;%</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(postal.x, latitude.x, longitude.x, postal.y, latitude.y, longitude.y))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Head</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(rs_coords_final)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 14
+  month   town     address block stree…¹ flat_…² store…³ floor…⁴ flat_…⁵ lease…⁶
+  &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;
+1 2021-01 ANG MO … 547 AN… 547   ANG MO… 4 ROOM  04 TO …      92 New Ge…    1981
+2 2021-01 ANG MO … 414 AN… 414   ANG MO… 4 ROOM  01 TO …      92 New Ge…    1979
+3 2021-01 ANG MO … 509 AN… 509   ANG MO… 4 ROOM  01 TO …      91 New Ge…    1980
+4 2021-01 ANG MO … 467 AN… 467   ANG MO… 4 ROOM  07 TO …      92 New Ge…    1979
+5 2021-01 ANG MO … 571 AN… 571   ANG MO… 4 ROOM  07 TO …      92 New Ge…    1979
+6 2021-01 ANG MO … 134 AN… 134   ANG MO… 4 ROOM  07 TO …      98 New Ge…    1978
+# … with 4 more variables: remaining_lease_mths &lt;dbl&gt;, resale_price &lt;dbl&gt;,
+#   latitude &lt;chr&gt;, longitude &lt;chr&gt;, and abbreviated variable names
+#   ¹​street_name, ²​flat_type, ³​storey_range, ⁴​floor_area_sqm, ⁵​flat_model,
+#   ⁶​lease_commence_date</code></pre>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="write-file-to-rds" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="write-file-to-rds"><span class="header-section-number">2.5</span> Write file to rds</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>rs_coords_rds <span class="ot">&lt;-</span> <span class="fu">write_rds</span>(rs_coords_final, <span class="st">"data/aspatial/rds/rs_coords.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="read-rs_coords-rds-file" class="level2" data-number="2.6">
+<h2 data-number="2.6" class="anchored" data-anchor-id="read-rs_coords-rds-file"><span class="header-section-number">2.6</span> Read rs_coords RDS file</h2>
+<div class="panel-tabset">
+<p>Code</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>rs_coords <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/aspatial/rds/rs_coords.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Glimpse</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(rs_coords)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 23,656
+Columns: 14
+$ month                &lt;chr&gt; "2021-01", "2021-01", "2021-01", "2021-01", "2021…
+$ town                 &lt;chr&gt; "ANG MO KIO", "ANG MO KIO", "ANG MO KIO", "ANG MO…
+$ address              &lt;chr&gt; "547 ANG MO KIO AVE 10", "414 ANG MO KIO AVE 10",…
+$ block                &lt;chr&gt; "547", "414", "509", "467", "571", "134", "204", …
+$ street_name          &lt;chr&gt; "ANG MO KIO AVE 10", "ANG MO KIO AVE 10", "ANG MO…
+$ flat_type            &lt;chr&gt; "4 ROOM", "4 ROOM", "4 ROOM", "4 ROOM", "4 ROOM",…
+$ storey_range         &lt;chr&gt; "04 TO 06", "01 TO 03", "01 TO 03", "07 TO 09", "…
+$ floor_area_sqm       &lt;dbl&gt; 92, 92, 91, 92, 92, 98, 92, 92, 92, 92, 92, 109, …
+$ flat_model           &lt;chr&gt; "New Generation", "New Generation", "New Generati…
+$ lease_commence_date  &lt;dbl&gt; 1981, 1979, 1980, 1979, 1979, 1978, 1977, 1978, 1…
+$ remaining_lease_mths &lt;dbl&gt; 708, 693, 702, 695, 689, 681, 661, 682, 692, 692,…
+$ resale_price         &lt;dbl&gt; 370000, 375000, 380000, 385000, 410000, 410000, 4…
+$ latitude             &lt;chr&gt; "1.37420951743562", "1.36390466431674", "1.374000…
+$ longitude            &lt;chr&gt; "103.858209667888", "103.853913839503", "103.8501…</code></pre>
+</div>
+</div>
+</div>
+<section id="assign-and-transform-crs-and-check" class="level3" data-number="2.6.1">
+<h3 data-number="2.6.1" class="anchored" data-anchor-id="assign-and-transform-crs-and-check"><span class="header-section-number">2.6.1</span> Assign and Transform CRS and Check</h3>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

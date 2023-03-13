@@ -1,0 +1,358 @@
+---
+title: "Take-Home_Ex03"
+date: "9 Mar 2023"
+date-modified: "`r Sys.Date()`"
+number-sections: true
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: visual
+---
+
+# Overview
+
+The price of housing is affected by many factors such as the general economy of a country or inflation rate. These factors can be further divided to structural and locational factors. Structural factors are variables related to the property themselves such as the size, fitting, and tenure of the property. Locational factors are variables related to the neighbourhood of the properties such as proximity to childcare centre, public transport service and shopping centre.
+
+Conventional, housing resale prices predictive models were built by using [**Ordinary Least Square (OLS)**](https://en.wikipedia.org/wiki/Ordinary_least_squares) method. However, this method failed to take into consideration that spatial autocorrelation and spatial heterogeneity exist in geographic data sets such as housing transactions. With the existence of spatial autocorrelation, the OLS estimation of predictive housing resale pricing models could lead to biased, inconsistent, or inefficient results (Anselin 1998). In view of this limitation, **Geographical Weighted Models** were introduced for calibrating predictive model for housing resale prices.
+
+## Data Used
+
+| Type                      | Name                              | Format  | Source                                                                                   |
+|-------------------|--------------------|-----------------|-----------------|
+| Aspatial                  | HDB Flat Resale Prices            | csv     | [data.gov](https://data.gov.sg/dataset/resale-flat-prices)                               |
+| Geospatial                | Master Plan 2014 Subzone Boundary | shp     | [data.gov](https://data.gov.sg/dataset/master-plan-2014-subzone-boundary-web)            |
+| Locational (w geo-coord)  | Eldercare services                | shp     | [data.gov](https://data.gov.sg/dataset/eldercare-services)                               |
+| Locational (w geo-coord)  | Park facilities                   | geojson | [data.gov](https://data.gov.sg/dataset/park-facilities)                                  |
+| Locational (w geo-coord)  | Hawker centres                    | geojson | [data.gov](https://data.gov.sg/dataset/hawker-centres)                                   |
+| Locational (w geo-coord)  | Supermarkets                      | geojson | [data.gov](https://data.gov.sg/dataset/supermarkets)                                     |
+| Locational (w geo-coord)  | Bus Stops                         | shp     | [Datamall.lta.gov.sg](https://datamall.lta.gov.sg/content/datamall/en/static-data.html)  |
+| Locational (w geo-coord)  | MRT                               | shp     | [Datamall.lta.gov.sg](https://datamall.lta.gov.sg/content/datamall/en/static-data.html)  |
+| Locational (no geo-coord) | Childcare                         | csv     | [dataportal.asia](https://dataportal.asia/dataset/192512222_list-of-childcare-centres)   |
+| Locational (no geo-coord) | Kindergartens                     | csv     | [dataportal.asia](https://dataportal.asia/dataset/192512222_list-of-kindergartens)       |
+| Locational (no geo-coord) | Primary school                    | csv     | [data.gov](https://data.gov.sg/dataset/school-directory-and-information)                 |
+| Locational (no geo-coord) | CBD                               |         | Google search                                                                            |
+| Locational (no geo-coord) | Shopping Malls                    | list    | [Wikipedia](https://en.wikipedia.org/wiki/List_of_shopping_malls_in_Singapore)           |
+| Locational (no geo-coord) | Good primary school               | list    | [Local Salary Forum](https://www.salary.sg/2021/best-primary-schools-2021-by-popularity) |
+
+## Packages
+
+\[References taken from [Take-home Exercise 3](https://aisyahajit2018-is415.netlify.app/posts/2021-11-07-take-home-exercise-3/) by NOR AISYAH BINTE AJIT.\]
+
+\[References taken from [Take-Home Exercise 3: Hedonic Pricing Models for Resale Prices of Public Housing in Singapore](https://is415-msty.netlify.app/posts/2021-10-25-take-home-exercise-3/) by MEGAN SIM TZE YEN.\]
+
+-   **sf**: used for importing, managing, and processing geospatial data
+
+-   **tidyverse**: a collection of packages for data science tasks
+
+-   **tmap**: used for creating thematic maps, such as choropleth and bubble maps
+
+-   **sfdep**: used to create spatial weights matrix objects, global and local spatial autocorrelation statistics and related calculations (e.g. spatially lag attributes)
+
+-   **httr**: used to make API calls, such as a GET request
+
+-   **jsonlite**: a JSON parser that can convert from JSON to the appropraite R data types
+
+-   **rvest: A new package that makes it easy to scrape (or harvest) data from html web pages, inspired by libraries like beautiful soup.**
+
+    -   In this analysis, it will be used to scrape data for **Shopping malls** and **Good primary schools**
+
+**Tidyverse packages:**
+
+-   **readr** for importing delimited files (.csv)
+
+-   **readxl** for importing Excel worksheets (.xlsx) - note that it has to be loaded explicitly as it is not a core tidyverse package
+
+-   **tidyr** for manipulating and tidying data
+
+-   **dplyr** for wrangling and transforming data
+
+-   **ggplot2** for visualising data
+
+**Building + visualising hedonic pricing models:**
+
+-   **olsrr**: used for building least squares regression models
+
+-   **coorplot** + **ggpubr**: both are used for multivariate data visualisation & analysis
+
+-   **GWmodel**: provides a collection of localised spatial statistical methods, such as summary statistics, principal components analysis, discriminant analysis and various forms of GW regression
+
+**Visualisations:**
+
+-   **devtools:** used for installing any R packages which is not available in RCRAN. In this exercise, I will be installing using devtools to install the package xaringanExtra which is still under development stage.
+
+-   **kableExtra**: an extension of kable, used for table customisation
+
+-   **plotly**: used for creating interactive web graphics, and can be used in conjunction with ggplot2 with the `ggplotly()` function
+
+-   **ggthemes**: an extension of ggplot2, with more advanced themes for plotting
+
+## Import Packages
+
+```{r}
+pacman::p_load(sf, tidyverse, tmap, httr, rvest, sfdep, readxl, jsonlite, olsrr, corrplot, ggpubr, GWmodel, kableExtra, plotly, ggthemes, broom, devtools)
+```
+
+```{r}
+devtools::install_github("gadenbuie/xaringanExtra")
+library(xaringanExtra)
+```
+
+# Aspatial Data Wrangling
+
+\[References taken from [Take-home Exercise 3](https://aisyahajit2018-is415.netlify.app/posts/2021-11-07-take-home-exercise-3/) by NOR AISYAH BINTE AJIT.\]
+
+```{r}
+resale <- read_csv("data/aspatial/resale-flat-prices.csv")
+glimpse(resale)
+```
+
+## Filter the data
+
+The study should focus on either three-room, four-room or five-room flat and transaction period should be from 1st January 2021 to 31st December 2022. The test data should be January and February 2023 resale prices.
+
+For this project, I will be going with 4 room flats. 
+
+::: panel-tabset
+
+Code
+
+```{r}
+rs_subset <-  filter(resale,flat_type == "4 ROOM") %>%
+                    filter(month >= "2021-01" & month <= "2022-12")
+```
+
+Glimpse
+```{r}
+glimpse(rs_subset)
+```
+Unique month
+```{r}
+unique(rs_subset$month)
+```
+
+Unique flat_type
+```{r}
+unique(rs_subset$flat_type)
+```
+:::
+
+## Transform resale data
+After checking the correctly filtered out data, next is transforming the data,
+
+### New columns
+
+::: panel-tabset
+
+Code
+```{r}
+rs_transform <- rs_subset %>%
+  mutate(rs_subset, address = paste(block,street_name)) %>%
+  mutate(rs_subset, remaining_lease_yr = as.integer(str_sub(remaining_lease, 0, 2))) %>%
+  mutate(rs_subset, remaining_lease_mth = as.integer(str_sub(remaining_lease, 9, 11)))
+```
+
+Head
+```{r}
+head(rs_transform)
+```
+:::
+
+### Add up the remaining lease in months
+
+-   Replace NA values in remaining_lease_mth with the value 0 using is.na() function
+-   Multiply remaining_lease_yr by 12 to convert it to months unit
+-   Create remaining_lease_mths column using mutate function of dplyr package which contains the summation of the remaining_lease_yr and remaining_lease_mths using rowSums() function of base R package
+-   Select required columns for analysis
+
+::: panel-tabset
+
+Code
+```{r}
+rs_transform$remaining_lease_mth[is.na(rs_transform$remaining_lease_mth)] <- 0
+rs_transform$remaining_lease_yr <- rs_transform$remaining_lease_yr * 12
+rs_transform <- rs_transform %>% 
+  mutate(rs_transform, remaining_lease_mths = rowSums(rs_transform[, c("remaining_lease_yr", "remaining_lease_mth")])) %>%
+  select(month, town, address, block, street_name, flat_type, storey_range, floor_area_sqm, flat_model, 
+         lease_commence_date, remaining_lease_mths, resale_price)
+```
+
+Head
+```{r}
+head(rs_transform)
+```
+
+:::
+
+## Retrieve Postal Codes and Coordinates of Addresses
+This section aims to get the postal codes and coordinates which is needed for the locational factors without geographical coordinates.
+
+###  Create a list storing unique addresses
+-   Use unique() function to extract the unique addresses then use sort() function to sort the unique vector.
+```{r}
+add_list <- sort(unique(rs_transform$address))
+```
+
+## Create function to retrieve coordinates from OneMap.Sg API
+
+```{r}
+get_coords <- function(add_list){
+  
+  # Create a data frame to store all retrieved coordinates
+  postal_coords <- data.frame()
+    
+  for (i in add_list){
+    #print(i)
+
+    r <- GET('https://developers.onemap.sg/commonapi/search?',
+           query=list(searchVal=i,
+                     returnGeom='Y',
+                     getAddrDetails='Y'))
+    data <- fromJSON(rawToChar(r$content))
+    found <- data$found
+    res <- data$results
+    
+    # Create a new data frame for each address
+    new_row <- data.frame()
+    
+    # If single result, append 
+    if (found == 1){
+      postal <- res$POSTAL 
+      lat <- res$LATITUDE
+      lng <- res$LONGITUDE
+      new_row <- data.frame(address= i, postal = postal, latitude = lat, longitude = lng)
+    }
+    
+    # If multiple results, drop NIL and append top 1
+    else if (found > 1){
+      # Remove those with NIL as postal
+      res_sub <- res[res$POSTAL != "NIL", ]
+      
+      # Set as NA first if no Postal
+      if (nrow(res_sub) == 0) {
+          new_row <- data.frame(address= i, postal = NA, latitude = NA, longitude = NA)
+      }
+      
+      else{
+        top1 <- head(res_sub, n = 1)
+        postal <- top1$POSTAL 
+        lat <- top1$LATITUDE
+        lng <- top1$LONGITUDE
+        new_row <- data.frame(address= i, postal = postal, latitude = lat, longitude = lng)
+      }
+    }
+
+    else {
+      new_row <- data.frame(address= i, postal = NA, latitude = NA, longitude = NA)
+    }
+    
+    # Add the row
+    postal_coords <- rbind(postal_coords, new_row)
+  }
+  return(postal_coords)
+}
+```
+
+### Call get_coords function to retrieve resale coordinates
+```{r}
+coords <- get_coords(add_list)
+```
+
+### Inspect results
+```{r}
+coords[(is.na(coords$postal) | is.na(coords$latitude) | is.na(coords$longitude) | coords$postal=="NIL"), ]
+```
+
+
+### Combine resale and coordinates data
+
+::: panel-tabset
+
+Code
+```{r}
+rs_coords <- left_join(rs_transform, coords, by = c('address' = 'address'))
+```
+
+Head
+```{r}
+head(rs_coords)
+```
+
+:::
+
+###  Handle invalid addresses
+
+::: panel-tabset
+
+Code
+```{r}
+rs_coords$address <- sub("ST. GEORGE'S", "SAINT GEORGE'S", rs_coords$address)
+rs_invalid <- rs_coords[grepl("SAINT GEORGE'S", rs_coords$address), ]
+```
+
+Glimpse
+```{r}
+glimpse(rs_invalid)
+```
+:::
+
+#### Create unique list of addresses again 
+```{r}
+add_list <- sort(unique(rs_invalid$address))
+```
+
+#### Call get_coords to retrieve resale coordinates again 
+```{r}
+rs_invalid_coords <- get_coords(add_list)
+```
+
+####  Inspect results again
+```{r}
+rs_invalid_coords[(is.na(rs_invalid_coords$postal) | is.na(rs_invalid_coords$latitude) | is.na(rs_invalid_coords$longitude)), ]
+```
+
+Yep, the results shows no invalid coordinates now.
+
+#### Combine rs_invalid_coords with rs_coords data 
+
+::: panel-tabset
+
+Code
+```{r}
+rs_coords_final <- rs_coords %>%
+  left_join(rs_invalid_coords, by = c("address")) %>%
+  mutate(latitude = ifelse(is.na(postal.x), postal.y, postal.x)) %>%
+  mutate(latitude = ifelse(is.na(latitude.x), latitude.y, latitude.x)) %>%
+  mutate(longitude = ifelse(is.na(longitude.x), longitude.y, longitude.x)) %>%
+  select(-c(postal.x, latitude.x, longitude.x, postal.y, latitude.y, longitude.y))
+```
+
+Head
+```{r}
+head(rs_coords_final)
+```
+:::
+
+## Write file to rds
+```{r}
+rs_coords_rds <- write_rds(rs_coords_final, "data/aspatial/rds/rs_coords.rds")
+```
+
+## Read rs_coords RDS file
+::: panel-tabset
+
+Code
+```{r}
+rs_coords <- read_rds("data/aspatial/rds/rs_coords.rds")
+```
+
+Glimpse
+```{r}
+glimpse(rs_coords)
+```
+:::
+
+
+### Assign and Transform CRS and Check
+

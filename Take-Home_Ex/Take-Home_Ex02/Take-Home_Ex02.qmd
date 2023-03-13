@@ -58,7 +58,7 @@ With reference to the local Gi\* values of the vaccination rate maps prepared in
 ## Data used
 
 | Type       | Name                                     | Format | Description                   | Source                                   |
-|---------------|---------------|---------------|---------------|---------------|
+|------------|------------------------------------------|--------|-------------------------------|------------------------------------------|
 | Aspatial   | Riwayat File Vaksinasi DKI Jakarta       | csv    | Daily vaccination data        | Open Data Vaksinasi Provinsi DKI Jakarta |
 | Geospatial | DKI Jakarta administration boundary 2019 | SHP    | geoBoundaries data of Jakarta | Indonesia Geospatial                     |
 
@@ -1172,13 +1172,13 @@ tmap_arrange(map23, map24, ncol = 2)
 ```
 :::
 
-## Observations 
--   In (Jul 2021 to Aug 2021), there are several subtle cold spot clusters in the central and south region as observed from the gi* maps. And, on the p-value maps, we can easily identified the hot spots clusters and cold spots clusters by comparing the significant clusters in both maps.
+## Observations
 
--   In (Sept 2021), the clusters starts to move to other parts including the far end of Jakarta towards the North-West area and South-East area. 
+-   In (Jul 2021 to Aug 2021), there are several subtle cold spot clusters in the central and south region as observed from the gi\* maps. And, on the p-value maps, we can easily identified the hot spots clusters and cold spots clusters by comparing the significant clusters in both maps.
+
+-   In (Sept 2021), the clusters starts to move to other parts including the far end of Jakarta towards the North-West area and South-East area.
 
 -   In (Dec 2021 to June 2022), clusters in the south region is still very significant. Old clusters becomes insignificant and new clusters around the north-east region starts to arise. While the central cluster still remains as a prominent hot spot of cluster.
-
 
 # Spatio-temporal cube
 
@@ -1190,11 +1190,9 @@ vac_rate <- combined_jkt|>
 vac_rate
 ```
 
-
 ## Creating a Time Series Cube
 
-- Encountered an error ! Number of rows does not equal `n time-periods x n locations`
-[1] FALSE, have tried to re-create another df but unsure how to go abt with it hence only have the code out.
+-   Encountered an error ! Number of rows does not equal `n time-periods x n locations` \[1\] FALSE, have tried to re-create another df but unsure how to go abt with it hence only have the code out.
 
 ```{r}
 time_st <- spacetime(vac_rate, jkt,
@@ -1219,9 +1217,8 @@ is_spacetime_cube(time_st)
 #   set_wts("wt")
 ```
 
+## Computing Gi\*
 
-
-## Computing Gi*
 ```{r}
 # gi_stars <- vac_nb %>% 
 #   group_by(Date) %>% 
@@ -1230,12 +1227,11 @@ is_spacetime_cube(time_st)
 #   tidyr::unnest(gi_star)
 ```
 
-
 # Mann-Kendall Test
+
 ```{r}
 # cbg <- combined_jkt %>% 
 #   ungroup() %>% 
 #   filter(Sub_District == "KELAPA GADING TIMUR") |> 
 #   select(Sub_District, Date, gi_star)
 ```
-
