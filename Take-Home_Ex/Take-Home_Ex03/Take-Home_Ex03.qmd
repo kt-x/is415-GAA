@@ -585,35 +585,647 @@ get_prox <- function(origin_df, dest_df, col_name){
 #### CALL GET_PROX FUNCTION
 
 ```{r}
-# rs_coords_sf <- get_prox(rs_coords_sf, elder_sf, "PROX_ELDERLYCARE")
-# rs_coords_sf <- get_prox(rs_coords_sf, mrtlrt_sf, "PROX_MRT")
-# rs_coords_sf <- get_prox(rs_coords_sf, hawker_sf, "PROX_HAWKER") 
-# rs_coords_sf <- get_prox(rs_coords_sf, parks_sf, "PROX_PARK") 
-# rs_coords_sf <- get_prox(rs_coords_sf, supermkt_sf, "PROX_SUPERMARKET")
+rs_coords_sf <- get_prox(rs_coords_sf, elder_sf, "PROX_ELDERLYCARE")
+rs_coords_sf <- get_prox(rs_coords_sf, mrtlrt_sf, "PROX_MRT")
+rs_coords_sf <- get_prox(rs_coords_sf, hawker_sf, "PROX_HAWKER")
+rs_coords_sf <- get_prox(rs_coords_sf, parks_sf, "PROX_PARK")
+rs_coords_sf <- get_prox(rs_coords_sf, supermkt_sf, "PROX_SUPERMARKET")
 ```
 
 ## Create get_within function to calculate no. of factors within dist
 
 ```{r}
-# get_within <- function(origin_df, dest_df, threshold_dist, col_name){
-#   
-#   # creates a matrix of distances
-#   dist_matrix <- st_distance(origin_df, dest_df)   
-#   
-#   # count the number of location_factors within threshold_dist and create new data frame
-#   wdist <- origin_df %>% 
-#     mutate(WITHIN_DT = apply(dist_matrix, 1, function(x) sum(x <= threshold_dist)))
-#   
-#   # rename column name according to input parameter
-#   names(wdist)[names(wdist) == 'WITHIN_DT'] <- col_name
-# 
-#   # Return df
-#   return(wdist)
-# }
+get_within <- function(origin_df, dest_df, threshold_dist, col_name){
+
+  # creates a matrix of distances
+  dist_matrix <- st_distance(origin_df, dest_df)
+
+  # count the number of location_factors within threshold_dist and create new data frame
+  wdist <- origin_df %>%
+    mutate(WITHIN_DT = apply(dist_matrix, 1, function(x) sum(x <= threshold_dist)))
+
+  # rename column name according to input parameter
+  names(wdist)[names(wdist) == 'WITHIN_DT'] <- col_name
+
+  # Return df
+  return(wdist)
+}
+```
+
+#### CALL GET_WITHIN FUNCTION
+The threshold will be set to 350m for locational factors such as, Kindergartens, Childcare centres and Bus stops.
+
+##### kindergarten 
+
+:::panel-tabset
+
+###### Code
+```{r}
+rs_coords_sf <- get_within(rs_coords_sf, kind_sf, 350, "WITHIN_350M_KINDERGARTEN")
+```
+###### Head
+```{r}
+head(rs_coords_sf)
+```
+:::
+
+##### Childcare centres 
+
+:::panel-tabset
+
+###### Code
+```{r}
+rs_coords_sf <- get_within(rs_coords_sf, childcare_sf, 350, "WITHIN_350M_CHILDCARE")
+```
+###### Head
+```{r}
+head(rs_coords_sf)
+```
+:::
+
+##### Bus stops 
+
+:::panel-tabset
+
+###### Code
+```{r}
+rs_coords_sf <- get_within(rs_coords_sf, bus_sf, 350, "WITHIN_350M_BUS")
+```
+###### Head
+```{r}
+head(rs_coords_sf)
+```
+:::
+
+
+
+# Locational factors without geographic coordinates
+
+## CBD
+
+according to google, the latitude and longitude of Downtown Core (aka CBD), are 1.287953 and 103.851784 respectively.
+
+#### STORE CBD COORDINATES IN DATAFRAME 
+```{r}
+name <- c('CBD Area')
+latitude= c(1.287953)
+longitude= c(103.851784)
+cbd_coords <- data.frame(name, latitude, longitude)
+```
+
+#### ASSIGN AND TRANSFORM CRS
+To convert the data frame into sf object then, transform the coordinates of the sf object
+
+:::panel-tabset
+
+##### code
+
+```{r}
+cbd_coords_sf <- st_as_sf(cbd_coords,
+                    coords = c("longitude", 
+                               "latitude"),
+                    crs=4326) |>
+  st_transform(crs = 3414)
+```
+
+##### st_crs
+```{r}
+st_crs(cbd_coords_sf)
+```
+:::
+
+The coordinates for CBD area is in EPSG 3414 (SVY21) format is c(30055.05, 30040.83).
+
+#### CALL GET_PROX FUNCTION
+Get the proximity of HDB and CBD area.
+```{r}
+rs_coords_sf <- get_prox(rs_coords_sf, cbd_coords_sf, "PROX_CBD") 
+```
+
+## Shopping mall
+In a nutshell, the following code chunk will perform 3 steps:
+-   Read the Wikipedia html page containing the Shopping Malls in Singapore
+-   Read the text portion (html_text()) of the Unordered -  -   List element selected by html_nodes()
+-   Append it to the empty mall_list created
+#### EXTRACT SHOPPING MALLS FROM WIKIPEDIA
+
+:::panel-tabset
+
+##### Code
+```{r}
+url <- "https://en.wikipedia.org/wiki/List_of_shopping_malls_in_Singapore"
+malls_list <- list()
+
+for (i in 2:7){
+  malls <- read_html(url) %>%
+    html_nodes(xpath = paste('//*[@id="mw-content-text"]/div[1]/div[',as.character(i),']/ul/li',sep="") ) %>%
+    html_text()
+  malls_list <- append(malls_list, malls)
+}
+```
+
+##### st_crs
+```{r}
+st_crs(malls_list)
+```
+:::
+
+#### CALL GET_COORDS FUNCTION
+To retrieve coordinates of Shopping Malls and rename the address to mall_name for easier reference
+```{r}
+malls_list_coords <- get_coords(malls_list) %>% 
+  rename("mall_name" = "address")
 ```
 
 
+#### REMOVE INVALID SHOPPING MALL NAME
+```{r}
+malls_list_coords <- subset(malls_list_coords, mall_name!= "Yew Tee Shopping Centre")
+```
 
+####  CORRECT INVALID MALL NAMES THAT CAN BE FOUND
+```{r}
+invalid_malls<- subset(malls_list_coords, is.na(malls_list_coords$postal))
+invalid_malls_list <- unique(invalid_malls$mall_name)
+corrected_malls <- c("Clarke Quay", "City Gate", "Raffles Holland V", "Knightsbridge", "Mustafa Centre", "GR.ID", "Shaw House",
+                     "The Poiz Centre", "Velocity @ Novena Square", "Singapore Post Centre", "PLQ Mall", "KINEX", "The Grandstand")
+
+for (i in 1:length(invalid_malls_list)) {
+  malls_list_coords <- malls_list_coords %>% 
+    mutate(mall_name = ifelse(as.character(mall_name) == invalid_malls_list[i], corrected_malls[i], as.character(mall_name)))
+}
+```
+
+#### CREATE A LIST STORING UNIQUE MALL NAMES
+
+```{r}
+malls_list <- sort(unique(malls_list_coords$mall_name))
+```
+
+#### CALL GET_COORDS TO RETRIEVE COORDINATES OF SHOPPING MALLS AGAIN
+```{r}
+malls_coords <- get_coords(malls_list)
+```
+
+#### INSPECT RESULTS
+```{r}
+malls_coords[(is.na(malls_coords$postal) | is.na(malls_coords$latitude) | is.na(malls_coords$longitude)), ]
+```
+
+#### CONVERT DATA FRAME INTO SF OBJECT, ASSIGN AND TRANSFORM CRS
+```{r}
+malls_sf <- st_as_sf(malls_coords,
+                    coords = c("longitude", 
+                               "latitude"),
+                    crs=4326) %>%
+  st_transform(crs = 3414)
+```
+
+#### CALL GET_PROX FUNCTION
+```{r}
+rs_coords_sf <- get_prox(rs_coords_sf, malls_sf, "PROX_MALL") 
+```
+
+
+## Primary Schools
+### READ IN CSV FILE
+
+:::panel-tabset
+
+#### code
+```{r}
+pri_sch <- read_csv("data/geospatial/prisch/general-information-of-schools.csv")
+```
+
+#### glimpse
+```{r}
+glimpse(pri_sch)
+```
+:::
+
+### EXTRACT PRIMARY SCHOOLS AND REQUIRED COLUMNS ONLY
+
+:::panel-tabset
+
+#### code
+```{r}
+pri_sch <- pri_sch %>%
+  filter(mainlevel_code == "PRIMARY") %>%
+  select(school_name, address, postal_code, mainlevel_code)
+```
+
+#### glimpse
+```{r}
+glimpse(pri_sch)
+```
+:::
+
+#### CREATE LIST STORING UNIQUE POSTAL CODES OF PRIMARY SCHOOLS
+```{r}
+prisch_list <- sort(unique(pri_sch$postal_code))
+```
+
+#### CALL GET_COORDS FUNCTION TO RETRIEVE COORDINATES OF PRIMARY SCHOOLS
+```{r}
+prisch_coords <- get_coords(prisch_list)
+```
+
+#### INSPECT RESULTS
+```{r}
+prisch_coords[(is.na(prisch_coords$postal) | is.na(prisch_coords$latitude) | is.na(prisch_coords$longitude)), ]
+```
+
+No NA values.
+
+#### COMBINE COORDINATES WITH PRIMARY SCHOOL NAMES
+To verify whether we have extracted it correctly.
+
+:::panel-tabset
+
+##### code
+```{r}
+prisch_coords = prisch_coords[c("postal","latitude", "longitude")]
+pri_sch <- left_join(pri_sch, prisch_coords, by = c('postal_code' = 'postal'))
+```
+
+##### head
+```{r}
+head(pri_sch)
+```
+:::
+
+#### CONVERT PRI_SCH DATA FRAME INTO SF OBJECT, ASSIGN AND TRANSFORM CRS
+
+:::panel-tabset
+
+##### code
+```{r}
+prisch_sf <- st_as_sf(pri_sch,
+                    coords = c("longitude", 
+                               "latitude"),
+                    crs=4326) %>%
+  st_transform(crs = 3414)
+```
+
+##### st_crs
+```{r}
+st_crs(prisch_sf)
+```
+:::
+
+#### CALL GET_WITHIN FUNCTION
+
+:::panel-tabset
+
+##### code
+```{r}
+rs_coords_sf <- get_within(rs_coords_sf, prisch_sf, 1000, "WITHIN_1KM_PRISCH")
+```
+
+##### head
+```{r}
+head(rs_coords_sf)
+```
+:::
+
+## Good primary school
+
+### EXTRACT RANKING LIST OF PRIMARY SCHOOLS
+
+:::panel-tabset
+
+#### code
+```{r}
+url <- "https://www.salary.sg/2021/best-primary-schools-2021-by-popularity/"
+
+good_pri <- data.frame()
+
+schools <- read_html(url) %>%
+  html_nodes(xpath = paste('//*[@id="post-3068"]/div[3]/div/div/ol/li') ) %>%
+  html_text() 
+
+for (i in (schools)){
+  sch_name <- toupper(gsub(" – .*","",i))
+  sch_name <- gsub("\\(PRIMARY SECTION)","",sch_name)
+  sch_name <- trimws(sch_name)
+  new_row <- data.frame(pri_sch_name=sch_name)
+  # Add the row
+  good_pri <- rbind(good_pri, new_row)
+}
+
+top_good_pri <- head(good_pri, 10)
+```
+
+#### head
+```{r}
+head(top_good_pri)
+```
+:::
+
+#### CHECK FOR GOOD PRIMARY SCHOOLS IN PRIMARY SCHOOL DF
+To check whether the names of the good primary schools is similar to the names in primary school dataframe 
+```{r}
+top_good_pri$pri_sch_name[!top_good_pri$pri_sch_name %in% prisch_sf$school_name]
+```
+
+####  CREATE A LIST STORING UNIQUE GOOD PRIMARY SCHOOL NAMES
+```{r}
+good_pri_list <- unique(top_good_pri$pri_sch_name)
+```
+
+#### CALL GET_COORDS FUNCTION TO RETRIEVE COORDINATES OF GOOD PRIMARY SCHOOLS
+```{r}
+goodprisch_coords <- get_coords(good_pri_list)
+```
+
+#### INSPECT RESULTS
+```{r}
+goodprisch_coords[(is.na(goodprisch_coords$postal) | is.na(goodprisch_coords$latitude) | is.na(goodprisch_coords$longitude)), ]
+```
+
+#### REPLACE INVALID GOOD PRIMARY SCHOOL NAMES
+```{r}
+top_good_pri$pri_sch_name[top_good_pri$pri_sch_name == "CHIJ ST. NICHOLAS GIRLS’ SCHOOL"] <- "CHIJ SAINT NICHOLAS GIRLS' SCHOOL"
+top_good_pri$pri_sch_name[top_good_pri$pri_sch_name == "ST. HILDA’S PRIMARY SCHOOL"] <- "SAINT HILDA'S PRIMARY SCHOOL"
+```
+
+#### CREATE A LIST STORING UNIQUE GOOD PRIMARY SCHOOL NAMES AGAIN
+```{r}
+good_pri_list <- unique(top_good_pri$pri_sch_name)
+```
+
+####  CALL GET_COORDS FUNCTION TO RETRIEVE COORDINATES OF GOOD PRIMARY SCHOOLS AGAIN
+```{r}
+goodprisch_coords <- get_coords(good_pri_list)
+```
+
+####  INSPECT RESULTS AGAIN
+```{r}
+goodprisch_coords[(is.na(goodprisch_coords$postal) | is.na(goodprisch_coords$latitude) | is.na(goodprisch_coords$longitude)), ]
+```
+
+#### CONVERT DATA FRAME INTO SF OBJECTS, ASSIGN AND TRANSFORM CRS
+
+:::panel-tabset
+
+##### code
+```{r}
+goodpri_sf <- st_as_sf(goodprisch_coords,
+                    coords = c("longitude", 
+                               "latitude"),
+                    crs=4326) %>%
+  st_transform(crs = 3414)
+```
+
+##### st_crs
+```{r}
+st_crs(goodpri_sf)
+```
+:::
+
+#### CALL GET_PROX FUNCTION
+```{r}
+rs_coords_sf <- get_prox(rs_coords_sf, goodpri_sf, "PROX_GOOD_PRISCH")
+```
+
+## Write to RDS file 
+To prevent running of the codes
+```{r}
+rs_factors_rds <- write_rds(rs_coords_sf, "data/aspatial/rds/rs_factors.rds")
+```
+
+# Import Data for Analysis
+
+## Geospatial data
+
+### MP2019
+
+:::panel-tabset
+
+#### Code
+```{r}
+mpsz_sf <- st_read(dsn = "data/geospatial/mpsz", layer="MPSZ-2019")
+```
+
+#### st_crs()
+```{r}
+st_crs(mpsz_sf)
+```
+:::
+
+### Transform CRS
+
+:::panel-tabset
+
+#### Code
+```{r}
+mpsz_sf <- st_transform(mpsz_sf, 3414)
+```
+
+#### st_crs()
+```{r}
+st_crs(mpsz_sf)
+```
+:::
+
+
+
+### Remove invalid geometries (if any)
+
+#### CHECK FOR INVALID GEOMETRIES
+
+```{r}
+length(which(st_is_valid(mpsz_sf) == FALSE))
+```
+
+#### HANDLE INVALID GEOMETRIES AND CHECK
+```{r}
+mpsz_sf <- st_make_valid(mpsz_sf)
+length(which(st_is_valid(mpsz_sf) == FALSE))
+```
+
+### Reveal the extent of mpsz_sf
+```{r}
+st_bbox(mpsz_sf)
+```
+
+
+# Resale with locational factors
+
+## Read RDS file
+
+:::panel-tabset
+
+#### Code
+```{r}
+rs_sf <- read_rds("data/aspatial/rds/rs_factors.rds")
+```
+
+#### Glimpse
+```{r}
+glimpse(rs_sf)
+```
+:::
+
+### Extract unique storey_range and sort
+```{r}
+storeys <- sort(unique(rs_sf$storey_range))
+```
+
+### Create dataframe storey_range_order to store order of storey_range
+
+:::panel-tabset
+
+#### Code
+```{r}
+storey_order <- 1:length(storeys)
+storey_range_order <- data.frame(storeys, storey_order)
+```
+
+#### Head
+```{r}
+head(storey_range_order)
+```
+:::
+
+
+### Combine storey_order with resale dataframe
+
+:::panel-tabset
+
+#### Code
+```{r}
+rs_sf <- left_join(rs_sf, storey_range_order, by= c("storey_range" = "storeys"))
+```
+
+#### Glimpse
+```{r}
+glimpse(rs_sf)
+```
+:::
+
+### Select required columns for analysis
+
+:::panel-tabset
+
+#### Code
+```{r}
+rs_req <- rs_sf %>%
+  select(resale_price, floor_area_sqm, storey_order, remaining_lease_mths,
+         PROX_CBD, PROX_ELDERLYCARE, PROX_HAWKER, PROX_MRT, PROX_PARK, PROX_GOOD_PRISCH, PROX_MALL,
+         PROX_SUPERMARKET, WITHIN_350M_KINDERGARTEN, WITHIN_350M_CHILDCARE, WITHIN_350M_BUS, WITHIN_1KM_PRISCH)
+```
+
+#### Glimpse
+```{r}
+glimpse(rs_req)
+```
+:::
+
+### View summary
+```{r}
+summary(rs_req)
+```
+
+# Exploratory Data Analysis (EDA)
+
+## statistical graphics
+
+### Plot Histogram of resale_price
+```{r}
+ggplot(data=rs_req, aes(x=`resale_price`)) +
+  geom_histogram(bins=20, color="black", fill="light coral")
+```
+
+### Normalise using Log Transformation
+```{r}
+rs_req <- rs_req %>%
+  mutate(`LOG_SELLING_PRICE` = log(resale_price))
+```
+
+### Plot Histogram of LOG_RESALE_PRICE
+```{r}
+ggplot(data=rs_req, aes(x=`LOG_SELLING_PRICE`)) +
+  geom_histogram(bins=20, color="black", fill="light green")
+```
+
+## Multiple Histogram Plots distribution of variables
+
+### Stuctural Factors
+
+#### EXTRACT COLUMN NAMES TO PLOT
+```{r}
+s_factor <- c("floor_area_sqm", "storey_order", "remaining_lease_mths")
+```
+
+#### CREATE A LIST TO STORE HISTOGRAMS OF STUCTURAL FACTORS
+```{r}
+s_factor_hist_list <- vector(mode = "list", length = length(s_factor))
+for (i in 1:length(s_factor)) {
+  hist_plot <- ggplot(rs_req, aes_string(x = s_factor[[i]])) +
+    geom_histogram(color="firebrick", fill = "light coral") +
+    labs(title = s_factor[[i]]) +
+    theme(plot.title = element_text(size = 10),
+          axis.title = element_blank())
+  
+  s_factor_hist_list[[i]] <- hist_plot
+}
+```
+
+
+#### PLOT HISTOGRAMS TO EXAMINE DISTRIBUTION OF STUCTURAL FACTORS
+```{r}
+ggarrange(plotlist = s_factor_hist_list,
+          ncol = 2,
+          nrow = 2)
+```
+
+### Locational Factors
+
+#### EXTRACT COLUMN NAMES TO PLOT
+```{r}
+l_factor <- c("PROX_CBD", "PROX_ELDERLYCARE", "PROX_HAWKER", "PROX_MRT", "PROX_PARK", "PROX_GOOD_PRISCH", "PROX_MALL",
+              "PROX_SUPERMARKET", "WITHIN_350M_KINDERGARTEN", "WITHIN_350M_CHILDCARE", "WITHIN_350M_BUS", "WITHIN_1KM_PRISCH")
+```
+
+#### CREATE A LIST TO STORE HISTOGRAMS OF LOCATIONAL FACTORS
+
+```{r}
+l_factor_hist_list <- vector(mode = "list", length = length(l_factor))
+for (i in 1:length(l_factor)) {
+  hist_plot <- ggplot(rs_req, aes_string(x = l_factor[[i]])) +
+    geom_histogram(color="midnight blue", fill = "light sky blue") +
+    labs(title = l_factor[[i]]) +
+    theme(plot.title = element_text(size = 10),
+          axis.title = element_blank())
+  
+  l_factor_hist_list[[i]] <- hist_plot
+}
+```
+
+#### PLOT HISTOGRAMS TO EXAMINE DISTRIBUTION OF LOCATIONAL FACTORS
+```{r}
+ggarrange(plotlist = l_factor_hist_list,
+          ncol = 4,
+          nrow = 4)
+```
+
+## Statistical Point Map
+```{r}
+tmap_mode("view")
+tm_shape(rs_sf) +  
+  tm_dots(col = "resale_price",
+          alpha = 0.6,
+          style="quantile") +
+  tm_view(set.zoom.limits = c(11,14)) +
+tm_basemap("OpenStreetMap")
+
+```
+
+
+```{r}
+tmap_mode("plot")
+```
 
 
 
