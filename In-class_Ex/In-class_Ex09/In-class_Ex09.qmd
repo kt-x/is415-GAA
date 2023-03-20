@@ -17,7 +17,7 @@ editor: visual
 
 ```{r}
 pacman::p_load(sf, spdep, GWmodel, SpatialML, tidyverse, tmap, ggpubr,
-               olsrr, devtools, rsample)
+               olsrr, devtools, tidymodels, rsample)
 ```
 
 ## Import Aspatial package
@@ -26,133 +26,10 @@ pacman::p_load(sf, spdep, GWmodel, SpatialML, tidyverse, tmap, ggpubr,
 mdata <- read_rds('data/aspatial/mdata.rds')
 ```
 
-
 ```{r}
 set.seed(1234)
-
-resale_split <- initial_split(mdata, 
-                              prop = 6.5/10,)
+resale_split <- initial_split(mdata,
+                              prop = 6.5 / 10,)
 train_data <- training(resale_split)
 test_data <- testing(resale_split)
 ```
-
-```{r}
-write_rds(train_data, "data/aspatial/train_data.rds")
-write_rds(test_data, "data/aspatial/test_data.rds")
-```
-
-# ordinal least square mdoel
-the model answer
-```{r}
-price_mlr <- lm(resale_price ~ floor_area_sqm + 
-                  storey_order + remaining_lease_mths + 
-                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER + 
-                  PROX_MRT + PROX_PARK + PROX_MALL + 
-                  PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN + 
-                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + 
-                  PROX_GOOD_PRISCH,
-                data = train_data)
-summary(price_mlr)
-```
-
-```{r}
-write_rds(train_data, "data/aspatial/price_mlr.rds")
-```
-
-
-# preparation of training data
-
-## convert to SpatialPointDataFrame
-```{r}
-train_data_sp <- as_Spatial(train_data)
-train_data_sp
-```
-
-## prepare coordinates data
-```{r}
-
-coord <- st_coordinates(mdata)
-coords_train <- st_coordinates(train_data)
-coords_test <- st_coordinates(test_data)
-```
-
-```{r}
-
-coords_train <- write_rds(coords_train, "data/aspatial/coords_train.rds")
-coords_test <- write_rds(coords_test, "data/aspatial/coords_test.rds")
-```
-
-```{r}
-train_data <- train_data |>
-  st_drop_geometry()
-```
-
-
-
-# calibrating random forest
-```{r}
-set.seed(1234)
-rf <- ranger(resale_price ~ floor_area_sqm + 
-                  storey_order + remaining_lease_mths + 
-                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER + 
-                  PROX_MRT + PROX_PARK + PROX_MALL + 
-                  PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN + 
-                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + 
-                  PROX_GOOD_PRISCH,
-                data = train_data )
-
-print(rf)
-```
-
-# Grf
-not more than 10 minutes (should be 5 mins~)
-
-gwRF_adpative$Global.Model$variable.importance -> see which variables are important
-
-```{r}
-set.seed(1234)
-gwRF_adaptive <- grf(formula = resale_price ~ floor_area_sqm + 
-                  storey_order + remaining_lease_mths + 
-                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER + 
-                  PROX_MRT + PROX_PARK + PROX_MALL + 
-                  PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN + 
-                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + 
-                  PROX_GOOD_PRISCH,
-                dframe = train_data,
-                bw = 55,
-                kernel = "adaptive",
-                coords = coords_train)
-
-```
-
-
-## prepare test data
-```{r}
-test_data <- cbind(test_data, coords_test) |>
-  st_drop_geometry()
-```
-
-
-```{r}
-# gwRF_adaptive <-predict.grf(gwRF_adaptive,
-#                             test_data,
-#                             x.var.name = "X",
-#                             y.var.name = "Y",
-#                             local.w = 1,
-#                             global.w = 0)
-```
-
-```{r}
-# gwRF_pred_df <- as.data.frame(gwRF_adaptive)
-```
-
-
-```{r}
-
-```
-
-
-
-
-
-
