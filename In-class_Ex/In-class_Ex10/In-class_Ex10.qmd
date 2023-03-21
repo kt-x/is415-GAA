@@ -11,7 +11,7 @@ execute:
 editor: visual
 ---
 
-## Import packages 
+## Import packages
 
 ```{r}
 pacman::p_load(tmap, SpatialAcc, sf, 
@@ -98,7 +98,7 @@ EucMatrix_km <- as.matrix(EucMatrix/1000)
 
 ## Modelling and Visualising Accessibility using Hansen Method
 
-### Computing Hansen\'s accessibility
+### Computing Hansen's accessibility
 
 ```{r}
 acc_Hansen <- data.frame(ac(hexagons$demand,
@@ -134,7 +134,7 @@ acc_Hansen <- tbl_df(acc_Hansen)
 hexagon_Hansen <- bind_cols(hexagons, acc_Hansen)
 ```
 
-### Visualising Hansen\'s accessibility
+### Visualising Hansen's accessibility
 
 #### Extracting map extend
 
@@ -187,7 +187,7 @@ ggplot(data=hexagon_Hansen,
 
 ## Modelling and Visualising Accessibility using KD2SFCA Method
 
-### Computing KD2SFCA\'s accessibility
+### Computing KD2SFCA's accessibility
 
 ```{r}
 acc_KD2SFCA <- data.frame(ac(hexagons$demand,
@@ -202,7 +202,7 @@ acc_KD2SFCA <- tbl_df(acc_KD2SFCA)
 hexagon_KD2SFCA <- bind_cols(hexagons, acc_KD2SFCA)
 ```
 
-### Visualising KD2SFCA\'s accessibility
+### Visualising KD2SFCA's accessibility
 
 ```{r}
 tmap_mode("plot")
@@ -264,7 +264,7 @@ acc_SAM <- tbl_df(acc_SAM)
 hexagon_SAM <- bind_cols(hexagons, acc_SAM)
 ```
 
-### Visualising SAM\'s accessibility
+### Visualising SAM's accessibility
 
 ```{r}
 tmap_mode("plot")
