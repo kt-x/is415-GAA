@@ -20,7 +20,7 @@ Conventional, housing resale prices predictive models were built by using [**Ord
 ## Data Used
 
 | Type                      | Name                              | Format  | Source                                                                                   |
-|----------------|----------------|----------------|-------------------------|
+|-----------------|-----------------|-----------------|-----------------------|
 | Aspatial                  | HDB Flat Resale Prices            | csv     | [data.gov](https://data.gov.sg/dataset/resale-flat-prices)                               |
 | Geospatial                | Master Plan 2014 Subzone Boundary | shp     | [data.gov](https://data.gov.sg/dataset/master-plan-2014-subzone-boundary-web)            |
 | Locational (w geo-coord)  | Eldercare services                | shp     | [data.gov](https://data.gov.sg/dataset/eldercare-services)                               |
@@ -1278,7 +1278,7 @@ ggplot(data=rs_req, aes(x=`LOG_SELLING_PRICE`)) +
 
 ## Multiple Histogram Plots distribution of variables
 
-### Stuctural Factors
+### Structural Factors
 
 #### EXTRACT COLUMN NAMES TO PLOT
 
@@ -1472,9 +1472,7 @@ bw_adaptive <- bw.gwr(resale_price ~ floor_area_sqm +
 
 ![](data/bw_adaptive.JPG)
 
-
-Results above show that:
--   118 is the recommended data points to be used
+Results above show that: - 118 is the recommended data points to be used
 
 ## write bw_adpative to rds file
 
@@ -1506,19 +1504,19 @@ gwr_adaptive <- gwr.basic(formula = resale_price ~
                           longlat = FALSE)
 ```
 
-![](data/gwr_adaptive_part1.JPG)
+![](gwr_adaptive_part1.JPG)
 
-![](data/gwr_adaptive_part2.JPG)
+![](gwr_adaptive_part2.JPG)
 
-![](data/gwr_adaptive_part3.JPG){width="344"}
+![](gwr_adaptive_part3.JPG)
 
-![](data/gwr_adaptive_part4.JPG){width="467"}
+![](gwr_adaptive_part4.JPG)
 
-![](data/gwr_adaptive_part5.JPG)
+![](gwr_adaptive_part5.JPG)
 
-![](data/gwr_adaptive_part6.JPG){width="340"}
+![](gwr_adaptive_part6.JPG)
 
-![](data/gwr_adaptive_part7.JPG)
+![](gwr_adaptive_part7.JPG)
 
 Overall the values between the dependent and independent variables are similar in range.
 
@@ -1585,7 +1583,7 @@ rf <- ranger(resale_price ~ floor_area_sqm + storey_order +
 print(rf)
 ```
 
-![](data/rf.JPG)
+![](rf.JPG)
 
 ## Calibrating Geographical Random Forest Model
 
@@ -1700,7 +1698,7 @@ rs_mlr1 <- lm(formula = resale_price ~ floor_area_sqm + storey_order + remaining
 ols_regress(rs_mlr1)
 ```
 
-The adjusted r-square of the GWR is 0.715 which is worse than the GWR model of 0.7207. 
+The adjusted r-square of the GWR is 0.715 which is worse than the GWR model of 0.7207.
 
 Overall, we can see that the adaptive bandwidth GWR model has the best adjusted R-square value of 0.9627267 as compared to Multiple Linear Regression Model and Fixed Bandwidth GWR model. Hence, we will be using it to visualise GWR output in the next section.
 
@@ -1717,8 +1715,8 @@ Since all the VIF values of the independent variables are less than 10, we can c
 ```{r}
 ols_plot_resid_fit(rs_mlr1)
 ```
-Most of the data points are scattered around the 0 line.
-Thus, we can conclude that the relationships between the dependent variable and independent variables are linear.
+
+Most of the data points are scattered around the 0 line. Thus, we can conclude that the relationships between the dependent variable and independent variables are linear.
 
 ### **Test for Normality Assumption**
 
@@ -1730,17 +1728,9 @@ Results above reveals that the residual of the multiple linear regression model 
 
 # Comparsion of OLS and GWR
 
-The performance of GWR seems to be better than OLS since it can analyse the spatially varying relationships and capture spatial patterns. 
-
-
-
-
+The performance of GWR seems to be better than OLS since it can analyse the spatially varying relationships and capture spatial patterns.
 
 # Acknoledgement
 
 -   Take-home Exercise 3 by NOR AISYAH BINTE AJIT.
 -   In-class Exercise 9 by Prof Kam \[https://is415-gaa-tskam.netlify.app/in-class_ex/in-class_ex09/in-class_ex09_gwml\]
-
-
-
-
