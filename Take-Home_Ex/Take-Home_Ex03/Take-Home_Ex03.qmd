@@ -20,7 +20,7 @@ Conventional, housing resale prices predictive models were built by using [**Ord
 ## Data Used
 
 | Type                      | Name                              | Format  | Source                                                                                   |
-|---------------|---------------|---------------|-----------------------------|
+|----------------|----------------|----------------|-------------------------|
 | Aspatial                  | HDB Flat Resale Prices            | csv     | [data.gov](https://data.gov.sg/dataset/resale-flat-prices)                               |
 | Geospatial                | Master Plan 2014 Subzone Boundary | shp     | [data.gov](https://data.gov.sg/dataset/master-plan-2014-subzone-boundary-web)            |
 | Locational (w geo-coord)  | Eldercare services                | shp     | [data.gov](https://data.gov.sg/dataset/eldercare-services)                               |
@@ -1472,6 +1472,10 @@ bw_adaptive <- bw.gwr(resale_price ~ floor_area_sqm +
 
 ![](data/bw_adaptive.JPG)
 
+
+Results above show that:
+-   118 is the recommended data points to be used
+
 ## write bw_adpative to rds file
 
 ```{r}
@@ -1516,7 +1520,7 @@ gwr_adaptive <- gwr.basic(formula = resale_price ~
 
 ![](data/gwr_adaptive_part7.JPG)
 
-Overall...
+Overall the values between the dependent and independent variables are similar in range.
 
 ### save to rds
 
@@ -1565,7 +1569,7 @@ train_data <- train_data %>%
 In this section, we will be calibrating a model to predict HDB resale price by using random forest function of ranger package.
 
 ```{r}
-
+#| eval: false
 set.seed(1234)
 rf <- ranger(resale_price ~ floor_area_sqm + storey_order + 
                remaining_lease_mths + PROX_CBD + PROX_ELDERLYCARE + 
@@ -1577,9 +1581,11 @@ rf <- ranger(resale_price ~ floor_area_sqm + storey_order +
 ```
 
 ```{r}
-
+#| eval: false
 print(rf)
 ```
+
+![](data/rf.JPG)
 
 ## Calibrating Geographical Random Forest Model
 
@@ -1603,14 +1609,14 @@ gwRF_adaptive <- grf(formula = resale_price ~ floor_area_sqm + storey_order + re
 
 ```{r}
 #| eval: false
-write_rds(gwRF_adaptive, "data/model/gwRF_adaptive.rds")
+write_rds(gwRF_adaptive, "data/aspatial/gwRF_adaptive.rds")
 ```
 
 ## retrieve for future use
 
 ```{r}
 #| eval: false
-gwRF_adaptive <- read_rds("data/model/gwRF_adaptive.rds")
+gwRF_adaptive <- read_rds("data/aspatial/gwRF_adaptive.rds")
 ```
 
 ## Predicting by using test data
@@ -1686,393 +1692,55 @@ ggplot(data = test_data_p,
   geom_point()
 ```
 
-# OLS
+# Ordinary Least Square method (OLS)
 
 ```{r}
-#| eval: false
-rs_mlr1 <- lm(formula = resale_price ~ floor_area_sqm + storey_order + remaining_lease_mths + PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER + PROX_MRT + PROX_PARK + PROX_MALL  + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + WITHIN_1KM_PRISCH, data=rs_req)
-
-
-ols_regress(rs_mlr1)
-```
-
-# Hedonic Pricing Modelling in R
-
-In this section, we will be performing regression analysis to see the relationship between a dependent variable (y) and one or more independent variables (x).
-
--   y variable - HDB resale price
--   x variables - the structural and locational factors
-
-The objective is to find out the amount change in price given a one unit change in the factors.
-
-We will also be performing both Simple and Multiple Linear Regression (MLR) Analysis to compare both results.
-
-## Simple Linear Regression (SLR) Model
-
-### Combine structural and locational factors list
-
-```{r}
-#| eval: false
-factors <- c(s_factor, l_factor)
-factors
-```
-
-### Build Simple Linear Regression model
-
-::: panel-tabset
-#### Code
-
-```{r}
-#| eval: false
-intercept_df <- data.frame()
-rsq_fstat_df <- data.frame()
-
-for (i in factors){
-  rs_slr <- lm(as.formula(paste("resale_price", "~", i)), data = rs_req)
-  intercept <- tidy(summary(rs_slr))
-  intercept$var_name <- i
-  rsq_fstat <- glance(rs_slr)[1:5]
-  rsq_fstat$var_name <- i
-  # Append
-  intercept_df <- bind_rows(intercept_df, intercept)
-  rsq_fstat_df <- bind_rows(rsq_fstat_df, rsq_fstat)
-}
-```
-
-#### Intercept
-
-```{r}
-#| eval: false
-intercept_df
-```
-
-#### r-sq
-
-```{r}
-#| eval: false
-rsq_fstat_df
-```
-:::
-
-From the result,...
-
-### Visualise best fit curve
-
-```{r}
-#| eval: false
-scatterplot_list <- vector(mode = "list", length = length(factors))
-
-for (i in factors){
-  scatterplot <- ggplot(data=rs_req,
-                        aes_string(x=i, y="resale_price")) + 
-    geom_point() + geom_smooth(method = lm)
-  scatterplot_list[[i]] <- scatterplot
-}
-```
-
-```{r}
-#| eval: false
-ggarrange(plotlist = scatterplot_list, ncol = 4, nrow = 4)
-```
-
-Overall...
-
-## Multiple Linear Regression Model
-
-### Visualise relationships of independent variables
-
-#### SET GEOMETRY AS NULL FIRST
-
-::: panel-tabset
-##### code
-
-```{r}
-#| eval: false
-rs_req_nogeom <- st_set_geometry(rs_req, NULL) 
-```
-
-##### Glimpse
-
-```{r}
-#| eval: false
-glimpse(rs_req_nogeom)
-```
-:::
-
-#### PLOT A SCATTERPLOT MATRIX
-
-```{r}
-#| eval: false
-corrplot(cor(rs_req_nogeom[, 2:17]), diag = FALSE, order = "AOE",
-          tl.pos = "td", tl.cex = 0.8, method = "number", type = "upper")
-```
-
-### Hedonic Pricing Model Using Multiple Linear Regression Method
-
-#### CALIBRATE THE MULTIPLE LINEAR REGRESSION MODEL
-
-To calibrate the multiple linear regression model. And PROX_GOOD_PRISCH is excluded in this model.
-
-```{r}
-#| eval: false
-rs_mlr1 <- lm(formula = resale_price ~ floor_area_sqm + storey_order + remaining_lease_mths + PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER + PROX_MRT + PROX_PARK + PROX_MALL + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + WITHIN_1KM_PRISCH, data=rs_req)
-
-summary(rs_mlr1)
-```
-
-Results shows that
-
-#### CALIBRATE THE REVISED MULTIPLE LINEAR REGRESSION MODEL
-
--   To calibrate the revised model
--   Using ols_regress() function to perform the Ordinary least squares regression (OLS)
-
-```{r}
-#| eval: false
 rs_mlr1 <- lm(formula = resale_price ~ floor_area_sqm + storey_order + remaining_lease_mths + PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER + PROX_MRT + PROX_PARK + PROX_MALL  + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + WITHIN_1KM_PRISCH, data=rs_req)
 
 ols_regress(rs_mlr1)
 ```
 
-SO...
+The adjusted r-square of the GWR is 0.715 which is worse than the GWR model of 0.7207. 
 
-### Check for multicolinearity
+Overall, we can see that the adaptive bandwidth GWR model has the best adjusted R-square value of 0.9627267 as compared to Multiple Linear Regression Model and Fixed Bandwidth GWR model. Hence, we will be using it to visualise GWR output in the next section.
 
--   ols_vif_tol() function is used to check if there are any strong signs of multicollinearity.
+### **Check for multicolinearity**
 
 ```{r}
-#| eval: false
 ols_vif_tol(rs_mlr1)
 ```
 
-It seems like...
+Since all the VIF values of the independent variables are less than 10, we can conclude that there is no signs of multicollinearity among the independent variables.
 
-### Test for Non-Linearity
+### **Test for Non-Linearity**
 
 ```{r}
-#| eval: false
 ols_plot_resid_fit(rs_mlr1)
 ```
+Most of the data points are scattered around the 0 line.
+Thus, we can conclude that the relationships between the dependent variable and independent variables are linear.
 
-From the graph, ...
-
-### Test for Normality Assumption
-
--   Since our sample size is more than 5000, we will not be using ols_test_normality() function for this analysis.
--   Instead, we will be using ols_plot_resid_hist() of olsrr package to perform normality assumption test.
+### **Test for Normality Assumption**
 
 ```{r}
-#| eval: false
 ols_plot_resid_hist(rs_mlr1)
 ```
 
-(must change accordingly) Results above reveals that the residual of the multiple linear regression model (i.e. rs_mlr1) resembles a normal distribution.
+Results above reveals that the residual of the multiple linear regression model seems like a normal distribution.
 
-### Test for Spatial Autocorrelation
+# Comparsion of OLS and GWR
 
--   It is important to visualise the residual of the hedonic pricing model since the model is using geographically referenced attributes.
+The performance of GWR seems to be better than OLS since it can analyse the spatially varying relationships and capture spatial patterns. 
 
--   
 
-    1.  Convert rs_req into a SpatialPointsDataFrame.
 
--   
 
-    2.  Export the residual of the hedonic pricing model and save it as a data frame.
-
--   
-
-    3.  Join the newly created data frame with rs_req object.
-
--   
-
-    4.  Convert rs.res.sf simple feature object into a SpatialPointsDataFrame because spdep package can only process sp conformed spatial data objects
-
-#### EXPORT RESIDUAL OF HEDONIC PRICING MODEL
-
-```{r}
-#| eval: false
-mlr.output <- as.data.frame(rs_mlr1$residuals)
-```
-
-#### JOIN WITH CONDO_RESALE.SF OBJECT
-
-::: panel-tabset
-##### code
-
-```{r}
-#| eval: false
-rs.res.sf <- cbind(rs_req,
-                   rs_mlr1$residuals) %>%
-rename(`MLR_RES` = `rs_mlr1.residuals`)
-```
-
-##### Glimpse
-
-```{r}
-#| eval: false
-glimpse(rs.res.sf)
-```
-:::
-
-#### CONVERT TO SPATIALPOINTSDATAFRAME
-
-```{r}
-#| eval: false
-rs.sp <- as_Spatial(rs.res.sf)
-rs.sp
-```
-
-#### DISPLAY INTERACTIVE POINT SYMBOL MAP
-
-To display the distribution of the residuals.
-
-```{r}
-#| eval: false
-tmap_mode("view")
-tm_basemap("OpenStreetMap")+
-tm_shape(mpsz_sf)+
-  tm_polygons(alpha = 0.4) +
-tm_shape(rs.res.sf) +  
-  tm_dots(col = "MLR_RES",
-          alpha = 0.6,
-          style="quantile") +
-  tm_view(set.zoom.limits = c(11,14))
-```
-
-(need to change accordingly) From the plot above, we can see that there is somewhat spatial autocorrelation where similar values tend to be in similar location. However, to confirm that there truly is spatial autocorrelation, we will perform Moran's I test to validate our claims.
-
-```{r}
-#| eval: false
-tmap_mode("plot")
-```
-
-## Moran's I test
-
-### Obtaining upper distance band
-
-```{r}
-#| eval: false
-coords <- coordinates(rs.sp)
-k <- knn2nb(knearneigh(coords))
-kdists <- unlist(nbdists(k, coords, longlat=FALSE))
-summary(kdists) 
-```
-
-### Compute the distance-based weight matrix
-
-```{r}
-#| eval: false
-nb <- dnearneigh(coordinates(rs.sp), 0, 1500, longlat = FALSE)
-summary(nb)
-```
-
-### Convert to a spatial weights
-
--   nb2listw() of spdep package will be used to convert the output neighbours lists (i.e. nb) into a spatial weights
-
-```{r}
-#| eval: false
-nb_lw <- nb2listw(nb, style = 'W')
-summary(nb_lw)
-```
-
-### Perform Moran's I test for residual spatial autocorrelation
-
--   Use lm.morantest() of spdep package will be used to perform Moran's I test for residual spatial autocorrelation
-
-```{r}
-#| eval: false
-lm.morantest(rs_mlr1, nb_lw)
-```
-
-(need to change) The Global Moran's I test for residual spatial autocorrelation shows that it's p-value is less than 0.00000000000000022 which is less than the alpha value of 0.05. Hence, we will reject the null hypothesis that the residuals are randomly distributed. Since the Observed Global Moran I = 0.4111541 which is greater than 0, we can infer than the residuals resemble cluster distribution.
-
-# Building Hedonic Pricing Models using GWmodel
-
-## Build Fixed Bandwidth GWR Model
-
-### Compute fixed bandwidth
-
--   bw.gwr() of GWModel package is used to determine the optimal fixed bandwidth to use in the model. Notice that the argument adaptive is set to FALSE indicates that we are interested to compute the fixed bandwidth.
-
-There are 2 possible approaches to determine the stopping rule, they are: - CV cross-validation approach and - AIC corrected (AICc) approach.
-
-We define the stopping rule using approach argument. For our analysis, since our sample size is quite huge, 15901 rows, we will not be using AIC as it works better for lower sample sizes.
-
-```{r}
-#| eval: false
-# bw.fixed <- bw.gwr(formula = resale_price ~ floor_area_sqm + storey_order + remaining_lease_mths + PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER + PROX_MRT + PROX_PARK + PROX_MALL  + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + WITHIN_1KM_PRISCH, data=rs.sp, approach="CV", kernel="gaussian", adaptive=FALSE, longlat=FALSE)
-```
-
-Due to the long run time, the output of the above computation will be shown in the following screenshot:
-
-(insert img of result)
-
-Results above show that:
-
-(need to change accordingly) The CV score is becoming smaller and smaller. The recommended bandwidth is 570.6638 metres as it converged and stabilised here with the CV score of 1.068985e+13.
-
-### GWModel method - fixed bandwidth
-
-```{r}
-#| eval: false
-# gwr.fixed <- gwr.basic(formula = resale_price ~ floor_area_sqm + storey_order + remaining_lease_mths + PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER + PROX_MRT + PROX_PARK + PROX_MALL  + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + WITHIN_1KM_PRISCH, data=rs.sp, bw=bw.fixed, kernel = 'gaussian', longlat = FALSE)
-# gwr.fixed
-```
-
-Due to the long run time, the output of the above computation will be shown in the following screenshot:
-
-(insert img of result)
-
-Results above show that:
-
-(need to change accordingly) The adjusted r-square of the GWR is 0.9572575 which is significantly better than the global multiple linear regression model of 0.7386.
-
-## Build Adaptive Bandwidth GWR Model
-
-In this section, we will calibrate the gwr-based hedonic pricing model by using adaptive bandwidth approach.
-
-10.2.1 Compute the adaptive bandwidth Similar to the earlier section, we will first use bw.ger() to determine the recommended data point to use. The code chunk used look very similar to the one used to compute the fixed bandwidth except the adaptive argument has changed to TRUE.
-
-```{r}
-#| eval: false
-# bw.adaptive <- bw.gwr(formula = resale_price ~ floor_area_sqm + storey_order + remaining_lease_mths + PROX_CBD + 
-#                         PROX_ELDERLYCARE + PROX_HAWKER + PROX_MRT + PROX_PARK + PROX_MALL  + PROX_SUPERMARKET  +
-#                         WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + WITHIN_1KM_PRISCH, 
-#                       data=rs.sp, approach="CV", kernel="gaussian", adaptive=TRUE, longlat=FALSE)
-```
-
-Due to the long run time, the output of the above computation will be shown in the following screenshot:
-
-(img)
-
-Results above show that:
-
-### Construct the adaptive bandwidth GWR model
-
-Calibrate the GWR-based hedonic pricing model by using adaptive bandwidth and gaussian kernel
-
-```{r}
-#| eval: false
-# gwr.adaptive <- gwr.basic(formula = resale_price ~ floor_area_sqm + storey_order + remaining_lease_mths + PROX_CBD +
-#                             PROX_ELDERLYCARE + PROX_HAWKER + PROX_MRT + PROX_PARK + PROX_MALL + PROX_SUPERMARKET + 
-#                             WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + WITHIN_1KM_PRISCH, 
-#                           data=rs.sp, bw=bw.adaptive, kernel = 'gaussian', adaptive=TRUE, longlat = FALSE)
-# gwr.adaptive
-```
-
-Due to the long run time, the output of the above computation will be shown in the following screenshot:
-
-(img of result)
-
-Results above show that:
-
-(need to change accordingly) The adjusted r-square of the GWR is 0.9627267 which is significantly better than the global multiple linear regression model of 0.7386 Overall, we can see that the adaptive bandwidth GWR model has the best adjusted R-square value of 0.9627267 as compared to Multiple Linear Regression Model and Fixed Bandwidth GWR model. Hence, we will be using it to visualise GWR output in the next section.
-
-# Visualising GWR Output
 
 # Acknoledgement
 
 -   Take-home Exercise 3 by NOR AISYAH BINTE AJIT.
 -   In-class Exercise 9 by Prof Kam \[https://is415-gaa-tskam.netlify.app/in-class_ex/in-class_ex09/in-class_ex09_gwml\]
+
+
+
+
