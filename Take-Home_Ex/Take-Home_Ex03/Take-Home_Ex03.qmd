@@ -20,7 +20,7 @@ Conventional, housing resale prices predictive models were built by using [**Ord
 ## Data Used
 
 | Type                      | Name                              | Format  | Source                                                                                   |
-|-----------------|-----------------|-----------------|-----------------------|
+|---------------------------|-----------------------------------|---------|------------------------------------------------------------------------------------------|
 | Aspatial                  | HDB Flat Resale Prices            | csv     | [data.gov](https://data.gov.sg/dataset/resale-flat-prices)                               |
 | Geospatial                | Master Plan 2014 Subzone Boundary | shp     | [data.gov](https://data.gov.sg/dataset/master-plan-2014-subzone-boundary-web)            |
 | Locational (w geo-coord)  | Eldercare services                | shp     | [data.gov](https://data.gov.sg/dataset/eldercare-services)                               |
